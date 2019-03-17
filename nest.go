@@ -4,31 +4,39 @@ import (
 	"github.com/mdlayher/netlink"
 )
 
-type RtNlOption struct {
-	Type uint16
-	Data interface{}
-}
+type ValueType int
 
-var optionEncoderType = map[uint16]uint8{
-	TCA_KIND: 5,
+const (
+	vtUint8 ValueType = iota
+	vtUint16
+	vtUint32
+	vtUint64
+	vtString
+	vtBytes
+)
+
+type RtNlOption struct {
+	Interpretation ValueType
+	Type           uint16
+	Data           interface{}
 }
 
 func nestAttributes(options []RtNlOption) ([]byte, error) {
 	ad := netlink.NewAttributeEncoder()
 
 	for _, option := range options {
-		switch optionEncoderType[option.Type] {
-		case 1:
+		switch option.Interpretation {
+		case vtUint8:
 			ad.Uint8(option.Type, (option.Data).(uint8))
-		case 2:
+		case vtUint16:
 			ad.Uint16(option.Type, (option.Data).(uint16))
-		case 3:
+		case vtUint32:
 			ad.Uint32(option.Type, (option.Data).(uint32))
-		case 4:
+		case vtUint64:
 			ad.Uint64(option.Type, (option.Data).(uint64))
-		case 5:
+		case vtString:
 			ad.String(option.Type, (option.Data).(string))
-		case 6:
+		case vtBytes:
 			ad.Bytes(option.Type, (option.Data).([]byte))
 		}
 	}
