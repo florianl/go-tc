@@ -3,6 +3,9 @@
 package rtnetlink
 
 import (
+	"encoding/binary"
+	"unsafe"
+
 	"github.com/mdlayher/netlink"
 	"golang.org/x/sys/unix"
 )
@@ -10,6 +13,23 @@ import (
 // RtNl represents a RTNETLINK handler
 type RtNl struct {
 	con *netlink.Conn
+}
+
+// for detailes see https://github.com/tensorflow/tensorflow/blob/master/tensorflow/go/tensor.go#L488-L505
+var nativeEndian binary.ByteOrder
+
+func init() {
+	buf := [2]byte{}
+	*(*uint16)(unsafe.Pointer(&buf[0])) = uint16(0xABCD)
+
+	switch buf {
+	case [2]byte{0xCD, 0xAB}:
+		nativeEndian = binary.LittleEndian
+	case [2]byte{0xAB, 0xCD}:
+		nativeEndian = binary.BigEndian
+	default:
+		panic("Could not determine native endianness.")
+	}
 }
 
 // Open establishes a socket RTNETLINK socket
