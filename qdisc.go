@@ -25,6 +25,48 @@ const (
 	rtm_getqdisc = 38
 )
 
+type Qdisc struct {
+	Tcmsg
+	QdiscInfo
+}
+
+type QdiscInfo struct {
+	Kind         string
+	EgressBlock  uint32
+	IngressBlock uint32
+	HwOffload    uint8
+	Chain        uint32
+	TcStats      *TcStats
+	TcXStats     *TcStats
+	TcStats2     *TcStats2
+	FqCodel      *QdiscFqCodel
+	BPF          *QdiscBPF
+}
+
+type QdiscFqCodel struct {
+	Target        uint32
+	Limit         uint32
+	Interval      uint32
+	ECN           uint32
+	Flows         uint32
+	Quantum       uint32
+	CEThreshold   uint32
+	DropBatchSize uint32
+	MemoryLimit   uint32
+}
+
+type QdiscBPF struct {
+	ClassID  uint32
+	OpsLen   uint16
+	Ops      []byte
+	FD       uint32
+	Name     string
+	Flags    uint32
+	FlagsGen uint32
+	Tag      string
+	ID       uint32
+}
+
 func (rtnl *RtNl) Qdisc() *RtNlQdisc {
 	return &RtNlQdisc{*rtnl}
 }
@@ -36,7 +78,7 @@ func (qd *RtNlQdisc) action(action int, dev string, handle QdiscHandle, parent u
 		return err
 	}
 
-	tcminfo, err := TcmsgEncode(Tcmsg{
+	tcminfo, err := tcmsgEncode(Tcmsg{
 		Family:  unix.AF_UNSPEC,
 		Ifindex: uint32(devID.Index),
 		Handle:  (uint32(handle.Major) << 16) | uint32(handle.Minor),
@@ -83,11 +125,12 @@ func (qd *RtNlQdisc) Del(dev string, handle QdiscHandle, parent uint32, qdiscNam
 	return qd.action(rtm_delqdisc, dev, handle, parent, qdiscName)
 }
 
-func (qd *RtNlQdisc) Get() error {
+func (qd *RtNlQdisc) Get() ([]Qdisc, error) {
+	var results []Qdisc
 
-	tcminfo, err := TcmsgEncode(Tcmsg{})
+	tcminfo, err := tcmsgEncode(Tcmsg{})
 	if err != nil {
-		return err
+		return results, err
 	}
 
 	var data []byte
@@ -103,13 +146,15 @@ func (qd *RtNlQdisc) Get() error {
 
 	msgs, err := qd.query(req)
 	if err != nil {
-		return err
+		return results, err
 	}
 
 	for _, msg := range msgs {
-		TcmsgDecode(msg.Data[:20])
-		extractTCMSGAttributes(msg.Data[20:])
+		result := Qdisc{}
+		tcmsgDecode(msg.Data[:20], &result.Tcmsg)
+		extractTCMSGAttributes(msg.Data[20:], &result.QdiscInfo)
+		results = append(results, result)
 	}
 
-	return nil
+	return results, nil
 }
