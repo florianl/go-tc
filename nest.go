@@ -4,10 +4,10 @@ import (
 	"github.com/mdlayher/netlink"
 )
 
-type ValueType int
+type valueType int
 
 const (
-	vtUint8 ValueType = iota
+	vtUint8 valueType = iota
 	vtUint16
 	vtUint32
 	vtUint64
@@ -15,13 +15,13 @@ const (
 	vtBytes
 )
 
-type RtNlOption struct {
-	Interpretation ValueType
+type rtNlOption struct {
+	Interpretation valueType
 	Type           uint16
 	Data           interface{}
 }
 
-func nestAttributes(options []RtNlOption) ([]byte, error) {
+func nestAttributes(options []rtNlOption) ([]byte, error) {
 	ad := netlink.NewAttributeEncoder()
 
 	for _, option := range options {
