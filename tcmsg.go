@@ -5,6 +5,7 @@ import (
 	"encoding/binary"
 )
 
+// Tcmsg contains basic traffic controll elements
 type Tcmsg struct {
 	Family  uint32
 	Ifindex uint32
@@ -13,9 +14,9 @@ type Tcmsg struct {
 	Info    uint32
 }
 
-func tcmsgEncode(i Tcmsg) ([]byte, error) {
+func tcmsgEncode(i *Tcmsg) ([]byte, error) {
 	var tcm bytes.Buffer
-	err := binary.Write(&tcm, nativeEndian, i)
+	err := binary.Write(&tcm, nativeEndian, *i)
 	return tcm.Bytes(), err
 }
 
