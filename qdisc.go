@@ -1,90 +1,29 @@
 //+build linux
 
-package rtnetlink
+package tc
 
 import (
-	"fmt"
-	"net"
-
 	"github.com/mdlayher/netlink"
-	"golang.org/x/sys/unix"
 )
 
-type RtNlQdisc struct {
-	RtNl
-}
-
-type QdiscHandle struct {
-	Major uint16
-	Minor uint16
+// Qdisc represents the queueing discipline part of traffic controll
+type Qdisc struct {
+	Tc
 }
 
 const (
-	rtm_newqdisc = 36
-	rtm_delqdisc = 37
-	rtm_getqdisc = 38
+	rtmNewQdisc = 36
+	rtmDelQdisc = 37
+	rtmGetQdisc = 38
 )
 
-type Qdisc struct {
-	Tcmsg
-	QdiscInfo
+// Qdisc allows to read and alter queueing disciplins from the rtnetlink socket
+func (tc *Tc) Qdisc() *Qdisc {
+	return &Qdisc{*tc}
 }
 
-type QdiscInfo struct {
-	Kind         string
-	EgressBlock  uint32
-	IngressBlock uint32
-	HwOffload    uint8
-	Chain        uint32
-	TcStats      *TcStats
-	TcXStats     *TcStats
-	TcStats2     *TcStats2
-	FqCodel      *QdiscFqCodel
-	BPF          *QdiscBPF
-}
-
-type QdiscFqCodel struct {
-	Target        uint32
-	Limit         uint32
-	Interval      uint32
-	ECN           uint32
-	Flows         uint32
-	Quantum       uint32
-	CEThreshold   uint32
-	DropBatchSize uint32
-	MemoryLimit   uint32
-}
-
-type QdiscBPF struct {
-	ClassID  uint32
-	OpsLen   uint16
-	Ops      []byte
-	FD       uint32
-	Name     string
-	Flags    uint32
-	FlagsGen uint32
-	Tag      string
-	ID       uint32
-}
-
-func (rtnl *RtNl) Qdisc() *RtNlQdisc {
-	return &RtNlQdisc{*rtnl}
-}
-
-func (qd *RtNlQdisc) action(action int, dev string, handle QdiscHandle, parent uint32, qdiscName string) error {
-	devID, err := net.InterfaceByName(dev)
-	if err != nil {
-		fmt.Println(err)
-		return err
-	}
-
-	tcminfo, err := tcmsgEncode(Tcmsg{
-		Family:  unix.AF_UNSPEC,
-		Ifindex: uint32(devID.Index),
-		Handle:  (uint32(handle.Major) << 16) | uint32(handle.Minor),
-		Parent:  0xFFFFFFF1,
-		Info:    0,
-	})
+func (qd *Qdisc) action(action int, info *TcObject) error {
+	tcminfo, err := tcmsgEncode(&info.Tcmsg)
 	if err != nil {
 		return err
 	}
@@ -92,14 +31,11 @@ func (qd *RtNlQdisc) action(action int, dev string, handle QdiscHandle, parent u
 	var data []byte
 	data = append(data, tcminfo...)
 
-	attrs, err := nestAttributes([]RtNlOption{
-		RtNlOption{Interpretation: vtString, Type: TCA_KIND, Data: qdiscName},
-	})
+	attrs, err := processAttributes(&info.TcInfo)
 	if err != nil {
 		return err
 	}
 	data = append(data, attrs...)
-
 	req := netlink.Message{
 		Header: netlink.Header{
 			Type:  netlink.HeaderType(action),
@@ -112,23 +48,29 @@ func (qd *RtNlQdisc) action(action int, dev string, handle QdiscHandle, parent u
 	if err != nil {
 		return err
 	}
-	fmt.Println(msgs)
 
-	return ErrNotImplemented
+	for _, msg := range msgs {
+		_ = msg
+	}
+
+	return nil
 }
 
-func (qd *RtNlQdisc) New(dev string, handle QdiscHandle, parent uint32, qdiscName string) error {
-	return qd.action(rtm_newqdisc, dev, handle, parent, qdiscName)
+// New adds a queueing discipline
+func (qd *Qdisc) New(info *TcObject) error {
+	return qd.action(rtmNewQdisc, info)
 }
 
-func (qd *RtNlQdisc) Del(dev string, handle QdiscHandle, parent uint32, qdiscName string) error {
-	return qd.action(rtm_delqdisc, dev, handle, parent, qdiscName)
+// Del removess a queueing discipline
+func (qd *Qdisc) Del(info *TcObject) error {
+	return qd.action(rtmDelQdisc, info)
 }
 
-func (qd *RtNlQdisc) Get() ([]Qdisc, error) {
-	var results []Qdisc
+// Get a queueing discipline
+func (qd *Qdisc) Get() ([]TcObject, error) {
+	var results []TcObject
 
-	tcminfo, err := tcmsgEncode(Tcmsg{})
+	tcminfo, err := tcmsgEncode(&Tcmsg{})
 	if err != nil {
 		return results, err
 	}
@@ -138,7 +80,7 @@ func (qd *RtNlQdisc) Get() ([]Qdisc, error) {
 
 	req := netlink.Message{
 		Header: netlink.Header{
-			Type:  netlink.HeaderType(rtm_getqdisc),
+			Type:  netlink.HeaderType(rtmGetQdisc),
 			Flags: netlink.Request | netlink.Dump,
 		},
 		Data: data,
@@ -150,11 +92,24 @@ func (qd *RtNlQdisc) Get() ([]Qdisc, error) {
 	}
 
 	for _, msg := range msgs {
-		result := Qdisc{}
-		tcmsgDecode(msg.Data[:20], &result.Tcmsg)
-		extractTCMSGAttributes(msg.Data[20:], &result.QdiscInfo)
+		result := TcObject{}
+		if err := tcmsgDecode(msg.Data[:20], &result.Tcmsg); err != nil {
+			return results, nil
+		}
+		if err := extractTCMSGAttributes(msg.Data[20:], &result.TcInfo); err != nil {
+			return results, nil
+		}
 		results = append(results, result)
 	}
 
 	return results, nil
+}
+
+func processAttributes(info *TcInfo) ([]byte, error) {
+
+	options := []rtNlOption{}
+
+	options = append(options, rtNlOption{Interpretation: vtString, Type: tcaKind, Data: info.Kind})
+
+	return nestAttributes(options)
 }
