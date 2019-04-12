@@ -5,8 +5,8 @@ import (
 	"encoding/binary"
 )
 
-// TcStats from include/uapi/linux/pkt_sched.h
-type TcStats struct {
+// Stats from include/uapi/linux/pkt_sched.h
+type Stats struct {
 	Bytes      uint64 /* Number of enqueued bytes */
 	Packets    uint32 /* Number of enqueued packets	*/
 	Drops      uint32 /* Packets dropped because of lack of resources */
@@ -18,13 +18,13 @@ type TcStats struct {
 	Backlog uint32
 }
 
-func extractTCStats(data []byte, info *TcStats) error {
+func extractTCStats(data []byte, info *Stats) error {
 	b := bytes.NewReader(data)
 	return binary.Read(b, nativeEndian, info)
 }
 
-// TcStats2 from include/uapi/linux/pkt_sched.h
-type TcStats2 struct {
+// Stats2 from include/uapi/linux/pkt_sched.h
+type Stats2 struct {
 	// gnet_stats_basic
 	Bytes   uint64
 	Packets uint32
@@ -36,7 +36,7 @@ type TcStats2 struct {
 	Overlimits uint32
 }
 
-func extractTCStats2(data []byte, info *TcStats2) error {
+func extractTCStats2(data []byte, info *Stats2) error {
 	b := bytes.NewReader(data)
 	return binary.Read(b, nativeEndian, info)
 }

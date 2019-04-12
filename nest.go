@@ -15,13 +15,13 @@ const (
 	vtBytes
 )
 
-type rtNlOption struct {
+type tcOption struct {
 	Interpretation valueType
 	Type           uint16
 	Data           interface{}
 }
 
-func nestAttributes(options []rtNlOption) ([]byte, error) {
+func marshalAttributes(options []tcOption) ([]byte, error) {
 	ad := netlink.NewAttributeEncoder()
 
 	for _, option := range options {

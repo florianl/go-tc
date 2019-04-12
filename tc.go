@@ -10,7 +10,7 @@ import (
 	"golang.org/x/sys/unix"
 )
 
-// Tc represents a RTNETLINK handler
+// Tc represents a RTNETLINK wrapper
 type Tc struct {
 	con *netlink.Conn
 }
@@ -32,7 +32,7 @@ func init() {
 	}
 }
 
-// Open establishes a socket RTNETLINK socket
+// Open establishes a RTNETLINK socket for traffic control
 func Open(config *Config) (*Tc, error) {
 	var tc Tc
 
@@ -45,7 +45,7 @@ func Open(config *Config) (*Tc, error) {
 	return &tc, nil
 }
 
-// Close the connection to the netfilter route subsystem
+// Close the connection
 func (tc *Tc) Close() error {
 	return tc.con.Close()
 }
@@ -63,28 +63,62 @@ func (tc *Tc) query(req netlink.Message) ([]netlink.Message, error) {
 	return tc.con.Receive()
 }
 
-// TcObject represents a generic traffic controll object
-type TcObject struct {
-	Tcmsg
-	TcInfo
+func (tc *Tc) action(action int, info *Object, opts []tcOption) error {
+	tcminfo, err := tcmsgEncode(&info.Msg)
+	if err != nil {
+		return err
+	}
+
+	var data []byte
+	data = append(data, tcminfo...)
+
+	attrs, err := marshalAttributes(opts)
+	if err != nil {
+		return err
+	}
+	data = append(data, attrs...)
+	req := netlink.Message{
+		Header: netlink.Header{
+			Type:  netlink.HeaderType(action),
+			Flags: netlink.Request | netlink.Acknowledge | netlink.Excl | netlink.Create,
+		},
+		Data: data,
+	}
+
+	msgs, err := tc.query(req)
+	if err != nil {
+		return err
+	}
+
+	for _, msg := range msgs {
+		_ = msg
+	}
+
+	return nil
 }
 
-// TcInfo contains attributes of a queueing discipline
-type TcInfo struct {
+// Object represents a generic traffic control object
+type Object struct {
+	Msg
+	Attribute
+}
+
+// Attribute contains various elements for traffic control
+type Attribute struct {
 	Kind         string
 	EgressBlock  uint32
 	IngressBlock uint32
 	HwOffload    uint8
 	Chain        uint32
-	TcStats      *TcStats
-	TcXStats     *TcStats
-	TcStats2     *TcStats2
-	FqCodel      *TcFqCodel
-	BPF          *TcBPF
+	Stats        *Stats
+	XStats       *Stats
+	Stats2       *Stats2
+	FqCodel      *FqCodel
+	BPF          *BPF
 }
 
-// TcFqCodel contains attributes of the fq_codel discipline
-type TcFqCodel struct {
+// FqCodel contains attributes of the fq_codel discipline
+type FqCodel struct {
 	Target        uint32
 	Limit         uint32
 	Interval      uint32
@@ -96,8 +130,8 @@ type TcFqCodel struct {
 	MemoryLimit   uint32
 }
 
-// TcBPF contains attributes of the bpf discipline
-type TcBPF struct {
+// BPF contains attributes of the bpf discipline
+type BPF struct {
 	ClassID  uint32
 	OpsLen   uint16
 	Ops      []byte
