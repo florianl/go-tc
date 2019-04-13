@@ -139,8 +139,22 @@ type BPF struct {
 	Name     string
 	Flags    uint32
 	FlagsGen uint32
-	Tag      string
+	Tag      []byte
 	ID       uint32
+}
+
+// ActionStats contains various statistics of a action
+type ActionStats struct {
+	Basic     *GenStatsBasic
+	RateEst   *GenStatsRateEst
+	Queue     *GenStatsQueue
+	RateEst64 *GenStatsRateEst64
+}
+
+// Action describes a Traffic Control action
+type Action struct {
+	Kind       string
+	Statistics *ActionStats
 }
 
 // BuildHandle is a simple helper function to construct the handle for the Tcmsg struct

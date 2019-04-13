@@ -54,13 +54,13 @@ func extractTcft(data []byte, info *Tcft) error {
 	return binary.Read(b, nativeEndian, info)
 }
 
-// GnetStatsBasic from include/uapi/linux/gen_stats.h
-type GnetStatsBasic struct {
+// GenStatsBasic from include/uapi/linux/gen_stats.h
+type GenStatsBasic struct {
 	Bytes   uint64
 	Packets uint32
 }
 
-func extractGnetStatsBasic(data []byte, info *GnetStatsBasic) error {
+func extractGnetStatsBasic(data []byte, info *GenStatsBasic) error {
 	b := bytes.NewReader(data)
 	return binary.Read(b, nativeEndian, info)
 }
@@ -87,8 +87,8 @@ func extractGenStatsRateEst64(data []byte, info *GenStatsRateEst64) error {
 	return binary.Read(b, nativeEndian, info)
 }
 
-// GnetStatsQueue from include/uapi/linux/gen_stats.h
-type GnetStatsQueue struct {
+// GenStatsQueue from include/uapi/linux/gen_stats.h
+type GenStatsQueue struct {
 	QueueLen   uint32
 	Backlog    uint32
 	Drops      uint32
@@ -96,7 +96,7 @@ type GnetStatsQueue struct {
 	Overlimits uint32
 }
 
-func extractGnetStatsQueue(data []byte, info *GnetStatsQueue) error {
+func extractGnetStatsQueue(data []byte, info *GenStatsQueue) error {
 	b := bytes.NewReader(data)
 	return binary.Read(b, nativeEndian, info)
 }
