@@ -141,6 +141,16 @@ type BPF struct {
 	FlagsGen uint32
 	Tag      []byte
 	ID       uint32
+	Action   *Action
+}
+
+// BPFActionOptions contains various action attributes
+type BPFActionOptions struct {
+	OpsLen uint16
+	Ops    []byte
+	Tcft   *Tcft
+	FD     uint32
+	Name   string
 }
 
 // ActionStats contains various statistics of a action
@@ -155,6 +165,7 @@ type ActionStats struct {
 type Action struct {
 	Kind       string
 	Statistics *ActionStats
+	BPFOptions *BPFActionOptions
 }
 
 // BuildHandle is a simple helper function to construct the handle for the Tcmsg struct
