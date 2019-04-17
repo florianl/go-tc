@@ -19,20 +19,28 @@ func extractTcmsgAttributes(data []byte, info *Attribute) error {
 			info.Kind = ad.String()
 			kind = ad.String()
 		case tcaOptions:
-			extractTCAOptions(ad.Bytes(), info, kind)
+			if err := extractTCAOptions(ad.Bytes(), info, kind); err != nil {
+				return err
+			}
 		case tcaChain:
 			info.Chain = ad.Uint32()
 		case tcaXstats:
 			tcstats := &Stats{}
-			extractTCStats(ad.Bytes(), tcstats)
+			if err := extractTCStats(ad.Bytes(), tcstats); err != nil {
+				return err
+			}
 			info.XStats = tcstats
 		case tcaStats:
 			tcstats := &Stats{}
-			extractTCStats(ad.Bytes(), tcstats)
+			if err := extractTCStats(ad.Bytes(), tcstats); err != nil {
+				return err
+			}
 			info.Stats = tcstats
 		case tcaStats2:
 			tcstats2 := &Stats2{}
-			extractTCStats2(ad.Bytes(), tcstats2)
+			if err := extractTCStats2(ad.Bytes(), tcstats2); err != nil {
+				return err
+			}
 			info.Stats2 = tcstats2
 		case tcaHwOffload:
 			info.HwOffload = ad.Uint8()
