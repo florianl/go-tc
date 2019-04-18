@@ -151,6 +151,7 @@ type BPFActionOptions struct {
 	Tcft   *Tcft
 	FD     uint32
 	Name   string
+	Act    *ActBpf
 }
 
 // ActionStats contains various statistics of a action
