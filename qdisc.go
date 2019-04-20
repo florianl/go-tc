@@ -1,6 +1,8 @@
 package tc
 
 import (
+	"fmt"
+
 	"github.com/mdlayher/netlink"
 )
 
@@ -22,19 +24,19 @@ func (tc *Tc) Qdisc() *Qdisc {
 
 // New adds a queueing discipline
 func (qd *Qdisc) New(info *Object) error {
-	options := []tcOption{}
-
-	options = append(options, tcOption{Interpretation: vtString, Type: tcaKind, Data: info.Kind})
-
+	options, err := validateQdiscObject(rtmNewQdisc, info)
+	if err != nil {
+		return err
+	}
 	return qd.action(rtmNewQdisc, info, options)
 }
 
 // Del removes a queueing discipline
 func (qd *Qdisc) Del(info *Object) error {
-	options := []tcOption{}
-
-	options = append(options, tcOption{Interpretation: vtString, Type: tcaKind, Data: info.Kind})
-
+	options, err := validateQdiscObject(rtmDelQdisc, info)
+	if err != nil {
+		return err
+	}
 	return qd.action(rtmDelQdisc, info, options)
 }
 
@@ -75,4 +77,34 @@ func (qd *Qdisc) Get() ([]Object, error) {
 	}
 
 	return results, nil
+}
+
+func validateQdiscObject(action int, info *Object) ([]tcOption, error) {
+	options := []tcOption{}
+	if info.Ifindex == 0 {
+		return options, fmt.Errorf("Could not set device ID 0")
+	}
+
+	if info.Kind != "clsact" {
+		return options, ErrNotImplemented
+	}
+	options = append(options, tcOption{Interpretation: vtString, Type: tcaKind, Data: info.Kind})
+
+	if info.Stats != nil || info.XStats != nil || info.Stats2 != nil || info.FqCodel != nil || info.BPF != nil {
+		return options, ErrNotImplemented
+	}
+
+	if info.EgressBlock != 0 {
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaEgressBlock, Data: info.EgressBlock})
+	}
+	if info.IngressBlock != 0 {
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaIngressBlock, Data: info.IngressBlock})
+	}
+	if info.HwOffload != 0 {
+		options = append(options, tcOption{Interpretation: vtUint8, Type: tcaHwOffload, Data: info.HwOffload})
+	}
+	if info.Chain != 0 {
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaChain, Data: info.Chain})
+	}
+	return options, nil
 }
