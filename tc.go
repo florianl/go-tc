@@ -63,7 +63,7 @@ func (tc *Tc) query(req netlink.Message) ([]netlink.Message, error) {
 	return tc.con.Receive()
 }
 
-func (tc *Tc) action(action int, info *Object, opts []tcOption) error {
+func (tc *Tc) action(action int, flags netlink.HeaderFlags, info *Object, opts []tcOption) error {
 	tcminfo, err := tcmsgEncode(&info.Msg)
 	if err != nil {
 		return err
@@ -80,7 +80,7 @@ func (tc *Tc) action(action int, info *Object, opts []tcOption) error {
 	req := netlink.Message{
 		Header: netlink.Header{
 			Type:  netlink.HeaderType(action),
-			Flags: netlink.Request | netlink.Acknowledge | netlink.Excl | netlink.Create,
+			Flags: netlink.Request | netlink.Acknowledge | flags,
 		},
 		Data: data,
 	}
@@ -95,6 +95,44 @@ func (tc *Tc) action(action int, info *Object, opts []tcOption) error {
 	}
 
 	return nil
+}
+
+func (tc *Tc) get(action int, i *Msg) ([]Object, error) {
+	var results []Object
+
+	tcminfo, err := tcmsgEncode(i)
+	if err != nil {
+		return results, err
+	}
+
+	var data []byte
+	data = append(data, tcminfo...)
+
+	req := netlink.Message{
+		Header: netlink.Header{
+			Type:  netlink.HeaderType(action),
+			Flags: netlink.Request | netlink.Dump,
+		},
+		Data: data,
+	}
+
+	msgs, err := tc.query(req)
+	if err != nil {
+		return results, err
+	}
+
+	for _, msg := range msgs {
+		var result Object
+		if err := tcmsgDecode(msg.Data[:20], &result.Msg); err != nil {
+			return results, nil
+		}
+		if err := extractTcmsgAttributes(msg.Data[20:], &result.Attribute); err != nil {
+			return results, nil
+		}
+		results = append(results, result)
+	}
+
+	return results, nil
 }
 
 // Object represents a generic traffic control object
