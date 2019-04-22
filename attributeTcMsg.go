@@ -215,7 +215,11 @@ func extractActBpfOptions(data []byte, attr *BPFActionOptions) error {
 			}
 			attr.Tcft = info
 		case tcaActBpfParms:
-			/* struct tc_act_bpf */
+			info := &ActBpf{}
+			if err := extractTcActBpf(ad.Bytes(), info); err != nil {
+				return err
+			}
+			attr.Act = info
 		case tcaActBpfOpsLen:
 			attr.OpsLen = ad.Uint16()
 		case tcaActBpfOps:
