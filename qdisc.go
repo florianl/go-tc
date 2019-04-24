@@ -49,8 +49,8 @@ func (qd *Qdisc) Link(info *Object) error {
 	return qd.action(rtmNewQdisc, netlink.Replace, info, options)
 }
 
-// Delte removes a queueing discipline
-func (qd *Qdisc) Delte(info *Object) error {
+// Delete removes a queueing discipline
+func (qd *Qdisc) Delete(info *Object) error {
 	options, err := validateQdiscObject(rtmDelQdisc, info)
 	if err != nil {
 		return err
