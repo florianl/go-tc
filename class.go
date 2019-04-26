@@ -27,6 +27,6 @@ func (c *Class) Del() error {
 }
 
 // Get fetches all classes
-func (c *Class) Get() error {
-	return ErrNotImplemented
+func (c *Class) Get() ([]Object, error) {
+	return c.get(rtmGetClass, &Msg{})
 }
