@@ -16,17 +16,17 @@ func (tc *Tc) Class() *Class {
 	return &Class{*tc}
 }
 
-// New adds a class
-func (c *Class) New() error {
+// Add creats a new class
+func (c *Class) Add() error {
 	return ErrNotImplemented
 }
 
-// Del removes a class
-func (c *Class) Del() error {
+// Replace add/remove a class. If the node does not exist yet it is created
+func (c *Class) Replace() error {
 	return ErrNotImplemented
 }
 
-// Get fetches all classes
-func (c *Class) Get() ([]Object, error) {
-	return c.get(rtmGetClass, &Msg{})
+// Delete removes a class
+func (c *Class) Delete() error {
+	return ErrNotImplemented
 }
