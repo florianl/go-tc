@@ -1,6 +1,8 @@
 package tc
 
 import (
+	"fmt"
+
 	"github.com/mdlayher/netlink"
 )
 
@@ -20,51 +22,64 @@ func (f *Tc) Filter() *Filter {
 	return &Filter{*f}
 }
 
-// New adds a filter
-func (f *Filter) New() error {
+// Add create a new filter
+func (f *Filter) Add(info *Object) error {
+	options, err := validateFilterObject(rtmNewFilter, info)
+	if err != nil {
+		return err
+	}
+	return f.action(rtmNewFilter, netlink.Create|netlink.Excl, info, options)
+}
+
+// Replace add/remove a filter. If the node does not exist yet it is created
+func (f *Filter) Replace(info *Object) error {
 	return ErrNotImplemented
 }
 
-// Del removes a filter
-func (f *Filter) Del() error {
+// Delete removes a filter
+func (f *Filter) Delete() error {
 	return ErrNotImplemented
 }
 
 // Get fetches all filters
 func (f *Filter) Get(i *Msg) ([]Object, error) {
-	var results []Object
+	return f.get(rtmGetFilter, i)
+}
 
-	tcminfo, err := tcmsgEncode(i)
-	if err != nil {
-		return results, err
+func validateFilterObject(action int, info *Object) ([]tcOption, error) {
+	options := []tcOption{}
+	if info.Ifindex == 0 {
+		return options, fmt.Errorf("Could not set device ID 0")
 	}
 
-	var data []byte
-	data = append(data, tcminfo...)
-
-	req := netlink.Message{
-		Header: netlink.Header{
-			Type:  netlink.HeaderType(rtmGetFilter),
-			Flags: netlink.Request | netlink.Dump,
-		},
-		Data: data,
-	}
-
-	msgs, err := f.query(req)
-	if err != nil {
-		return results, err
-	}
-
-	for _, msg := range msgs {
-		var result Object
-		if err := tcmsgDecode(msg.Data[:20], &result.Msg); err != nil {
-			return results, nil
+	switch info.Kind {
+	case "bpf":
+		data, err := validateBPFOptions(info.BPF)
+		if err != nil {
+			return options, err
 		}
-		if err := extractTcmsgAttributes(msg.Data[20:], &result.Attribute); err != nil {
-			return results, nil
-		}
-		results = append(results, result)
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaOptions, Data: data})
+	default:
+		return options, ErrNotImplemented
+	}
+	options = append(options, tcOption{Interpretation: vtString, Type: tcaKind, Data: info.Kind})
+
+	if info.Stats != nil || info.XStats != nil || info.Stats2 != nil || info.FqCodel != nil {
+		return options, ErrNotImplemented
 	}
 
-	return results, nil
+	if info.EgressBlock != 0 {
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaEgressBlock, Data: info.EgressBlock})
+	}
+	if info.IngressBlock != 0 {
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaIngressBlock, Data: info.IngressBlock})
+	}
+	if info.HwOffload != 0 {
+		options = append(options, tcOption{Interpretation: vtUint8, Type: tcaHwOffload, Data: info.HwOffload})
+	}
+	if info.Chain != 0 {
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaChain, Data: info.Chain})
+	}
+
+	return options, nil
 }

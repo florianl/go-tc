@@ -152,59 +152,8 @@ type Attribute struct {
 	XStats       *Stats
 	Stats2       *Stats2
 	FqCodel      *FqCodel
+	Qfq          *Qfq
 	BPF          *BPF
-}
-
-// FqCodel contains attributes of the fq_codel discipline
-type FqCodel struct {
-	Target        uint32
-	Limit         uint32
-	Interval      uint32
-	ECN           uint32
-	Flows         uint32
-	Quantum       uint32
-	CEThreshold   uint32
-	DropBatchSize uint32
-	MemoryLimit   uint32
-}
-
-// BPF contains attributes of the bpf discipline
-type BPF struct {
-	ClassID  uint32
-	OpsLen   uint16
-	Ops      []byte
-	FD       uint32
-	Name     string
-	Flags    uint32
-	FlagsGen uint32
-	Tag      []byte
-	ID       uint32
-	Action   *Action
-}
-
-// BPFActionOptions contains various action attributes
-type BPFActionOptions struct {
-	OpsLen uint16
-	Ops    []byte
-	Tcft   *Tcft
-	FD     uint32
-	Name   string
-	Act    *ActBpf
-}
-
-// ActionStats contains various statistics of a action
-type ActionStats struct {
-	Basic     *GenStatsBasic
-	RateEst   *GenStatsRateEst
-	Queue     *GenStatsQueue
-	RateEst64 *GenStatsRateEst64
-}
-
-// Action describes a Traffic Control action
-type Action struct {
-	Kind       string
-	Statistics *ActionStats
-	BPFOptions *BPFActionOptions
 }
 
 // BuildHandle is a simple helper function to construct the handle for the Tcmsg struct

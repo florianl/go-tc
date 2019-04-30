@@ -66,6 +66,12 @@ func extractTCAOptions(data []byte, tc *Attribute, kind string) error {
 		tc.FqCodel = info
 	case "clsact":
 		return extractClsact(data)
+	case "qfq":
+		info := &Qfq{}
+		if err := extractQfqOptions(data, info); err != nil {
+			return err
+		}
+		tc.Qfq = info
 	case "bpf":
 		info := &BPF{}
 		if err := extractBpfOptions(data, info); err != nil {
@@ -77,56 +83,6 @@ func extractTCAOptions(data []byte, tc *Attribute, kind string) error {
 	}
 
 	return nil
-}
-
-func extractBpfOptions(data []byte, info *BPF) error {
-	ad, err := netlink.NewAttributeDecoder(data)
-	if err != nil {
-		return err
-	}
-	ad.ByteOrder = nativeEndian
-	for ad.Next() {
-		switch ad.Type() {
-		case tcaBpfAct:
-			action := &Action{}
-			if err := extractBPFAction(ad.Bytes(), action); err != nil {
-				return err
-			}
-			info.Action = action
-		case tcaBpfClassid:
-			info.ClassID = ad.Uint32()
-		case tcaBpfOpsLen:
-			info.OpsLen = ad.Uint16()
-		case tcaBpfOps:
-			info.Ops = ad.Bytes()
-		case tcaBpfFd:
-			info.FD = ad.Uint32()
-		case tcaBpfName:
-			info.Name = ad.String()
-		case tcaBpfFlags:
-			info.Flags = ad.Uint32()
-		case tcaBpfFlagsGen:
-			info.FlagsGen = ad.Uint32()
-		case tcaBpfTag:
-			info.Tag = ad.Bytes()
-		case tcaBpfID:
-			info.ID = ad.Uint32()
-		default:
-			return fmt.Errorf("extractBpfOptions()\t%d\n\t%v", ad.Type(), ad.Bytes())
-		}
-	}
-	return nil
-}
-
-// Actual attributes are nested inside and the nested bit is not set :-/
-func extractBPFAction(data []byte, action *Action) error {
-	ad, err := netlink.NewAttributeDecoder(data)
-	if err != nil {
-		return err
-	}
-	ad.ByteOrder = nativeEndian
-	ad.Next()
-	return extractTcAction(ad.Bytes(), action)
 }
 
 func extractTcAction(data []byte, act *Action) error {
@@ -200,76 +156,8 @@ func extractActStats(data []byte, stats *ActionStats) error {
 	return nil
 }
 
-func extractActBpfOptions(data []byte, attr *BPFActionOptions) error {
-	ad, err := netlink.NewAttributeDecoder(data)
-	if err != nil {
-		return err
-	}
-	ad.ByteOrder = nativeEndian
-	for ad.Next() {
-		switch ad.Type() {
-		case tcaActBpfTm:
-			info := &Tcft{}
-			if err := extractTcft(ad.Bytes(), info); err != nil {
-				return err
-			}
-			attr.Tcft = info
-		case tcaActBpfParms:
-			info := &ActBpf{}
-			if err := extractTcActBpf(ad.Bytes(), info); err != nil {
-				return err
-			}
-			attr.Act = info
-		case tcaActBpfOpsLen:
-			attr.OpsLen = ad.Uint16()
-		case tcaActBpfOps:
-			attr.Ops = ad.Bytes()
-		case tcaActBpfFD:
-			attr.FD = ad.Uint32()
-		case tcaActBpfName:
-			attr.Name = ad.String()
-		default:
-			return fmt.Errorf("extractActBpfOptions()\t%d\n\t%v", ad.Type(), ad.Bytes())
-		}
-	}
-	return nil
-}
-
 func extractClsact(data []byte) error {
 	return fmt.Errorf("extractClsact()\t%v", data)
-}
-
-func extractFqCodelOptions(data []byte, info *FqCodel) error {
-	ad, err := netlink.NewAttributeDecoder(data)
-	if err != nil {
-		return err
-	}
-	ad.ByteOrder = nativeEndian
-	for ad.Next() {
-		switch ad.Type() {
-		case tcaFqCodelTarget:
-			info.Target = ad.Uint32()
-		case tcaFqCodelLimit:
-			info.Limit = ad.Uint32()
-		case tcaFqCodelInterval:
-			info.Interval = ad.Uint32()
-		case tcaFqCodelEcn:
-			info.ECN = ad.Uint32()
-		case tcaFqCodelFlows:
-			info.Flows = ad.Uint32()
-		case tcaFqCodelQuantum:
-			info.Quantum = ad.Uint32()
-		case tcaFqCodelCeThreshold:
-			info.CEThreshold = ad.Uint32()
-		case tcaFqCodelDropBatchSize:
-			info.DropBatchSize = ad.Uint32()
-		case tcaFqCodelMemoryLimit:
-			info.MemoryLimit = ad.Uint32()
-		default:
-			return fmt.Errorf("extractFqCodelOptions()\t%d\n\t%v", ad.Type(), ad.Bytes())
-		}
-	}
-	return nil
 }
 
 const (
@@ -291,34 +179,6 @@ const (
 )
 
 const (
-	tcaFqCodelUnspec = iota
-	tcaFqCodelTarget
-	tcaFqCodelLimit
-	tcaFqCodelInterval
-	tcaFqCodelEcn
-	tcaFqCodelFlows
-	tcaFqCodelQuantum
-	tcaFqCodelCeThreshold
-	tcaFqCodelDropBatchSize
-	tcaFqCodelMemoryLimit
-)
-
-const (
-	tcaBpfUnspec = iota
-	tcaBpfAct
-	tcaBpfPolice
-	tcaBpfClassid
-	tcaBpfOpsLen
-	tcaBpfOps
-	tcaBpfFd
-	tcaBpfName
-	tcaBpfFlags
-	tcaBpfFlagsGen
-	tcaBpfTag
-	tcaBpfID
-)
-
-const (
 	tcaActUnspec = iota
 	tcaActKind
 	tcaActOptions
@@ -337,17 +197,4 @@ const (
 	tcaStatsRateEst64
 	tcaStatsPAD
 	tcaStatsBasicHw
-)
-
-const (
-	tcaActBpfUnspec = iota
-	tcaActBpfTm
-	tcaActBpfParms
-	tcaActBpfOpsLen
-	tcaActBpfOps
-	tcaActBpfFD
-	tcaActBpfName
-	tcaActBpfPad
-	tcaActBpfTag
-	tcaActBpfID
 )

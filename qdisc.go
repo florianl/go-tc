@@ -82,10 +82,17 @@ func validateQdiscObject(action int, info *Object) ([]tcOption, error) {
 
 	switch info.Kind {
 	case "clsact":
-		options = append(options, tcOption{Interpretation: vtString, Type: tcaKind, Data: info.Kind})
+		// clsact is parameterless
+	case "fq_codel":
+		data, err := validateFqCodelOptions(info.FqCodel)
+		if err != nil {
+			return options, err
+		}
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaOptions, Data: data})
 	default:
 		return options, ErrNotImplemented
 	}
+	options = append(options, tcOption{Interpretation: vtString, Type: tcaKind, Data: info.Kind})
 
 	if info.Stats != nil || info.XStats != nil || info.Stats2 != nil || info.FqCodel != nil || info.BPF != nil {
 		return options, ErrNotImplemented
