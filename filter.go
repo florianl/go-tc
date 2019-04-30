@@ -18,8 +18,8 @@ const (
 )
 
 // Filter allows to read and alter filters
-func (f *Tc) Filter() *Filter {
-	return &Filter{*f}
+func (tc *Tc) Filter() *Filter {
+	return &Filter{*tc}
 }
 
 // Add create a new filter
