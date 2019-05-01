@@ -24,6 +24,9 @@ func (tc *Tc) Filter() *Filter {
 
 // Add create a new filter
 func (f *Filter) Add(info *Object) error {
+	if info == nil {
+		return ErrNoArg
+	}
 	options, err := validateFilterObject(rtmNewFilter, info)
 	if err != nil {
 		return err
@@ -43,6 +46,9 @@ func (f *Filter) Delete() error {
 
 // Get fetches all filters
 func (f *Filter) Get(i *Msg) ([]Object, error) {
+	if i == nil {
+		return []Object{}, ErrNoArg
+	}
 	return f.get(rtmGetFilter, i)
 }
 

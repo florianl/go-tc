@@ -36,6 +36,10 @@ func init() {
 func Open(config *Config) (*Tc, error) {
 	var tc Tc
 
+	if config == nil {
+		config = &Config{}
+	}
+
 	con, err := netlink.Dial(unix.NETLINK_ROUTE, &netlink.Config{NetNS: config.NetNS})
 	if err != nil {
 		return nil, err

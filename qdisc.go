@@ -24,6 +24,9 @@ func (tc *Tc) Qdisc() *Qdisc {
 
 // Add creates a new queueing discipline
 func (qd *Qdisc) Add(info *Object) error {
+	if info == nil {
+		return ErrNoArg
+	}
 	options, err := validateQdiscObject(rtmNewQdisc, info)
 	if err != nil {
 		return err
@@ -33,6 +36,9 @@ func (qd *Qdisc) Add(info *Object) error {
 
 // Replace add/remove a queueing discipline. If the node does not exist yet it is created
 func (qd *Qdisc) Replace(info *Object) error {
+	if info == nil {
+		return ErrNoArg
+	}
 	options, err := validateQdiscObject(rtmNewQdisc, info)
 	if err != nil {
 		return err
@@ -42,6 +48,9 @@ func (qd *Qdisc) Replace(info *Object) error {
 
 // Link performs a replace on an existing queueing discipline
 func (qd *Qdisc) Link(info *Object) error {
+	if info == nil {
+		return ErrNoArg
+	}
 	options, err := validateQdiscObject(rtmNewQdisc, info)
 	if err != nil {
 		return err
@@ -51,6 +60,9 @@ func (qd *Qdisc) Link(info *Object) error {
 
 // Delete removes a queueing discipline
 func (qd *Qdisc) Delete(info *Object) error {
+	if info == nil {
+		return ErrNoArg
+	}
 	options, err := validateQdiscObject(rtmDelQdisc, info)
 	if err != nil {
 		return err
@@ -60,6 +72,9 @@ func (qd *Qdisc) Delete(info *Object) error {
 
 // Change modifies a queueing discipline 'in place'
 func (qd *Qdisc) Change(info *Object) error {
+	if info == nil {
+		return ErrNoArg
+	}
 	options, err := validateQdiscObject(rtmNewQdisc, info)
 	if err != nil {
 		return err
