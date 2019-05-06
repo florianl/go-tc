@@ -114,3 +114,13 @@ func extractTcActBpf(data []byte, info *ActBpf) error {
 	b := bytes.NewReader(data)
 	return binary.Read(b, nativeEndian, info)
 }
+
+// RateSpec from from include/uapi/linux/pkt_sched.h
+type RateSpec struct {
+	CellLog   uint8
+	Linklayer uint8
+	Overhead  uint16
+	CellAlign uint16
+	Mpu       uint16
+	Rate      uint32
+}
