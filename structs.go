@@ -124,3 +124,18 @@ type RateSpec struct {
 	Mpu       uint16
 	Rate      uint32
 }
+
+func extractRateSpec(data []byte, info *RateSpec) error {
+	b := bytes.NewReader(data)
+	return binary.Read(b, nativeEndian, info)
+}
+
+// FifoOpt from from include/uapi/linux/pkt_sched.h
+type FifoOpt struct {
+	Limit uint32
+}
+
+func extractFifoOpt(data []byte, info *FifoOpt) error {
+	b := bytes.NewReader(data)
+	return binary.Read(b, nativeEndian, info)
+}
