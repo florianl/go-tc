@@ -1,10 +1,12 @@
+//+build linux
+
 package tc
 
 import "errors"
 
 // Various errors
 var (
-	ErrNotImplemented = errors.New("Functionallity not yet implemented")
+	ErrNotImplemented = errors.New("Functionality not yet implemented")
 	ErrNoArg          = errors.New("Missing argument")
 )
 
