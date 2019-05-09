@@ -1,3 +1,5 @@
+//+build linux
+
 package tc
 
 import (
@@ -22,8 +24,5 @@ func tcmsgEncode(i *Msg) ([]byte, error) {
 
 func tcmsgDecode(data []byte, tc *Msg) error {
 	b := bytes.NewReader(data)
-	if err := binary.Read(b, nativeEndian, tc); err != nil {
-		return err
-	}
-	return nil
+	return binary.Read(b, nativeEndian, tc)
 }
