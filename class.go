@@ -1,3 +1,5 @@
+//+build linux
+
 package tc
 
 // Class represents the class part of rtnetlink
@@ -29,4 +31,12 @@ func (c *Class) Replace() error {
 // Delete removes a class
 func (c *Class) Delete() error {
 	return ErrNotImplemented
+}
+
+// Get fetches all classes
+func (c *Class) Get(i *Msg) ([]Object, error) {
+	if i == nil {
+		return []Object{}, ErrNoArg
+	}
+	return c.get(rtmGetClass, i)
 }
