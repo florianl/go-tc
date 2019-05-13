@@ -1,3 +1,5 @@
+//+build linux
+
 package tc
 
 import (
@@ -98,6 +100,8 @@ func validateQdiscObject(action int, info *Object) ([]tcOption, error) {
 	switch info.Kind {
 	case "clsact":
 		// clsact is parameterless
+	case "ingress":
+		// ingress is parameterless
 	case "fq_codel":
 		data, err := validateFqCodelOptions(info.FqCodel)
 		if err != nil {
