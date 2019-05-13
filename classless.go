@@ -1,3 +1,5 @@
+//+build linux
+
 package tc
 
 import (
@@ -481,6 +483,57 @@ func extractPieOptions(data []byte, info *Pie) error {
 			info.Bytemode = ad.Uint32()
 		default:
 			return fmt.Errorf("extractPieOptions()\t%d\n\t%v", ad.Type(), ad.Bytes())
+		}
+	}
+	return nil
+}
+
+const (
+	tcaHhfUnspec = iota
+	tcaHhfBacklogLimit
+	tcaHhfQuantum
+	tcaHhfHHFlowsLimit
+	tcaHhfResetTimeout
+	tcaHhfAdmitBytes
+	tcaHhfEVICTTimeout
+	tcaHhfNonHHWeight
+)
+
+// Hhf contains attributes of the hhf discipline
+type Hhf struct {
+	BacklogLimit uint32
+	Quantum      uint32
+	HHFlowsLimit uint32
+	ResetTimeout uint32
+	AdmitBytes   uint32
+	EVICTTimeout uint32
+	NonHHWeight  uint32
+}
+
+func extractHhfOptions(data []byte, info *Hhf) error {
+	ad, err := netlink.NewAttributeDecoder(data)
+	if err != nil {
+		return err
+	}
+	ad.ByteOrder = nativeEndian
+	for ad.Next() {
+		switch ad.Type() {
+		case tcaHhfBacklogLimit:
+			info.BacklogLimit = ad.Uint32()
+		case tcaHhfQuantum:
+			info.Quantum = ad.Uint32()
+		case tcaHhfHHFlowsLimit:
+			info.HHFlowsLimit = ad.Uint32()
+		case tcaHhfResetTimeout:
+			info.ResetTimeout = ad.Uint32()
+		case tcaHhfAdmitBytes:
+			info.AdmitBytes = ad.Uint32()
+		case tcaHhfEVICTTimeout:
+			info.EVICTTimeout = ad.Uint32()
+		case tcaHhfNonHHWeight:
+			info.NonHHWeight = ad.Uint32()
+		default:
+			return fmt.Errorf("extractHhfOptions()\t%d\n\t%v", ad.Type(), ad.Bytes())
 		}
 	}
 	return nil
