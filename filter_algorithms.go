@@ -1,6 +1,10 @@
+//+build linux
+
 package tc
 
 import (
+	"bytes"
+	"encoding/binary"
 	"fmt"
 
 	"github.com/mdlayher/netlink"
@@ -195,4 +199,324 @@ type Action struct {
 	Kind       string
 	Statistics *ActionStats
 	BPFOptions *BPFActionOptions
+}
+
+const (
+	tcaU32Unspec = iota
+	tcaU32ClassID
+	tcaU32Hash
+	tcaU32Link
+	tcaU32Divisor
+	tcaU32Sel
+	tcaU32Police
+	tcaU32Act
+	tcaU32InDev
+	tcaU32Pcnt
+	tcaU32Mark
+	tcaU32Flags
+	tcaU32Pad
+)
+
+// U32 contains attributes of the u32 discipline
+type U32 struct {
+	ClassID uint32
+	Hash    uint32
+	Link    uint32
+	Divisor uint32
+	Sel     *U32Sel
+	InDev   string
+	Pcnt    uint64
+	Mark    *U32Mark
+	Flags   uint32
+}
+
+func extractU32Options(data []byte, info *U32) error {
+	ad, err := netlink.NewAttributeDecoder(data)
+	if err != nil {
+		return err
+	}
+	ad.ByteOrder = nativeEndian
+	for ad.Next() {
+		switch ad.Type() {
+		case tcaU32ClassID:
+			info.ClassID = ad.Uint32()
+		case tcaU32Hash:
+			info.Hash = ad.Uint32()
+		case tcaU32Link:
+			info.Link = ad.Uint32()
+		case tcaU32Divisor:
+			info.Divisor = ad.Uint32()
+		case tcaU32Sel:
+			arg := &U32Sel{}
+			if err := extractU32Sel(ad.Bytes(), arg); err != nil {
+				return err
+			}
+			info.Sel = arg
+		case tcaU32InDev:
+			info.InDev = ad.String()
+		case tcaU32Pcnt:
+			info.Pcnt = ad.Uint64()
+		case tcaU32Mark:
+			arg := &U32Mark{}
+			if err := extractU32Mark(ad.Bytes(), arg); err != nil {
+				return err
+			}
+			info.Mark = arg
+		case tcaU32Flags:
+			info.Flags = ad.Uint32()
+		case tcaU32Pad:
+			// padding does not contail data, we just skip it
+		default:
+			return fmt.Errorf("extractU32Options()\t%d\n\t%v", ad.Type(), ad.Bytes())
+		}
+	}
+	return nil
+
+}
+
+// U32Sel from include/uapi/linux/pkt_sched.h
+type U32Sel struct {
+	Flags    byte
+	Offshift byte
+	NKeys    byte
+	OffMask  uint16
+	Off      uint16
+	Offoff   uint16
+	Hoff     uint16
+	Hmask    uint32
+	U32Key
+}
+
+func extractU32Sel(data []byte, info *U32Sel) error {
+	b := bytes.NewReader(data)
+	return binary.Read(b, nativeEndian, info)
+}
+
+//U32Mark from include/uapi/linux/pkt_sched.h
+type U32Mark struct {
+	Val     uint32
+	Mask    uint32
+	Success uint32
+}
+
+func extractU32Mark(data []byte, info *U32Mark) error {
+	b := bytes.NewReader(data)
+	return binary.Read(b, nativeEndian, info)
+}
+
+// U32Key from include/uapi/linux/pkt_sched.h
+type U32Key struct {
+	Mask    uint32
+	Val     uint32
+	Off     uint32
+	OffMask uint32
+}
+
+const (
+	tcaRsvpUnspec = iota
+	tcaRsvpClassID
+	tcaRsvpDst
+	tcaRsvpSrc
+	tcaRsvpPInfo
+	tcaRsvpPolice
+	tcaRsvpAct
+)
+
+// Rsvp contains attributes of the rsvp discipline
+type Rsvp struct {
+	ClassID uint32
+	Dst     []byte
+	Src     []byte
+	PInfo   *RsvpPInfo
+}
+
+func extractRsvpOptions(data []byte, info *Rsvp) error {
+	ad, err := netlink.NewAttributeDecoder(data)
+	if err != nil {
+		return err
+	}
+	ad.ByteOrder = nativeEndian
+	for ad.Next() {
+		switch ad.Type() {
+		case tcaRsvpClassID:
+			info.ClassID = ad.Uint32()
+		case tcaRsvpDst:
+			info.Dst = ad.Bytes()
+		case tcaRsvpSrc:
+			info.Src = ad.Bytes()
+		case tcaRsvpPInfo:
+			arg := &RsvpPInfo{}
+			if err := extractRsvpPInfo(ad.Bytes(), arg); err != nil {
+				return err
+			}
+			info.PInfo = arg
+		default:
+			return fmt.Errorf("extractRsvpOptions()\t%d\n\t%v", ad.Type(), ad.Bytes())
+		}
+	}
+	return nil
+
+}
+
+// RsvpPInfo from include/uapi/linux/pkt_sched.h
+type RsvpPInfo struct {
+	Dpi       *RsvpGpi
+	Spi       *RsvpGpi
+	Protocol  uint8
+	TunnelID  uint8
+	TunnelHdr uint8
+	Pad       uint8
+}
+
+func extractRsvpPInfo(data []byte, info *RsvpPInfo) error {
+	b := bytes.NewReader(data)
+	return binary.Read(b, nativeEndian, info)
+}
+
+// RsvpGpi from include/uapi/linux/pkt_sched.h
+type RsvpGpi struct {
+	Key    uint32
+	Mask   uint32
+	Offset uint32
+}
+
+const (
+	tcaRoute4Unspec = iota
+	tcaRoute4ClassID
+	tcaRoute4To
+	tcaRoute4From
+	tcaRoute4IIf
+	tcaRoute4Police
+	tcaRoute4Act
+)
+
+// Route4 contains attributes of the route discipline
+type Route4 struct {
+	ClassID uint32
+	To      uint32
+	From    uint32
+	IIf     uint32
+}
+
+func extractRoute4Options(data []byte, info *Route4) error {
+	ad, err := netlink.NewAttributeDecoder(data)
+	if err != nil {
+		return err
+	}
+	ad.ByteOrder = nativeEndian
+	for ad.Next() {
+		switch ad.Type() {
+		case tcaRoute4ClassID:
+			info.ClassID = ad.Uint32()
+		case tcaRoute4To:
+			info.To = ad.Uint32()
+		case tcaRoute4From:
+			info.From = ad.Uint32()
+		case tcaRoute4IIf:
+			info.IIf = ad.Uint32()
+		default:
+			return fmt.Errorf("extractRoute4Options()\t%d\n\t%v", ad.Type(), ad.Bytes())
+		}
+	}
+	return nil
+
+}
+
+const (
+	tcaFwUnspec = iota
+	tcaFwClassID
+	tcaFwPolice
+	tcaFwInDev
+	tcaFwAct
+	tcaFwMask
+)
+
+// Fw contains attributes of the fw discipline
+type Fw struct {
+	ClassID uint32
+	InDev   string
+	Mask    uint32
+}
+
+func extractFwOptions(data []byte, info *Fw) error {
+	ad, err := netlink.NewAttributeDecoder(data)
+	if err != nil {
+		return err
+	}
+	ad.ByteOrder = nativeEndian
+	for ad.Next() {
+		switch ad.Type() {
+		case tcaFwClassID:
+			info.ClassID = ad.Uint32()
+		case tcaFwInDev:
+			info.InDev = ad.String()
+		case tcaFwMask:
+			info.Mask = ad.Uint32()
+		default:
+			return fmt.Errorf("extractFwOptions()\t%d\n\t%v", ad.Type(), ad.Bytes())
+		}
+	}
+	return nil
+}
+
+const (
+	tcaFlowUnspec = iota
+	tcaFlowKeys
+	tcaFlowMode
+	tcaFlowBaseClass
+	tcaFlowRShift
+	tcaFlowAddend
+	tcaFlowMask
+	tcaFlowXOR
+	tcaFlowDivisor
+	tcaFlowAct
+	tcaFlowPolice
+	tcaFlowEMatches
+	tcaFlowPerTurb
+)
+
+// Flow contains attributes of the flow discipline
+type Flow struct {
+	Keys      uint32
+	Mode      uint32
+	BaseClass uint32
+	RShift    uint32
+	Addend    uint32
+	Mask      uint32
+	XOR       uint32
+	Divisor   uint32
+	PerTurb   uint32
+}
+
+func extractFlowOptions(data []byte, info *Flow) error {
+	ad, err := netlink.NewAttributeDecoder(data)
+	if err != nil {
+		return err
+	}
+	ad.ByteOrder = nativeEndian
+	for ad.Next() {
+		switch ad.Type() {
+		case tcaFlowKeys:
+			info.Keys = ad.Uint32()
+		case tcaFlowMode:
+			info.Mode = ad.Uint32()
+		case tcaFlowBaseClass:
+			info.BaseClass = ad.Uint32()
+		case tcaFlowRShift:
+			info.RShift = ad.Uint32()
+		case tcaFlowAddend:
+			info.Addend = ad.Uint32()
+		case tcaFlowMask:
+			info.Mask = ad.Uint32()
+		case tcaFlowXOR:
+			info.XOR = ad.Uint32()
+		case tcaFlowDivisor:
+			info.Divisor = ad.Uint32()
+		case tcaFlowPerTurb:
+			info.PerTurb = ad.Uint32()
+		default:
+			return fmt.Errorf("extractFlowOptions()\t%d\n\t%v", ad.Type(), ad.Bytes())
+		}
+	}
+	return nil
 }
