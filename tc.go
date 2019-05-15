@@ -156,8 +156,29 @@ type Attribute struct {
 	XStats       *Stats
 	Stats2       *Stats2
 	FqCodel      *FqCodel
+	Codel        *Codel
+	Fq           *Fq
+	Pie          *Pie
+	Hhf          *Hhf
+	Htb          *Htb
+	Hfsc         *Hfsc
+	Dsmark       *Dsmark
+	Drr          *Drr
+	Cbq          *Cbq
+	Atm          *Atm
+	Tbf          *Tbf
+	Sfb          *Sfb
+	Red          *Red
+	MqPrio       *MqPrio
+	Pfifo        *FifoOpt
+	Bfifo        *FifoOpt
 	Qfq          *Qfq
 	BPF          *BPF
+	U32          *U32
+	Rsvp         *Rsvp
+	Route4       *Route4
+	Fw           *Fw
+	Flow         *Flow
 }
 
 // BuildHandle is a simple helper function to construct the handle for the Tcmsg struct
