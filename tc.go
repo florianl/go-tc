@@ -128,10 +128,10 @@ func (tc *Tc) get(action int, i *Msg) ([]Object, error) {
 	for _, msg := range msgs {
 		var result Object
 		if err := tcmsgDecode(msg.Data[:20], &result.Msg); err != nil {
-			return results, nil
+			return results, err
 		}
 		if err := extractTcmsgAttributes(msg.Data[20:], &result.Attribute); err != nil {
-			return results, nil
+			return results, err
 		}
 		results = append(results, result)
 	}
