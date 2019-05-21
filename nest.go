@@ -3,6 +3,8 @@
 package tc
 
 import (
+	"fmt"
+
 	"github.com/mdlayher/netlink"
 )
 
@@ -40,6 +42,8 @@ func marshalAttributes(options []tcOption) ([]byte, error) {
 			ad.String(option.Type, (option.Data).(string))
 		case vtBytes:
 			ad.Bytes(option.Type, (option.Data).([]byte))
+		default:
+			return []byte{}, fmt.Errorf("Unknown interpretation: %d", option.Interpretation)
 		}
 	}
 
