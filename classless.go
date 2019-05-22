@@ -23,6 +23,11 @@ const (
 	tcaFqCodelMemoryLimit
 )
 
+const (
+	tcaFqCodelXStatsQdisc = iota
+	tcaFqCodelXStatsClass
+)
+
 // FqCodel contains attributes of the fq_codel discipline
 type FqCodel struct {
 	Target        uint32

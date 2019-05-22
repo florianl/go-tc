@@ -27,11 +27,11 @@ func extractTcmsgAttributes(data []byte, info *Attribute) error {
 		case tcaChain:
 			info.Chain = ad.Uint32()
 		case tcaXstats:
-			tcstats := &Stats{}
-			if err := extractTCStats(ad.Bytes(), tcstats); err != nil {
+			tcxstats := &XStats{}
+			if err := extractXStats(ad.Bytes(), tcxstats, kind); err != nil {
 				return err
 			}
-			info.XStats = tcstats
+			info.XStats = tcxstats
 		case tcaStats:
 			tcstats := &Stats{}
 			if err := extractTCStats(ad.Bytes(), tcstats); err != nil {
@@ -212,6 +212,74 @@ func extractTCAOptions(data []byte, tc *Attribute, kind string) error {
 		return fmt.Errorf("extractTCAOptions(): unsupported kind: %s", kind)
 	}
 
+	return nil
+}
+
+func extractXStats(data []byte, tc *XStats, kind string) error {
+	switch kind {
+	case "sfq":
+		info := &SfqXStats{}
+		if err := extractSfqXStats(data, info); err != nil {
+			return err
+		}
+		tc.Sfq = info
+	case "sfb":
+		info := &SfbXStats{}
+		if err := extractSfbXStats(data, info); err != nil {
+			return err
+		}
+		tc.Sfb = info
+	case "red":
+		info := &RedXStats{}
+		if err := extractRedXStats(data, info); err != nil {
+			return err
+		}
+		tc.Red = info
+	case "choke":
+		info := &ChokeXStats{}
+		if err := extractChokeXStats(data, info); err != nil {
+			return err
+		}
+		tc.Choke = info
+	case "htb":
+		info := &HtbXStats{}
+		if err := extractHtbXStats(data, info); err != nil {
+			return err
+		}
+		tc.Htb = info
+	case "cbq":
+		info := &CbqXStats{}
+		if err := extractCbqXStats(data, info); err != nil {
+			return err
+		}
+		tc.Cbq = info
+	case "codel":
+		info := &CodelXStats{}
+		if err := extractCodelXStats(data, info); err != nil {
+			return err
+		}
+		tc.Codel = info
+	case "hhf":
+		info := &HhfXStats{}
+		if err := extractHhfXStats(data, info); err != nil {
+			return err
+		}
+		tc.Hhf = info
+	case "pie":
+		info := &PieXStats{}
+		if err := extractPieXStats(data, info); err != nil {
+			return err
+		}
+		tc.Pie = info
+	case "fq_codel":
+		info := &FqCodelXStats{}
+		if err := extractFqCodelXStats(data, info); err != nil {
+			return err
+		}
+		tc.FqCodel = info
+	default:
+		return fmt.Errorf("extractXStats(): unsupported kind: %s", kind)
+	}
 	return nil
 }
 

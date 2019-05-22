@@ -153,7 +153,7 @@ type Attribute struct {
 	HwOffload    uint8
 	Chain        uint32
 	Stats        *Stats
-	XStats       *Stats
+	XStats       *XStats
 	Stats2       *Stats2
 	FqCodel      *FqCodel
 	Codel        *Codel
@@ -184,4 +184,18 @@ type Attribute struct {
 // BuildHandle is a simple helper function to construct the handle for the Tcmsg struct
 func BuildHandle(major, minor uint16) uint32 {
 	return uint32(major)<<16 | uint32(minor)
+}
+
+// XStats contains further statistics to the TCA_KIND
+type XStats struct {
+	Sfb     *SfbXStats
+	Sfq     *SfqXStats
+	Red     *RedXStats
+	Choke   *ChokeXStats
+	Htb     *HtbXStats
+	Cbq     *CbqXStats
+	Codel   *CodelXStats
+	Hhf     *HhfXStats
+	Pie     *PieXStats
+	FqCodel *FqCodelXStats
 }
