@@ -4,6 +4,7 @@ package tc
 
 import (
 	"encoding/binary"
+	"fmt"
 	"unsafe"
 
 	"github.com/mdlayher/netlink"
@@ -95,7 +96,9 @@ func (tc *Tc) action(action int, flags netlink.HeaderFlags, info *Object, opts [
 	}
 
 	for _, msg := range msgs {
-		_ = msg
+		if msg.Header.Type == netlink.Error {
+			return fmt.Errorf("could not process query: %v", err)
+		}
 	}
 
 	return nil

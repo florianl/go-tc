@@ -355,11 +355,19 @@ func extractActStats(data []byte, stats *ActionStats) error {
 }
 
 func extractClsact(data []byte) error {
-	return fmt.Errorf("extractClsact()\t%v", data)
+	// Clsact is parameterless - so we expect to options
+	if len(data) != 0 {
+		return fmt.Errorf("extractClsact()\t%v", data)
+	}
+	return nil
 }
 
 func extractIngress(data []byte) error {
-	return fmt.Errorf("extractIngress()\t%v", data)
+	// Ingress is parameterless - so we expect to options
+	if len(data) != 0 {
+		return fmt.Errorf("extractIngress()\t%v", data)
+	}
+	return nil
 }
 
 const (
