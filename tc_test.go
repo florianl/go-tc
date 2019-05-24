@@ -8,10 +8,13 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/mdlayher/netlink"
 	"github.com/mdlayher/netlink/nltest"
+	"golang.org/x/sys/unix"
 )
 
 func testConn(t *testing.T) (*Tc, func()) {
 	t.Helper()
+
+	var reqCache []netlink.Message
 
 	c := &Tc{
 		con: nltest.Dial(func(req []netlink.Message) ([]netlink.Message, error) {
@@ -23,35 +26,40 @@ func testConn(t *testing.T) (*Tc, func()) {
 				t.Fatalf("unexpected number of request messages (-want +got):\n%s", diff)
 			}
 
-			var responses []response
+			var altered []byte
 			switch req[0].Header.Type {
+			case rtmNewQdisc:
+				reqCache = req
 			case rtmGetQdisc:
-				responses = qdiscGetResponses(t)
+				altered = qdiscAlterResponses(t, &reqCache)
+			case rtmDelQdisc:
+				reqCache = []netlink.Message{}
 			default:
 			}
-			// Return many messages in response to the single request.
-			h := netlink.Header{
-				Sequence: req[0].Header.Sequence,
-				PID:      req[0].Header.PID,
+			emptyMsg := make([]netlink.Message, 0, 1)
+			var data []byte
+			tcmsg, err := tcmsgEncode(&Msg{
+				Family:  unix.AF_UNSPEC,
+				Ifindex: 0,
+				Handle:  0xC001,
+				Parent:  0xCAFE,
+				Info:    0,
+			})
+			if err != nil {
+				t.Fatalf("could not encode dummy Msg{}: %v", err)
 			}
-			msgs := make([]netlink.Message, 0, len(responses))
-			for _, r := range responses {
-				_ = r
-				var data []byte
-				tcmsg, err := tcmsgEncode(&r.Msg)
-				if err != nil {
-					t.Fatalf("could not encode %v: %v", r.Msg, err)
-				}
-				data = append(data, tcmsg...)
-				data = append(data, r.data...)
+			data = append(data, tcmsg...)
+			data = append(data, altered...)
 
-				msgs = append(msgs, netlink.Message{
-					Header: h,
-					Data:   data,
-				})
-			}
+			emptyMsg = append(emptyMsg, netlink.Message{
+				Header: netlink.Header{
+					Sequence: req[0].Header.Sequence,
+					PID:      req[0].Header.PID,
+				},
+				Data: data,
+			})
 
-			return msgs, nil
+			return emptyMsg, nil
 		}),
 	}
 
@@ -60,9 +68,4 @@ func testConn(t *testing.T) (*Tc, func()) {
 			t.Fatalf("failed to close: %v", err)
 		}
 	}
-}
-
-type response struct {
-	Msg
-	data []byte
 }

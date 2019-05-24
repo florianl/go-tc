@@ -7,6 +7,7 @@ import (
 	"encoding/binary"
 	"testing"
 
+	"github.com/mdlayher/netlink"
 	"golang.org/x/sys/unix"
 )
 
@@ -50,8 +51,20 @@ func TestQdisc(t *testing.T) {
 	}
 }
 
-func qdiscGetResponses(t *testing.T) []response {
+func qdiscAlterResponses(t *testing.T, cache *[]netlink.Message) []byte {
 	t.Helper()
+	var tmp []Object
+	var dataStream []byte
+
+	// Decode data from cache
+	for _, msg := range *cache {
+		var result Object
+		if err := extractTcmsgAttributes(msg.Data[20:], &result.Attribute); err != nil {
+			t.Fatalf("could not decode attributes: %v", err)
+		}
+		tmp = append(tmp, result)
+	}
+
 	var stats2 bytes.Buffer
 	if err := binary.Write(&stats2, nativeEndian, &Stats2{
 		Bytes:      42,
@@ -64,45 +77,28 @@ func qdiscGetResponses(t *testing.T) []response {
 	}); err != nil {
 		t.Fatalf("could not encode stats2: %v", err)
 	}
-	noqueue, err := marshalAttributes([]tcOption{
-		tcOption{Interpretation: vtString, Type: tcaKind, Data: "noqueue"},
-		tcOption{Interpretation: vtUint8, Type: tcaHwOffload, Data: uint8(0)},
-		tcOption{Interpretation: vtBytes, Type: tcaStats2, Data: stats2.Bytes()},
-	})
-	if err != nil {
-		t.Fatalf("could not marshal attributes: %v", err)
-	}
 
-	fqcodel, err := marshalAttributes([]tcOption{
-		tcOption{Interpretation: vtString, Type: tcaKind, Data: "fq_codel"},
-		tcOption{Interpretation: vtBytes, Type: tcaOptions, Data: []byte{0x08, 0x00, 0x01, 0x00, 0x87, 0x13, 0x00, 0x00, 0x08, 0x00, 0x02, 0x00, 0x00, 0x28, 0x00, 0x00, 0x08, 0x00, 0x03, 0x00, 0x9f, 0x86, 0x01, 0x00, 0x08, 0x00, 0x04, 0x00, 0x01, 0x00, 0x00, 0x00, 0x08, 0x00, 0x06, 0x00, 0xea, 0x05, 0x00, 0x00, 0x08, 0x00, 0x08, 0x00, 0x40, 0x00, 0x00, 0x00, 0x08, 0x00, 0x09, 0x00, 0x00, 0x00, 0x00, 0x02, 0x08, 0x00, 0x05, 0x00, 0x00, 0x04, 0x00, 0x00}},
-	})
-	if err != nil {
-		t.Fatalf("could not marshal attributes: %v", err)
-	}
+	// Alter and marshal data
+	for _, obj := range tmp {
+		var data []byte
+		var attrs []tcOption
 
-	responses := []response{
-		response{
-			Msg: Msg{
-				Family:  unix.AF_UNSPEC,
-				Ifindex: 1,
-				Handle:  321,
-				Parent:  456,
-				Info:    0,
-			},
-			data: noqueue,
-		},
-		response{
-			Msg: Msg{
-				Family:  unix.AF_UNSPEC,
-				Ifindex: 2,
-				Handle:  789,
-				Parent:  987,
-				Info:    2,
-			},
-			data: fqcodel,
-		},
-	}
+		attrs = append(attrs, tcOption{Interpretation: vtString, Type: tcaKind, Data: obj.Kind})
+		attrs = append(attrs, tcOption{Interpretation: vtBytes, Type: tcaStats2, Data: stats2.Bytes()})
 
-	return responses
+		switch obj.Kind {
+		case "fq_codel":
+			attrs = append(attrs, tcOption{Interpretation: vtBytes, Type: tcaOptions, Data: []byte{0x08, 0x00, 0x01, 0x00, 0x87, 0x13, 0x00, 0x00, 0x08, 0x00, 0x02, 0x00, 0x00, 0x28, 0x00, 0x00, 0x08, 0x00, 0x03, 0x00, 0x9f, 0x86, 0x01, 0x00, 0x08, 0x00, 0x04, 0x00, 0x01, 0x00, 0x00, 0x00, 0x08, 0x00, 0x06, 0x00, 0xea, 0x05, 0x00, 0x00, 0x08, 0x00, 0x08, 0x00, 0x40, 0x00, 0x00, 0x00, 0x08, 0x00, 0x09, 0x00, 0x00, 0x00, 0x00, 0x02, 0x08, 0x00, 0x05, 0x00, 0x00, 0x04, 0x00, 0x00}})
+		}
+
+		marshaled, err := marshalAttributes(attrs)
+		if err != nil {
+			t.Fatalf("could not marshal attributes: %v", err)
+		}
+		data = append(data, marshaled...)
+
+		dataStream = append(dataStream, data...)
+
+	}
+	return dataStream
 }
