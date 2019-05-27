@@ -113,7 +113,7 @@ func validateQdiscObject(action int, info *Object) ([]tcOption, error) {
 	}
 	options = append(options, tcOption{Interpretation: vtString, Type: tcaKind, Data: info.Kind})
 
-	if info.Stats != nil || info.XStats != nil || info.Stats2 != nil || info.FqCodel != nil || info.BPF != nil {
+	if info.Stats != nil || info.XStats != nil || info.Stats2 != nil || info.BPF != nil {
 		return options, ErrNotImplemented
 	}
 
