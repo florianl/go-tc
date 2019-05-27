@@ -20,35 +20,57 @@ func TestQdisc(t *testing.T) {
 		t.Fatalf("expected ErrNoArg, received: %v", err)
 	}
 
-	testQdisc := Object{
-		Msg{
-			Family:  unix.AF_UNSPEC,
-			Ifindex: 123,
-			Handle:  BuildHandle(0xFFFF, 0x0000),
-			Parent:  0xFFFFFFF1,
-			Info:    0,
-		},
-		Attribute{
-			Kind: "clsact",
-		},
+	fqCodelOptions := &FqCodel{
+		Target: 42,
+		Limit:  0xCAFE,
 	}
 
-	if err := tcSocket.Qdisc().Add(&testQdisc); err != nil {
-		t.Fatalf("could not add new qdisc: %v", err)
+	tests := map[string]struct {
+		kind    string
+		fqCodel *FqCodel
+	}{
+		"clsact":   {kind: "clsact"},
+		"fq_codel": {kind: "fq_codel", fqCodel: fqCodelOptions},
 	}
 
-	qdiscs, err := tcSocket.Qdisc().Get()
-	if err != nil {
-		t.Fatalf("could not get qdiscs: %v\n", err)
-		return
+	tcMsg := Msg{
+		Family:  unix.AF_UNSPEC,
+		Ifindex: 123,
+		Handle:  BuildHandle(0xFFFF, 0x0000),
+		Parent:  0xFFFFFFF1,
+		Info:    0,
 	}
-	for _, qdisc := range qdiscs {
-		t.Logf("%#v\n", qdisc)
+	for name, testcase := range tests {
+		t.Run(name, func(t *testing.T) {
+
+			testQdisc := Object{
+				tcMsg,
+				Attribute{
+					Kind:    testcase.kind,
+					FqCodel: testcase.fqCodel,
+				},
+			}
+
+			if err := tcSocket.Qdisc().Add(&testQdisc); err != nil {
+				t.Fatalf("could not add new qdisc: %v", err)
+			}
+
+			qdiscs, err := tcSocket.Qdisc().Get()
+			if err != nil {
+				t.Fatalf("could not get qdiscs: %v\n", err)
+				return
+			}
+			for _, qdisc := range qdiscs {
+				t.Logf("%#v\n", qdisc)
+			}
+
+			if err := tcSocket.Qdisc().Delete(&testQdisc); err != nil {
+				t.Fatalf("could not delete qdisc: %v", err)
+			}
+
+		})
 	}
 
-	if err := tcSocket.Qdisc().Delete(&testQdisc); err != nil {
-		t.Fatalf("could not delete qdisc: %v", err)
-	}
 }
 
 func qdiscAlterResponses(t *testing.T, cache *[]netlink.Message) []byte {
@@ -85,11 +107,6 @@ func qdiscAlterResponses(t *testing.T, cache *[]netlink.Message) []byte {
 
 		attrs = append(attrs, tcOption{Interpretation: vtString, Type: tcaKind, Data: obj.Kind})
 		attrs = append(attrs, tcOption{Interpretation: vtBytes, Type: tcaStats2, Data: stats2.Bytes()})
-
-		switch obj.Kind {
-		case "fq_codel":
-			attrs = append(attrs, tcOption{Interpretation: vtBytes, Type: tcaOptions, Data: []byte{0x08, 0x00, 0x01, 0x00, 0x87, 0x13, 0x00, 0x00, 0x08, 0x00, 0x02, 0x00, 0x00, 0x28, 0x00, 0x00, 0x08, 0x00, 0x03, 0x00, 0x9f, 0x86, 0x01, 0x00, 0x08, 0x00, 0x04, 0x00, 0x01, 0x00, 0x00, 0x00, 0x08, 0x00, 0x06, 0x00, 0xea, 0x05, 0x00, 0x00, 0x08, 0x00, 0x08, 0x00, 0x40, 0x00, 0x00, 0x00, 0x08, 0x00, 0x09, 0x00, 0x00, 0x00, 0x00, 0x02, 0x08, 0x00, 0x05, 0x00, 0x00, 0x04, 0x00, 0x00}})
-		}
 
 		marshaled, err := marshalAttributes(attrs)
 		if err != nil {
