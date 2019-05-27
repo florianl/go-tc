@@ -13,25 +13,25 @@ func extractTcmsgAttributes(data []byte, info *Attribute) error {
 	if err != nil {
 		return err
 	}
-	var kind string
+	var options []byte
+	var xStats []byte
 	ad.ByteOrder = nativeEndian
 	for ad.Next() {
 		switch ad.Type() {
 		case tcaKind:
 			info.Kind = ad.String()
-			kind = ad.String()
 		case tcaOptions:
-			if err := extractTCAOptions(ad.Bytes(), info, kind); err != nil {
-				return err
-			}
+			// the evaluation of this field depends on tcaKind.
+			// there is no guarantee, that kind is know at this moment,
+			// so we save it for later
+			options = ad.Bytes()
 		case tcaChain:
 			info.Chain = ad.Uint32()
 		case tcaXstats:
-			tcxstats := &XStats{}
-			if err := extractXStats(ad.Bytes(), tcxstats, kind); err != nil {
-				return err
-			}
-			info.XStats = tcxstats
+			// the evaluation of this field depends on tcaKind.
+			// there is no guarantee, that kind is know at this moment,
+			// so we save it for later
+			xStats = ad.Bytes()
 		case tcaStats:
 			tcstats := &Stats{}
 			if err := extractTCStats(ad.Bytes(), tcstats); err != nil {
@@ -54,6 +54,18 @@ func extractTcmsgAttributes(data []byte, info *Attribute) error {
 			return fmt.Errorf("extractTcmsgAttributes()\t%d\n\t%v", ad.Type(), ad.Bytes())
 
 		}
+	}
+	if len(options) > 0 {
+		if err := extractTCAOptions(options, info, info.Kind); err != nil {
+			return err
+		}
+	}
+	if len(xStats) > 0 {
+		tcxstats := &XStats{}
+		if err := extractXStats(ad.Bytes(), tcxstats, info.Kind); err != nil {
+			return err
+		}
+		info.XStats = tcxstats
 	}
 	return nil
 }
