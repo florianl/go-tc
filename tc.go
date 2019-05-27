@@ -4,7 +4,6 @@ package tc
 
 import (
 	"encoding/binary"
-	"fmt"
 	"unsafe"
 
 	"github.com/mdlayher/netlink"
@@ -97,7 +96,7 @@ func (tc *Tc) action(action int, flags netlink.HeaderFlags, info *Object, opts [
 
 	for _, msg := range msgs {
 		if msg.Header.Type == netlink.Error {
-			return fmt.Errorf("could not process query: %v", err)
+			// TODO: validate NLMSG_ERROR - see https://www.infradead.org/~tgr/libnl/doc/core.html#core_errmsg
 		}
 	}
 
