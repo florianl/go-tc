@@ -265,7 +265,7 @@ func extractU32Options(data []byte, info *U32) error {
 		case tcaU32Flags:
 			info.Flags = ad.Uint32()
 		case tcaU32Pad:
-			// padding does not contail data, we just skip it
+			// padding does not contain data, we just skip it
 		default:
 			return fmt.Errorf("extractU32Options()\t%d\n\t%v", ad.Type(), ad.Bytes())
 		}

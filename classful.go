@@ -154,7 +154,7 @@ func extractHtbOptions(data []byte, info *Htb) error {
 		case tcaHtbCeil64:
 			info.Ceil64 = ad.Uint64()
 		case tcaHtbPad:
-			// padding does not contail data, we just skip it
+			// padding does not contain data, we just skip it
 		default:
 			return fmt.Errorf("extractHtbOptions()\t%d\n\t%v", ad.Type(), ad.Bytes())
 		}

@@ -170,7 +170,7 @@ func extractTbfOptions(data []byte, info *Tbf) error {
 		case tcaTbfPburst:
 			info.Pburst = ad.Uint32()
 		case tcaTbfPad:
-			// padding does not contail data, we just skip it
+			// padding does not contain data, we just skip it
 		default:
 			return fmt.Errorf("extractTbfOptions()\t%d\n\t%v", ad.Type(), ad.Bytes())
 		}
