@@ -28,10 +28,16 @@ func testConn(t *testing.T) (*Tc, func()) {
 
 			var altered []byte
 			switch req[0].Header.Type {
+			case rtmNewFilter:
+				fallthrough
 			case rtmNewQdisc:
 				reqCache = req
+			case rtmGetFilter:
+				fallthrough
 			case rtmGetQdisc:
 				altered = qdiscAlterResponses(t, &reqCache)
+			case rtmDelFilter:
+				fallthrough
 			case rtmDelQdisc:
 				reqCache = []netlink.Message{}
 			default:
