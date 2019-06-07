@@ -133,6 +133,25 @@ func extractRateSpec(data []byte, info *RateSpec) error {
 	return binary.Read(b, nativeEndian, info)
 }
 
+// Policy from from include/uapi/linux/pkt_sched.h
+type Policy struct {
+	Index    uint32
+	Action   uint32
+	Limit    uint32
+	Burst    uint32
+	Mtu      uint32
+	Rate     RateSpec
+	PeakRage RateSpec
+	RefCnt   uint32
+	BindCnt  uint32
+	Capab    uint32
+}
+
+func extractPolicy(data []byte, info *Policy) error {
+	b := bytes.NewReader(data)
+	return binary.Read(b, nativeEndian, info)
+}
+
 // FifoOpt from from include/uapi/linux/pkt_sched.h
 type FifoOpt struct {
 	Limit uint32

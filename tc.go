@@ -4,6 +4,7 @@ package tc
 
 import (
 	"encoding/binary"
+	"fmt"
 	"unsafe"
 
 	"github.com/mdlayher/netlink"
@@ -206,4 +207,71 @@ type XStats struct {
 	Hhf     *HhfXStats
 	Pie     *PieXStats
 	FqCodel *FqCodelXStats
+}
+
+const (
+	tcaPoliceUnspec = iota
+	tcaPoliceTbf
+	tcaPoliceRate
+	tcaPolicePeakRate
+	tcaPoliceAvRate
+	tcaPoliceResult
+	tcaPoliceTm
+	tcaPolicePad
+)
+
+// Police represents policing attributes of various filters and classes
+type Police struct {
+	Tbf      *Policy
+	Rate     *RateSpec
+	PeakRage *RateSpec
+	AvRate   uint32
+	Result   uint32
+	Tm       *Tcft
+}
+
+func extractPoliceOptions(data []byte, info *Police) error {
+	ad, err := netlink.NewAttributeDecoder(data)
+	if err != nil {
+		return err
+	}
+	ad.ByteOrder = nativeEndian
+	for ad.Next() {
+		switch ad.Type() {
+		case tcaPoliceTbf:
+			policy := &Policy{}
+			if err := extractPolicy(ad.Bytes(), policy); err != nil {
+				return err
+			}
+			info.Tbf = policy
+		case tcaPoliceRate:
+			rate := &RateSpec{}
+			if err := extractRateSpec(ad.Bytes(), rate); err != nil {
+				return err
+			}
+			info.Rate = rate
+		case tcaPolicePeakRate:
+			rate := &RateSpec{}
+			if err := extractRateSpec(ad.Bytes(), rate); err != nil {
+				return err
+			}
+			info.PeakRage = rate
+		case tcaPoliceAvRate:
+			info.AvRate = ad.Uint32()
+		case tcaPoliceResult:
+			info.Result = ad.Uint32()
+		case tcaPoliceTm:
+			tm := &Tcft{}
+			if err := extractTcft(ad.Bytes(), tm); err != nil {
+				return err
+			}
+			info.Tm = tm
+		case tcaPolicePad:
+			// padding does not contain data, we just skip it
+		default:
+			return fmt.Errorf("extractPoliceOptions()\t%d\n\t%v", ad.Type(), ad.Bytes())
+
+		}
+	}
+	return nil
 }
