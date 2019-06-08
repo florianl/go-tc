@@ -228,6 +228,7 @@ type U32 struct {
 	Pcnt    uint64
 	Mark    *U32Mark
 	Flags   uint32
+	Police  *Police
 }
 
 func extractU32Options(data []byte, info *U32) error {
@@ -252,6 +253,12 @@ func extractU32Options(data []byte, info *U32) error {
 				return err
 			}
 			info.Sel = arg
+		case tcaU32Police:
+			pol := &Police{}
+			if err := extractPoliceOptions(ad.Bytes(), pol); err != nil {
+				return err
+			}
+			info.Police = pol
 		case tcaU32InDev:
 			info.InDev = ad.String()
 		case tcaU32Pcnt:
@@ -271,7 +278,6 @@ func extractU32Options(data []byte, info *U32) error {
 		}
 	}
 	return nil
-
 }
 
 // U32Sel from include/uapi/linux/pkt_sched.h
