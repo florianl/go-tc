@@ -57,8 +57,7 @@ func TestQdisc(t *testing.T) {
 
 			qdiscs, err := tcSocket.Qdisc().Get()
 			if err != nil {
-				t.Fatalf("could not get qdiscs: %v\n", err)
-				return
+				t.Fatalf("could not get qdiscs: %v", err)
 			}
 			for _, qdisc := range qdiscs {
 				t.Logf("%#v\n", qdisc)
