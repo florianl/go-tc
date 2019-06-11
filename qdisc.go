@@ -33,7 +33,7 @@ func (qd *Qdisc) Add(info *Object) error {
 	if err != nil {
 		return err
 	}
-	return qd.action(rtmNewQdisc, netlink.Create|netlink.Excl, info, options)
+	return qd.action(rtmNewQdisc, netlink.Create|netlink.Excl, &info.Msg, options)
 }
 
 // Replace add/remove a queueing discipline. If the node does not exist yet it is created
@@ -45,7 +45,7 @@ func (qd *Qdisc) Replace(info *Object) error {
 	if err != nil {
 		return err
 	}
-	return qd.action(rtmNewQdisc, netlink.Create|netlink.Replace, info, options)
+	return qd.action(rtmNewQdisc, netlink.Create|netlink.Replace, &info.Msg, options)
 }
 
 // Link performs a replace on an existing queueing discipline
@@ -57,7 +57,7 @@ func (qd *Qdisc) Link(info *Object) error {
 	if err != nil {
 		return err
 	}
-	return qd.action(rtmNewQdisc, netlink.Replace, info, options)
+	return qd.action(rtmNewQdisc, netlink.Replace, &info.Msg, options)
 }
 
 // Delete removes a queueing discipline
@@ -69,7 +69,7 @@ func (qd *Qdisc) Delete(info *Object) error {
 	if err != nil {
 		return err
 	}
-	return qd.action(rtmDelQdisc, netlink.HeaderFlags(0), info, options)
+	return qd.action(rtmDelQdisc, netlink.HeaderFlags(0), &info.Msg, options)
 }
 
 // Change modifies a queueing discipline 'in place'
@@ -81,7 +81,7 @@ func (qd *Qdisc) Change(info *Object) error {
 	if err != nil {
 		return err
 	}
-	return qd.action(rtmNewQdisc, netlink.HeaderFlags(0), info, options)
+	return qd.action(rtmNewQdisc, netlink.HeaderFlags(0), &info.Msg, options)
 }
 
 // Get fetches all queueing disciplines

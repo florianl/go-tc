@@ -33,7 +33,7 @@ func (f *Filter) Add(info *Object) error {
 	if err != nil {
 		return err
 	}
-	return f.action(rtmNewFilter, netlink.Create|netlink.Excl, info, options)
+	return f.action(rtmNewFilter, netlink.Create|netlink.Excl, &info.Msg, options)
 }
 
 // Replace add/remove a filter. If the node does not exist yet it is created

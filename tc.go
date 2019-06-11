@@ -68,8 +68,8 @@ func (tc *Tc) query(req netlink.Message) ([]netlink.Message, error) {
 	return tc.con.Receive()
 }
 
-func (tc *Tc) action(action int, flags netlink.HeaderFlags, info *Object, opts []tcOption) error {
-	tcminfo, err := tcmsgEncode(&info.Msg)
+func (tc *Tc) action(action int, flags netlink.HeaderFlags, msg *Msg, opts []tcOption) error {
+	tcminfo, err := tcmsgEncode(msg)
 	if err != nil {
 		return err
 	}
