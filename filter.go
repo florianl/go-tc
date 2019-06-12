@@ -38,12 +38,26 @@ func (f *Filter) Add(info *Object) error {
 
 // Replace add/remove a filter. If the node does not exist yet it is created
 func (f *Filter) Replace(info *Object) error {
-	return ErrNotImplemented
+	if info == nil {
+		return ErrNoArg
+	}
+	options, err := validateFilterObject(rtmNewFilter, info)
+	if err != nil {
+		return err
+	}
+	return f.action(rtmNewFilter, netlink.Create, &info.Msg, options)
 }
 
 // Delete removes a filter
-func (f *Filter) Delete() error {
-	return ErrNotImplemented
+func (f *Filter) Delete(info *Object) error {
+	if info == nil {
+		return ErrNoArg
+	}
+	options, err := validateFilterObject(rtmDelFilter, info)
+	if err != nil {
+		return err
+	}
+	return f.action(rtmDelFilter, netlink.HeaderFlags(0), &info.Msg, options)
 }
 
 // Get fetches all filters
