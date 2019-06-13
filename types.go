@@ -18,6 +18,9 @@ type Config struct {
 
 // Constants to define the direction
 const (
+	// Ingress and Egress can be used as value in Msg.Parent
 	Ingress = 0xFFFFFFF2
 	Egress  = 0xFFFFFFF3
+	// To alter filter in shared blocks, set Msg.Ifindex to MagicBlock
+	MagicBlock = 0xFFFFFFFF
 )
