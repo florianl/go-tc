@@ -81,6 +81,12 @@ func validateFilterObject(action int, info *Object) ([]tcOption, error) {
 			return options, err
 		}
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaOptions, Data: data})
+	case "u32":
+		data, err := MarshalU32(info.U32)
+		if err != nil {
+			return options, err
+		}
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaOptions, Data: data})
 	default:
 		return options, ErrNotImplemented
 	}
