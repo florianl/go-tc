@@ -192,7 +192,7 @@ func extractTCAOptions(data []byte, tc *Attribute, kind string) error {
 		tc.BPF = info
 	case "u32":
 		info := &U32{}
-		if err := extractU32Options(data, info); err != nil {
+		if err := UnmarshalU32(data, info); err != nil {
 			return err
 		}
 		tc.U32 = info
