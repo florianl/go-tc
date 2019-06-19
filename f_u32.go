@@ -96,7 +96,7 @@ func UnmarshalU32(data []byte, info *U32) error {
 			info.Sel = arg
 		case tcaU32Police:
 			pol := &Police{}
-			if err := extractPoliceOptions(ad.Bytes(), pol); err != nil {
+			if err := UnmarshalPolice(ad.Bytes(), pol); err != nil {
 				return err
 			}
 			info.Police = pol
