@@ -76,7 +76,7 @@ func validateFilterObject(action int, info *Object) ([]tcOption, error) {
 
 	switch info.Kind {
 	case "bpf":
-		data, err := validateBPFOptions(info.BPF)
+		data, err := MarshalBpf(info.BPF)
 		if err != nil {
 			return options, err
 		}
