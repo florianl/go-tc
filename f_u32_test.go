@@ -13,8 +13,9 @@ func TestU32(t *testing.T) {
 		err1 error
 		err2 error
 	}{
-		"empty":  {err1: fmt.Errorf("U32 options are missing")},
-		"simple": {val: U32{ClassID: 0xFFFF, Mark: &U32Mark{Val: 0x55, Mask: 0xAA, Success: 0x1}}},
+		"empty":    {err1: fmt.Errorf("U32 options are missing")},
+		"simple":   {val: U32{ClassID: 0xFFFF, Mark: &U32Mark{Val: 0x55, Mask: 0xAA, Success: 0x1}}},
+		"extended": {val: U32{ClassID: 0xFFFF, Mark: &U32Mark{Val: 0x55, Mask: 0xAA, Success: 0x1}, Police: &Police{AvRate: 1337, Result: 12}}},
 	}
 
 	for name, testcase := range tests {

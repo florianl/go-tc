@@ -67,6 +67,13 @@ func MarshalU32(info *U32) ([]byte, error) {
 	if info.ClassID != 0 {
 		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaU32ClassID, Data: info.ClassID})
 	}
+	if info.Police != nil {
+		data, err := MarshalPolice(info.Police)
+		if err != nil {
+			return []byte{}, err
+		}
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaU32Police, Data: data})
+	}
 
 	return marshalAttributes(options)
 }
