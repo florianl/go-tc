@@ -6,8 +6,9 @@ import "errors"
 
 // Various errors
 var (
-	ErrNotImplemented = errors.New("Functionality not yet implemented")
-	ErrNoArg          = errors.New("Missing argument")
+	ErrNotImplemented = errors.New("functionality not yet implemented")
+	ErrNoArg          = errors.New("missing argument")
+	ErrNoArgAlter     = errors.New("argument cannot be altered")
 )
 
 // Config contains options for RTNETLINK

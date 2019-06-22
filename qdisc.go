@@ -92,7 +92,7 @@ func (qd *Qdisc) Get() ([]Object, error) {
 func validateQdiscObject(action int, info *Object) ([]tcOption, error) {
 	options := []tcOption{}
 	if info.Ifindex == 0 {
-		return options, fmt.Errorf("Could not set device ID 0")
+		return options, fmt.Errorf("could not set device ID 0")
 	}
 
 	// TODO: improve logic and check combinations
