@@ -93,8 +93,8 @@ func MarshalRsvp(info *Rsvp) ([]byte, error) {
 
 // RsvpPInfo from include/uapi/linux/pkt_sched.h
 type RsvpPInfo struct {
-	Dpi       *RsvpGpi
-	Spi       *RsvpGpi
+	Dpi       RsvpGpi
+	Spi       RsvpGpi
 	Protocol  uint8
 	TunnelID  uint8
 	TunnelHdr uint8
