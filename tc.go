@@ -159,7 +159,7 @@ type Attribute struct {
 	Stats2       *Stats2
 
 	// Filters
-	BPF    *BPF
+	BPF    *Bpf
 	U32    *U32
 	Rsvp   *Rsvp
 	Route4 *Route4

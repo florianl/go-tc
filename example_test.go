@@ -133,7 +133,7 @@ func Example_cBPF() {
 		},
 		tc.Attribute{
 			Kind: "bpf",
-			BPF: &tc.BPF{
+			BPF: &tc.Bpf{
 				Ops:     []byte{0x6, 0x0, 0x0, 0x0, 0xff, 0xff, 0xff, 0xff},
 				OpsLen:  0x1,
 				ClassID: 0x10001,
