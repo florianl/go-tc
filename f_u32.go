@@ -38,8 +38,8 @@ type U32 struct {
 	Police  *Police
 }
 
-// MarshalU32 returns the binary encoding of U32
-func MarshalU32(info *U32) ([]byte, error) {
+// marshalU32 returns the binary encoding of U32
+func marshalU32(info *U32) ([]byte, error) {
 	options := []tcOption{}
 
 	if info == nil {
@@ -68,7 +68,7 @@ func MarshalU32(info *U32) ([]byte, error) {
 		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaU32ClassID, Data: info.ClassID})
 	}
 	if info.Police != nil {
-		data, err := MarshalPolice(info.Police)
+		data, err := marshalPolice(info.Police)
 		if err != nil {
 			return []byte{}, err
 		}
@@ -78,8 +78,8 @@ func MarshalU32(info *U32) ([]byte, error) {
 	return marshalAttributes(options)
 }
 
-//UnmarshalU32 parses the U32-encoded data and stores the result in the value pointed to by info.
-func UnmarshalU32(data []byte, info *U32) error {
+// unmarshalU32 parses the U32-encoded data and stores the result in the value pointed to by info.
+func unmarshalU32(data []byte, info *U32) error {
 	ad, err := netlink.NewAttributeDecoder(data)
 	if err != nil {
 		return err
@@ -103,7 +103,7 @@ func UnmarshalU32(data []byte, info *U32) error {
 			info.Sel = arg
 		case tcaU32Police:
 			pol := &Police{}
-			if err := UnmarshalPolice(ad.Bytes(), pol); err != nil {
+			if err := unmarshalPolice(ad.Bytes(), pol); err != nil {
 				return err
 			}
 			info.Police = pol

@@ -24,8 +24,8 @@ type Route4 struct {
 	IIf     uint32
 }
 
-//UnmarshalRoute4 parses the Route4-encoded data and stores the result in the value pointed to by info.
-func UnmarshalRoute4(data []byte, info *Route4) error {
+// unmarshalRoute4 parses the Route4-encoded data and stores the result in the value pointed to by info.
+func unmarshalRoute4(data []byte, info *Route4) error {
 	ad, err := netlink.NewAttributeDecoder(data)
 	if err != nil {
 		return err
@@ -48,8 +48,8 @@ func UnmarshalRoute4(data []byte, info *Route4) error {
 	return nil
 }
 
-// MarshalRoute4 returns the binary encoding of Route4
-func MarshalRoute4(info *Route4) ([]byte, error) {
+// marshalRoute4 returns the binary encoding of Route4
+func marshalRoute4(info *Route4) ([]byte, error) {
 	options := []tcOption{}
 
 	if info == nil {

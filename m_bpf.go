@@ -33,8 +33,8 @@ type ActBpf struct {
 	ID     uint32
 }
 
-//UnmarshalActBpf parses the ActBpf-encoded data and stores the result in the value pointed to by info.
-func UnmarshalActBpf(data []byte, info *ActBpf) error {
+// unmarshalActBpf parses the ActBpf-encoded data and stores the result in the value pointed to by info.
+func unmarshalActBpf(data []byte, info *ActBpf) error {
 	ad, err := netlink.NewAttributeDecoder(data)
 	if err != nil {
 		return err
@@ -50,7 +50,7 @@ func UnmarshalActBpf(data []byte, info *ActBpf) error {
 			info.Tm = tm
 		case tcaActBpfParms:
 			parms := &ActBpfParms{}
-			if err := UnmarshalActBpfParms(ad.Bytes(), parms); err != nil {
+			if err := unmarshalActBpfParms(ad.Bytes(), parms); err != nil {
 				return err
 			}
 			info.Parms = parms
@@ -73,8 +73,8 @@ func UnmarshalActBpf(data []byte, info *ActBpf) error {
 	return nil
 }
 
-// MarshalActBpf returns the binary encoding of ActBpf
-func MarshalActBpf(info *ActBpf) ([]byte, error) {
+// marshalActBpf returns the binary encoding of ActBpf
+func marshalActBpf(info *ActBpf) ([]byte, error) {
 	options := []tcOption{}
 
 	if info == nil {
@@ -101,7 +101,7 @@ func MarshalActBpf(info *ActBpf) ([]byte, error) {
 		options = append(options, tcOption{Interpretation: vtUint16, Type: tcaActBpfOpsLen, Data: info.OpsLen})
 	}
 	if info.Parms != nil {
-		data, err := MarshalActBpfParms(info.Parms)
+		data, err := marshalActBpfParms(info.Parms)
 		if err != nil {
 			return []byte{}, err
 		}
@@ -119,14 +119,14 @@ type ActBpfParms struct {
 	Bindcnt uint32
 }
 
-//UnmarshalActBpfParms parses the ActBpfParms-encoded data and stores the result in the value pointed to by info.
-func UnmarshalActBpfParms(data []byte, info *ActBpfParms) error {
+// unmarshalActBpfParms parses the ActBpfParms-encoded data and stores the result in the value pointed to by info.
+func unmarshalActBpfParms(data []byte, info *ActBpfParms) error {
 	b := bytes.NewReader(data)
 	return binary.Read(b, nativeEndian, info)
 }
 
-// MarshalActBpfParms returns the binary encoding of ActBpfParms
-func MarshalActBpfParms(info *ActBpfParms) ([]byte, error) {
+// marshalActBpfParms returns the binary encoding of ActBpfParms
+func marshalActBpfParms(info *ActBpfParms) ([]byte, error) {
 	var buf bytes.Buffer
 	err := binary.Write(&buf, nativeEndian, *info)
 	return buf.Bytes(), err

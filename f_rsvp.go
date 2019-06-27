@@ -27,8 +27,8 @@ type Rsvp struct {
 	Police  *Police
 }
 
-//UnmarshalRsvp parses the Rsvp-encoded data and stores the result in the value pointed to by info.
-func UnmarshalRsvp(data []byte, info *Rsvp) error {
+// unmarshalRsvp parses the Rsvp-encoded data and stores the result in the value pointed to by info.
+func unmarshalRsvp(data []byte, info *Rsvp) error {
 	ad, err := netlink.NewAttributeDecoder(data)
 	if err != nil {
 		return err
@@ -44,13 +44,13 @@ func UnmarshalRsvp(data []byte, info *Rsvp) error {
 			info.Src = ad.Bytes()
 		case tcaRsvpPInfo:
 			arg := &RsvpPInfo{}
-			if err := extractRsvpPInfo(ad.Bytes(), arg); err != nil {
+			if err := marshalRsvpPInfo(ad.Bytes(), arg); err != nil {
 				return err
 			}
 			info.PInfo = arg
 		case tcaRsvpPolice:
 			pol := &Police{}
-			if err := UnmarshalPolice(ad.Bytes(), pol); err != nil {
+			if err := unmarshalPolice(ad.Bytes(), pol); err != nil {
 				return err
 			}
 			info.Police = pol
@@ -62,8 +62,8 @@ func UnmarshalRsvp(data []byte, info *Rsvp) error {
 
 }
 
-// MarshalRsvp returns the binary encoding of Rsvp
-func MarshalRsvp(info *Rsvp) ([]byte, error) {
+// marshalRsvp returns the binary encoding of Rsvp
+func marshalRsvp(info *Rsvp) ([]byte, error) {
 	options := []tcOption{}
 
 	if info == nil {
@@ -75,14 +75,14 @@ func MarshalRsvp(info *Rsvp) ([]byte, error) {
 		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaRoute4ClassID, Data: info.ClassID})
 	}
 	if info.PInfo != nil {
-		data, err := validateRsvpPInfo(info.PInfo)
+		data, err := unmarshalRsvpPInfo(info.PInfo)
 		if err != nil {
 			return []byte{}, err
 		}
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaRsvpPInfo, Data: data})
 	}
 	if info.Police != nil {
-		data, err := MarshalPolice(info.Police)
+		data, err := marshalPolice(info.Police)
 		if err != nil {
 			return []byte{}, err
 		}
@@ -101,12 +101,12 @@ type RsvpPInfo struct {
 	Pad       uint8
 }
 
-func extractRsvpPInfo(data []byte, info *RsvpPInfo) error {
+func marshalRsvpPInfo(data []byte, info *RsvpPInfo) error {
 	b := bytes.NewReader(data)
 	return binary.Read(b, nativeEndian, info)
 }
 
-func validateRsvpPInfo(info *RsvpPInfo) ([]byte, error) {
+func unmarshalRsvpPInfo(info *RsvpPInfo) ([]byte, error) {
 	var buf bytes.Buffer
 	err := binary.Write(&buf, nativeEndian, *info)
 	return buf.Bytes(), err

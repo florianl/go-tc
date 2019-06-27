@@ -35,8 +35,8 @@ type Flow struct {
 	PerTurb   uint32
 }
 
-//UnmarshalFlow parses the Flow-encoded data and stores the result in the value pointed to by info.
-func UnmarshalFlow(data []byte, info *Flow) error {
+// unmarshalFlow parses the Flow-encoded data and stores the result in the value pointed to by info.
+func unmarshalFlow(data []byte, info *Flow) error {
 	ad, err := netlink.NewAttributeDecoder(data)
 	if err != nil {
 		return err
@@ -69,8 +69,8 @@ func UnmarshalFlow(data []byte, info *Flow) error {
 	return nil
 }
 
-// MarshalFlow returns the binary encoding of Bpf
-func MarshalFlow(info *Flow) ([]byte, error) {
+// marshalFlow returns the binary encoding of Bpf
+func marshalFlow(info *Flow) ([]byte, error) {
 	options := []tcOption{}
 
 	if info == nil {

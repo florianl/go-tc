@@ -36,8 +36,8 @@ type Bpf struct {
 	ID       uint32
 }
 
-//UnmarshalBpf parses the Bpf-encoded data and stores the result in the value pointed to by info.
-func UnmarshalBpf(data []byte, info *Bpf) error {
+// unmarshalBpf parses the Bpf-encoded data and stores the result in the value pointed to by info.
+func unmarshalBpf(data []byte, info *Bpf) error {
 	ad, err := netlink.NewAttributeDecoder(data)
 	if err != nil {
 		return err
@@ -47,7 +47,7 @@ func UnmarshalBpf(data []byte, info *Bpf) error {
 		switch ad.Type() {
 		case tcaBpfPolice:
 			pol := &Police{}
-			if err := UnmarshalPolice(ad.Bytes(), pol); err != nil {
+			if err := unmarshalPolice(ad.Bytes(), pol); err != nil {
 				return err
 			}
 			info.Police = pol
@@ -76,8 +76,8 @@ func UnmarshalBpf(data []byte, info *Bpf) error {
 	return nil
 }
 
-// MarshalBpf returns the binary encoding of Bpf
-func MarshalBpf(info *Bpf) ([]byte, error) {
+// marshalBpf returns the binary encoding of Bpf
+func marshalBpf(info *Bpf) ([]byte, error) {
 	options := []tcOption{}
 
 	if info == nil {

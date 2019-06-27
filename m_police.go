@@ -27,8 +27,8 @@ type Police struct {
 	Tm       *Tcft
 }
 
-// UnmarshalPolice parses the Police-encoded data and stores the result in the value pointed to by info.
-func UnmarshalPolice(data []byte, info *Police) error {
+// unmarshalPolice parses the Police-encoded data and stores the result in the value pointed to by info.
+func unmarshalPolice(data []byte, info *Police) error {
 	ad, err := netlink.NewAttributeDecoder(data)
 	if err != nil {
 		return err
@@ -74,8 +74,8 @@ func UnmarshalPolice(data []byte, info *Police) error {
 	return nil
 }
 
-// MarshalPolice returns the binary encoding of Police
-func MarshalPolice(info *Police) ([]byte, error) {
+// marshalPolice returns the binary encoding of Police
+func marshalPolice(info *Police) ([]byte, error) {
 	options := []tcOption{}
 
 	if info == nil {

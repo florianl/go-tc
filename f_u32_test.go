@@ -20,7 +20,7 @@ func TestU32(t *testing.T) {
 
 	for name, testcase := range tests {
 		t.Run(name, func(t *testing.T) {
-			data, err1 := MarshalU32(&testcase.val)
+			data, err1 := marshalU32(&testcase.val)
 			if err1 != nil {
 				if testcase.err1 != nil && testcase.err1.Error() == err1.Error() {
 					return
@@ -28,7 +28,7 @@ func TestU32(t *testing.T) {
 				t.Fatalf("Unexpected error: %v", err1)
 			}
 			val := U32{}
-			err2 := UnmarshalU32(data, &val)
+			err2 := unmarshalU32(data, &val)
 			if err2 != nil {
 				if testcase.err2 != nil && testcase.err2.Error() == err2.Error() {
 					return
