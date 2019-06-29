@@ -63,13 +63,13 @@ func unmarshalFlow(data []byte, info *Flow) error {
 		case tcaFlowPerTurb:
 			info.PerTurb = ad.Uint32()
 		default:
-			return fmt.Errorf("UnmarshalFlow()\t%d\n\t%v", ad.Type(), ad.Bytes())
+			return fmt.Errorf("unmarshalFlow()\t%d\n\t%v", ad.Type(), ad.Bytes())
 		}
 	}
 	return nil
 }
 
-// marshalFlow returns the binary encoding of Bpf
+// marshalFlow returns the binary encoding of Flow
 func marshalFlow(info *Flow) ([]byte, error) {
 	options := []tcOption{}
 

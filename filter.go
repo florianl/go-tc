@@ -76,13 +76,13 @@ func validateFilterObject(action int, info *Object) ([]tcOption, error) {
 
 	switch info.Kind {
 	case "bpf":
-		data, err := MarshalBpf(info.BPF)
+		data, err := marshalBpf(info.BPF)
 		if err != nil {
 			return options, err
 		}
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaOptions, Data: data})
 	case "u32":
-		data, err := MarshalU32(info.U32)
+		data, err := marshalU32(info.U32)
 		if err != nil {
 			return options, err
 		}

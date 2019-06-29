@@ -122,7 +122,7 @@ func unmarshalU32(data []byte, info *U32) error {
 		case tcaU32Pad:
 			// padding does not contain data, we just skip it
 		default:
-			return fmt.Errorf("UnmarshalU32()\t%d\n\t%v", ad.Type(), ad.Bytes())
+			return fmt.Errorf("unmarshalU32()\t%d\n\t%v", ad.Type(), ad.Bytes())
 		}
 	}
 	return nil

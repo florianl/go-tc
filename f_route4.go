@@ -42,7 +42,7 @@ func unmarshalRoute4(data []byte, info *Route4) error {
 		case tcaRoute4IIf:
 			info.IIf = ad.Uint32()
 		default:
-			return fmt.Errorf("UnmarshalRoute4()\t%d\n\t%v", ad.Type(), ad.Bytes())
+			return fmt.Errorf("unmarshalRoute4()\t%d\n\t%v", ad.Type(), ad.Bytes())
 		}
 	}
 	return nil

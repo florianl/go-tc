@@ -55,7 +55,7 @@ func unmarshalRsvp(data []byte, info *Rsvp) error {
 			}
 			info.Police = pol
 		default:
-			return fmt.Errorf("UnmarshalRsvp()\t%d\n\t%v", ad.Type(), ad.Bytes())
+			return fmt.Errorf("unmarshalRsvp()\t%d\n\t%v", ad.Type(), ad.Bytes())
 		}
 	}
 	return nil

@@ -23,8 +23,8 @@ type Fw struct {
 	Mask    uint32
 }
 
-//UnmarshalFw parses the Fw-encoded data and stores the result in the value pointed to by info.
-func UnmarshalFw(data []byte, info *Fw) error {
+// unmarshalFw parses the Fw-encoded data and stores the result in the value pointed to by info.
+func unmarshalFw(data []byte, info *Fw) error {
 	ad, err := netlink.NewAttributeDecoder(data)
 	if err != nil {
 		return err
@@ -40,19 +40,19 @@ func UnmarshalFw(data []byte, info *Fw) error {
 			info.Mask = ad.Uint32()
 		case tcaFwPolice:
 			pol := &Police{}
-			if err := UnmarshalPolice(ad.Bytes(), pol); err != nil {
+			if err := unmarshalPolice(ad.Bytes(), pol); err != nil {
 				return err
 			}
 			info.Police = pol
 		default:
-			return fmt.Errorf("UnmarshalFw()\t%d\n\t%v", ad.Type(), ad.Bytes())
+			return fmt.Errorf("unmarshalFw()\t%d\n\t%v", ad.Type(), ad.Bytes())
 		}
 	}
 	return nil
 }
 
-// MarshalFw returns the binary encoding of Fw
-func MarshalFw(info *Fw) ([]byte, error) {
+// marshalFw returns the binary encoding of Fw
+func marshalFw(info *Fw) ([]byte, error) {
 	options := []tcOption{}
 
 	if info == nil {
@@ -70,7 +70,7 @@ func MarshalFw(info *Fw) ([]byte, error) {
 		options = append(options, tcOption{Interpretation: vtString, Type: tcaFwInDev, Data: info.InDev})
 	}
 	if info.Police != nil {
-		data, err := MarshalPolice(info.Police)
+		data, err := marshalPolice(info.Police)
 		if err != nil {
 			return []byte{}, err
 		}
