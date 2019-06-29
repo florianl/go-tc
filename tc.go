@@ -1,5 +1,3 @@
-//+build linux
-
 package tc
 
 import (
@@ -7,7 +5,6 @@ import (
 	"unsafe"
 
 	"github.com/mdlayher/netlink"
-	"golang.org/x/sys/unix"
 )
 
 // Tc represents a RTNETLINK wrapper
@@ -30,28 +27,6 @@ func init() {
 	default:
 		panic("Could not determine native endianness.")
 	}
-}
-
-// Open establishes a RTNETLINK socket for traffic control
-func Open(config *Config) (*Tc, error) {
-	var tc Tc
-
-	if config == nil {
-		config = &Config{}
-	}
-
-	con, err := netlink.Dial(unix.NETLINK_ROUTE, &netlink.Config{NetNS: config.NetNS})
-	if err != nil {
-		return nil, err
-	}
-	tc.con = con
-
-	return &tc, nil
-}
-
-// Close the connection
-func (tc *Tc) Close() error {
-	return tc.con.Close()
 }
 
 func (tc *Tc) query(req netlink.Message) ([]netlink.Message, error) {

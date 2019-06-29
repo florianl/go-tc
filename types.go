@@ -1,5 +1,3 @@
-//+build linux
-
 package tc
 
 import "errors"
@@ -9,6 +7,7 @@ var (
 	ErrNotImplemented = errors.New("functionality not yet implemented")
 	ErrNoArg          = errors.New("missing argument")
 	ErrNoArgAlter     = errors.New("argument cannot be altered")
+	ErrNotLinux       = errors.New("not implemented for OS other than linux")
 )
 
 // Config contains options for RTNETLINK
