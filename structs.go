@@ -117,6 +117,12 @@ func extractRateSpec(data []byte, info *RateSpec) error {
 	return binary.Read(b, nativeEndian, info)
 }
 
+func validateRateSpec(info *RateSpec) ([]byte, error) {
+	var buf bytes.Buffer
+	err := binary.Write(&buf, nativeEndian, *info)
+	return buf.Bytes(), err
+}
+
 // Policy from from include/uapi/linux/pkt_sched.h
 type Policy struct {
 	Index    uint32
@@ -134,6 +140,12 @@ type Policy struct {
 func extractPolicy(data []byte, info *Policy) error {
 	b := bytes.NewReader(data)
 	return binary.Read(b, nativeEndian, info)
+}
+
+func validatePolicy(info *Policy) ([]byte, error) {
+	var buf bytes.Buffer
+	err := binary.Write(&buf, nativeEndian, *info)
+	return buf.Bytes(), err
 }
 
 // FifoOpt from from include/uapi/linux/pkt_sched.h

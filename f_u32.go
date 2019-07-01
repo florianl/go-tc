@@ -142,14 +142,9 @@ type U32Sel struct {
 }
 
 func validateU32SelOptions(info *U32Sel) ([]byte, error) {
-	options := []tcOption{}
-
-	if info == nil {
-		return []byte{}, fmt.Errorf("U32Sel options are missing")
-	}
-
-	// TODO: improve logic and check combination
-	return marshalAttributes(options)
+	var buf bytes.Buffer
+	err := binary.Write(&buf, nativeEndian, *info)
+	return buf.Bytes(), err
 }
 
 func extractU32Sel(data []byte, info *U32Sel) error {

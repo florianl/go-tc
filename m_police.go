@@ -21,7 +21,7 @@ const (
 type Police struct {
 	Tbf      *Policy
 	Rate     *RateSpec
-	PeakRage *RateSpec
+	PeakRate *RateSpec
 	AvRate   uint32
 	Result   uint32
 	Tm       *Tcft
@@ -53,7 +53,7 @@ func unmarshalPolice(data []byte, info *Police) error {
 			if err := extractRateSpec(ad.Bytes(), rate); err != nil {
 				return err
 			}
-			info.PeakRage = rate
+			info.PeakRate = rate
 		case tcaPoliceAvRate:
 			info.AvRate = ad.Uint32()
 		case tcaPoliceResult:
@@ -82,6 +82,27 @@ func marshalPolice(info *Police) ([]byte, error) {
 		return []byte{}, fmt.Errorf("Police options are missing")
 	}
 	// TODO: improve logic and check combinations
+	if info.Rate != nil {
+		data, err := validateRateSpec(info.Rate)
+		if err != nil {
+			return []byte{}, err
+		}
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaPoliceRate, Data: data})
+	}
+	if info.PeakRate != nil {
+		data, err := validateRateSpec(info.PeakRate)
+		if err != nil {
+			return []byte{}, err
+		}
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaPolicePeakRate, Data: data})
+	}
+	if info.Tbf != nil {
+		data, err := validatePolicy(info.Tbf)
+		if err != nil {
+			return []byte{}, err
+		}
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaPoliceTbf, Data: data})
+	}
 	if info.AvRate != 0 {
 		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaPoliceAvRate, Data: info.AvRate})
 	}
