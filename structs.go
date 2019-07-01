@@ -102,20 +102,6 @@ func extractGnetStatsQueue(data []byte, info *GenStatsQueue) error {
 	return binary.Read(b, nativeEndian, info)
 }
 
-// ActBpf from include/uapi/linux/tc_act/tc_bpf.h
-type ActBpf struct {
-	Index   uint32
-	Capab   uint32
-	Action  uint32
-	Refcnt  uint32
-	Bindcnt uint32
-}
-
-func extractTcActBpf(data []byte, info *ActBpf) error {
-	b := bytes.NewReader(data)
-	return binary.Read(b, nativeEndian, info)
-}
-
 // RateSpec from from include/uapi/linux/pkt_sched.h
 type RateSpec struct {
 	CellLog   uint8
