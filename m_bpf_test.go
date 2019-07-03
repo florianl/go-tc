@@ -9,14 +9,17 @@ import (
 
 func TestActBpft(t *testing.T) {
 	tests := map[string]struct {
-		val  ActBpf
-		err1 error
-		err2 error
+		val    ActBpf
+		enrich *Tcft
+		err1   error
+		err2   error
 	}{
 		"empty":           {err1: fmt.Errorf("ActBpft options are missing")},
 		"simple":          {val: ActBpf{FD: 12, Name: "simpleTest"}},
 		"invalidArgument": {val: ActBpf{FD: 12, Name: "simpleTest", Tm: &Tcft{Install: 1}}, err1: ErrNoArgAlter},
-		"extended":        {val: ActBpf{FD: 12, Name: "simpleTest", Parms: &ActBpfParms{Action: 2, Index: 4}}, err1: ErrNoArgAlter},
+		"extended":        {val: ActBpf{FD: 12, Name: "simpleTest", Parms: &ActBpfParms{Action: 2, Index: 4}}},
+		"Tm Attribute": {val: ActBpf{FD: 12, Name: "simpleTest", Parms: &ActBpfParms{Action: 2, Index: 4}},
+			enrich: &Tcft{Install: 1, LastUse: 2, Expires: 3, FirstUse: 4}},
 	}
 
 	for name, testcase := range tests {
@@ -27,6 +30,16 @@ func TestActBpft(t *testing.T) {
 					return
 				}
 				t.Fatalf("Unexpected error: %v", err1)
+			}
+			if testcase.enrich != nil {
+				enrichment, err := validateTcft(testcase.enrich)
+				if err != nil {
+					t.Fatalf("could not generate enrichment: %v", err)
+				}
+				tmp, _ := marshalAttributes([]tcOption{tcOption{
+					Interpretation: vtBytes, Type: tcaActBpfTm, Data: enrichment}})
+				data = append(data, tmp...)
+				testcase.val.Tm = testcase.enrich
 			}
 			val := ActBpf{}
 			err2 := unmarshalActBpf(data, &val)

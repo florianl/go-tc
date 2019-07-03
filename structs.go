@@ -55,6 +55,12 @@ func extractTcft(data []byte, info *Tcft) error {
 	return binary.Read(b, nativeEndian, info)
 }
 
+func validateTcft(info *Tcft) ([]byte, error) {
+	var buf bytes.Buffer
+	err := binary.Write(&buf, nativeEndian, *info)
+	return buf.Bytes(), err
+}
+
 // GenStatsBasic from include/uapi/linux/gen_stats.h
 type GenStatsBasic struct {
 	Bytes   uint64
@@ -207,6 +213,12 @@ type HtbXStats struct {
 func extractHtbXStats(data []byte, info *HtbXStats) error {
 	b := bytes.NewReader(data)
 	return binary.Read(b, nativeEndian, info)
+}
+
+func validateHtbXStats(info *HtbXStats) ([]byte, error) {
+	var buf bytes.Buffer
+	err := binary.Write(&buf, nativeEndian, *info)
+	return buf.Bytes(), err
 }
 
 // CbqXStats from from include/uapi/linux/pkt_sched.h
