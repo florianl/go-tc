@@ -60,7 +60,7 @@ func extractTcmsgAttributes(data []byte, info *Attribute) error {
 	}
 	if len(xStats) > 0 {
 		tcxstats := &XStats{}
-		if err := extractXStats(ad.Bytes(), tcxstats, info.Kind); err != nil {
+		if err := extractXStats(xStats, tcxstats, info.Kind); err != nil {
 			return err
 		}
 		info.XStats = tcxstats
