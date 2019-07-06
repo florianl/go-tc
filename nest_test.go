@@ -26,7 +26,7 @@ func TestMarshalAttributes(t *testing.T) {
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			got, err := marshalAttributes([]tcOption{
-				tcOption{
+				{
 					Interpretation: tc.interpretation,
 					Type:           tc.attributeType,
 					Data:           tc.data,
