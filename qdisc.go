@@ -106,6 +106,12 @@ func validateQdiscObject(action int, info *Object) ([]tcOption, error) {
 			return options, err
 		}
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaOptions, Data: data})
+	case "htb":
+		data, err := marshalHtb(info.Htb)
+		if err != nil {
+			return options, err
+		}
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaOptions, Data: data})
 	default:
 		return options, ErrNotImplemented
 	}
