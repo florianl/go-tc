@@ -28,6 +28,8 @@ func testConn(t *testing.T) (*Tc, func()) {
 
 			var altered []byte
 			switch req[0].Header.Type {
+			case rtmNewClass:
+				fallthrough
 			case rtmNewFilter:
 				fallthrough
 			case rtmNewQdisc:
