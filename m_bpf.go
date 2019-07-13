@@ -44,7 +44,7 @@ func unmarshalActBpf(data []byte, info *ActBpf) error {
 		switch ad.Type() {
 		case tcaActBpfTm:
 			tm := &Tcft{}
-			if err := extractTcft(ad.Bytes(), tm); err != nil {
+			if err := unmarshalStruct(ad.Bytes(), tm); err != nil {
 				return err
 			}
 			info.Tm = tm

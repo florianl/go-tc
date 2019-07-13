@@ -32,7 +32,7 @@ func TestActBpft(t *testing.T) {
 				t.Fatalf("Unexpected error: %v", err1)
 			}
 			if testcase.enrich != nil {
-				enrichment, err := validateTcft(testcase.enrich)
+				enrichment, err := marshalStruct(testcase.enrich)
 				if err != nil {
 					t.Fatalf("could not generate enrichment: %v", err)
 				}

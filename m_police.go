@@ -38,19 +38,19 @@ func unmarshalPolice(data []byte, info *Police) error {
 		switch ad.Type() {
 		case tcaPoliceTbf:
 			policy := &Policy{}
-			if err := extractPolicy(ad.Bytes(), policy); err != nil {
+			if err := unmarshalStruct(ad.Bytes(), policy); err != nil {
 				return err
 			}
 			info.Tbf = policy
 		case tcaPoliceRate:
 			rate := &RateSpec{}
-			if err := extractRateSpec(ad.Bytes(), rate); err != nil {
+			if err := unmarshalStruct(ad.Bytes(), rate); err != nil {
 				return err
 			}
 			info.Rate = rate
 		case tcaPolicePeakRate:
 			rate := &RateSpec{}
-			if err := extractRateSpec(ad.Bytes(), rate); err != nil {
+			if err := unmarshalStruct(ad.Bytes(), rate); err != nil {
 				return err
 			}
 			info.PeakRate = rate
@@ -60,7 +60,7 @@ func unmarshalPolice(data []byte, info *Police) error {
 			info.Result = ad.Uint32()
 		case tcaPoliceTm:
 			tm := &Tcft{}
-			if err := extractTcft(ad.Bytes(), tm); err != nil {
+			if err := unmarshalStruct(ad.Bytes(), tm); err != nil {
 				return err
 			}
 			info.Tm = tm
@@ -83,21 +83,21 @@ func marshalPolice(info *Police) ([]byte, error) {
 	}
 	// TODO: improve logic and check combinations
 	if info.Rate != nil {
-		data, err := validateRateSpec(info.Rate)
+		data, err := marshalStruct(info.Rate)
 		if err != nil {
 			return []byte{}, err
 		}
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaPoliceRate, Data: data})
 	}
 	if info.PeakRate != nil {
-		data, err := validateRateSpec(info.PeakRate)
+		data, err := marshalStruct(info.PeakRate)
 		if err != nil {
 			return []byte{}, err
 		}
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaPolicePeakRate, Data: data})
 	}
 	if info.Tbf != nil {
-		data, err := validatePolicy(info.Tbf)
+		data, err := marshalStruct(info.Tbf)
 		if err != nil {
 			return []byte{}, err
 		}

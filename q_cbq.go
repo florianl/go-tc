@@ -65,7 +65,7 @@ func unmarshalCbq(data []byte, info *Cbq) error {
 			info.OVLStrategy = arg
 		case tcaCbqRate:
 			arg := &RateSpec{}
-			if err := extractRateSpec(ad.Bytes(), arg); err != nil {
+			if err := unmarshalStruct(ad.Bytes(), arg); err != nil {
 				return err
 			}
 			info.Rate = arg

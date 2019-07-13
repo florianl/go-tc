@@ -32,13 +32,13 @@ func extractTcmsgAttributes(data []byte, info *Attribute) error {
 			xStats = ad.Bytes()
 		case tcaStats:
 			tcstats := &Stats{}
-			if err := extractTCStats(ad.Bytes(), tcstats); err != nil {
+			if err := unmarshalStruct(ad.Bytes(), tcstats); err != nil {
 				return err
 			}
 			info.Stats = tcstats
 		case tcaStats2:
 			tcstats2 := &Stats2{}
-			if err := extractTCStats2(ad.Bytes(), tcstats2); err != nil {
+			if err := unmarshalStruct(ad.Bytes(), tcstats2); err != nil {
 				return err
 			}
 			info.Stats2 = tcstats2
@@ -156,7 +156,7 @@ func extractTCAOptions(data []byte, tc *Attribute, kind string) error {
 		tc.Red = info
 	case "pfifo":
 		limit := &FifoOpt{}
-		if err := extractFifoOpt(data, limit); err != nil {
+		if err := unmarshalStruct(data, limit); err != nil {
 			return err
 		}
 		tc.Pfifo = limit
@@ -168,7 +168,7 @@ func extractTCAOptions(data []byte, tc *Attribute, kind string) error {
 		tc.MqPrio = info
 	case "bfifo":
 		limit := &FifoOpt{}
-		if err := extractFifoOpt(data, limit); err != nil {
+		if err := unmarshalStruct(data, limit); err != nil {
 			return err
 		}
 		tc.Bfifo = limit
@@ -229,55 +229,55 @@ func extractXStats(data []byte, tc *XStats, kind string) error {
 	switch kind {
 	case "sfq":
 		info := &SfqXStats{}
-		if err := extractSfqXStats(data, info); err != nil {
+		if err := unmarshalStruct(data, info); err != nil {
 			return err
 		}
 		tc.Sfq = info
 	case "sfb":
 		info := &SfbXStats{}
-		if err := extractSfbXStats(data, info); err != nil {
+		if err := unmarshalStruct(data, info); err != nil {
 			return err
 		}
 		tc.Sfb = info
 	case "red":
 		info := &RedXStats{}
-		if err := extractRedXStats(data, info); err != nil {
+		if err := unmarshalStruct(data, info); err != nil {
 			return err
 		}
 		tc.Red = info
 	case "choke":
 		info := &ChokeXStats{}
-		if err := extractChokeXStats(data, info); err != nil {
+		if err := unmarshalStruct(data, info); err != nil {
 			return err
 		}
 		tc.Choke = info
 	case "htb":
 		info := &HtbXStats{}
-		if err := extractHtbXStats(data, info); err != nil {
+		if err := unmarshalStruct(data, info); err != nil {
 			return err
 		}
 		tc.Htb = info
 	case "cbq":
 		info := &CbqXStats{}
-		if err := extractCbqXStats(data, info); err != nil {
+		if err := unmarshalStruct(data, info); err != nil {
 			return err
 		}
 		tc.Cbq = info
 	case "codel":
 		info := &CodelXStats{}
-		if err := extractCodelXStats(data, info); err != nil {
+		if err := unmarshalStruct(data, info); err != nil {
 			return err
 		}
 		tc.Codel = info
 	case "hhf":
 		info := &HhfXStats{}
-		if err := extractHhfXStats(data, info); err != nil {
+		if err := unmarshalStruct(data, info); err != nil {
 			return err
 		}
 		tc.Hhf = info
 	case "pie":
 		info := &PieXStats{}
-		if err := extractPieXStats(data, info); err != nil {
+		if err := unmarshalStruct(data, info); err != nil {
 			return err
 		}
 		tc.Pie = info

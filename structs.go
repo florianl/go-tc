@@ -6,6 +6,17 @@ import (
 	"fmt"
 )
 
+func unmarshalStruct(data []byte, s interface{}) error {
+	b := bytes.NewReader(data)
+	return binary.Read(b, nativeEndian, s)
+}
+
+func marshalStruct(s interface{}) ([]byte, error) {
+	var buf bytes.Buffer
+	err := binary.Write(&buf, nativeEndian, s)
+	return buf.Bytes(), err
+}
+
 // Stats from include/uapi/linux/pkt_sched.h
 type Stats struct {
 	Bytes      uint64 /* Number of enqueued bytes */
@@ -17,11 +28,6 @@ type Stats struct {
 	Pps     uint32 /* Current flow packet rate */
 	Qlen    uint32
 	Backlog uint32
-}
-
-func extractTCStats(data []byte, info *Stats) error {
-	b := bytes.NewReader(data)
-	return binary.Read(b, nativeEndian, info)
 }
 
 // Stats2 from include/uapi/linux/pkt_sched.h
@@ -37,11 +43,6 @@ type Stats2 struct {
 	Overlimits uint32
 }
 
-func extractTCStats2(data []byte, info *Stats2) error {
-	b := bytes.NewReader(data)
-	return binary.Read(b, nativeEndian, info)
-}
-
 // Tcft from include/uapi/linux/pkt_sched.h
 type Tcft struct {
 	Install  uint64
@@ -50,26 +51,10 @@ type Tcft struct {
 	FirstUse uint64
 }
 
-func extractTcft(data []byte, info *Tcft) error {
-	b := bytes.NewReader(data)
-	return binary.Read(b, nativeEndian, info)
-}
-
-func validateTcft(info *Tcft) ([]byte, error) {
-	var buf bytes.Buffer
-	err := binary.Write(&buf, nativeEndian, *info)
-	return buf.Bytes(), err
-}
-
 // GenStatsBasic from include/uapi/linux/gen_stats.h
 type GenStatsBasic struct {
 	Bytes   uint64
 	Packets uint32
-}
-
-func extractGnetStatsBasic(data []byte, info *GenStatsBasic) error {
-	b := bytes.NewReader(data)
-	return binary.Read(b, nativeEndian, info)
 }
 
 // GenStatsRateEst from include/uapi/linux/gen_stats.h
@@ -78,20 +63,10 @@ type GenStatsRateEst struct {
 	PacketPerSecond uint32
 }
 
-func extractGenStatsRateEst(data []byte, info *GenStatsRateEst) error {
-	b := bytes.NewReader(data)
-	return binary.Read(b, nativeEndian, info)
-}
-
 // GenStatsRateEst64 from include/uapi/linux/gen_stats.h
 type GenStatsRateEst64 struct {
 	BytePerSecond   uint64
 	PacketPerSecond uint64
-}
-
-func extractGenStatsRateEst64(data []byte, info *GenStatsRateEst64) error {
-	b := bytes.NewReader(data)
-	return binary.Read(b, nativeEndian, info)
 }
 
 // GenStatsQueue from include/uapi/linux/gen_stats.h
@@ -103,11 +78,6 @@ type GenStatsQueue struct {
 	Overlimits uint32
 }
 
-func extractGnetStatsQueue(data []byte, info *GenStatsQueue) error {
-	b := bytes.NewReader(data)
-	return binary.Read(b, nativeEndian, info)
-}
-
 // RateSpec from from include/uapi/linux/pkt_sched.h
 type RateSpec struct {
 	CellLog   uint8
@@ -116,17 +86,6 @@ type RateSpec struct {
 	CellAlign uint16
 	Mpu       uint16
 	Rate      uint32
-}
-
-func extractRateSpec(data []byte, info *RateSpec) error {
-	b := bytes.NewReader(data)
-	return binary.Read(b, nativeEndian, info)
-}
-
-func validateRateSpec(info *RateSpec) ([]byte, error) {
-	var buf bytes.Buffer
-	err := binary.Write(&buf, nativeEndian, *info)
-	return buf.Bytes(), err
 }
 
 // Policy from from include/uapi/linux/pkt_sched.h
@@ -143,35 +102,14 @@ type Policy struct {
 	Capab    uint32
 }
 
-func extractPolicy(data []byte, info *Policy) error {
-	b := bytes.NewReader(data)
-	return binary.Read(b, nativeEndian, info)
-}
-
-func validatePolicy(info *Policy) ([]byte, error) {
-	var buf bytes.Buffer
-	err := binary.Write(&buf, nativeEndian, *info)
-	return buf.Bytes(), err
-}
-
 // FifoOpt from from include/uapi/linux/pkt_sched.h
 type FifoOpt struct {
 	Limit uint32
 }
 
-func extractFifoOpt(data []byte, info *FifoOpt) error {
-	b := bytes.NewReader(data)
-	return binary.Read(b, nativeEndian, info)
-}
-
 // SfqXStats from from include/uapi/linux/pkt_sched.h
 type SfqXStats struct {
 	Allot int32
-}
-
-func extractSfqXStats(data []byte, info *SfqXStats) error {
-	b := bytes.NewReader(data)
-	return binary.Read(b, nativeEndian, info)
 }
 
 // RedXStats from from include/uapi/linux/pkt_sched.h
@@ -180,11 +118,6 @@ type RedXStats struct {
 	PDrop  uint32
 	Other  uint32
 	Marked uint32
-}
-
-func extractRedXStats(data []byte, info *RedXStats) error {
-	b := bytes.NewReader(data)
-	return binary.Read(b, nativeEndian, info)
 }
 
 // ChokeXStats from from include/uapi/linux/pkt_sched.h
@@ -196,11 +129,6 @@ type ChokeXStats struct {
 	Matched uint32
 }
 
-func extractChokeXStats(data []byte, info *ChokeXStats) error {
-	b := bytes.NewReader(data)
-	return binary.Read(b, nativeEndian, info)
-}
-
 // HtbXStats from from include/uapi/linux/pkt_sched.h
 type HtbXStats struct {
 	Lends   uint32
@@ -210,28 +138,12 @@ type HtbXStats struct {
 	CTokens uint32
 }
 
-func extractHtbXStats(data []byte, info *HtbXStats) error {
-	b := bytes.NewReader(data)
-	return binary.Read(b, nativeEndian, info)
-}
-
-func validateHtbXStats(info *HtbXStats) ([]byte, error) {
-	var buf bytes.Buffer
-	err := binary.Write(&buf, nativeEndian, *info)
-	return buf.Bytes(), err
-}
-
 // CbqXStats from from include/uapi/linux/pkt_sched.h
 type CbqXStats struct {
 	Borrows     uint32
 	Overactions uint32
 	AvgIdle     int32
 	Undertime   int32
-}
-
-func extractCbqXStats(data []byte, info *CbqXStats) error {
-	b := bytes.NewReader(data)
-	return binary.Read(b, nativeEndian, info)
 }
 
 // SfbXStats from from include/uapi/linux/pkt_sched.h
@@ -247,11 +159,6 @@ type SfbXStats struct {
 	AvgProb     uint32
 }
 
-func extractSfbXStats(data []byte, info *SfbXStats) error {
-	b := bytes.NewReader(data)
-	return binary.Read(b, nativeEndian, info)
-}
-
 // CodelXStats from from include/uapi/linux/pkt_sched.h
 type CodelXStats struct {
 	MaxPacket     uint32
@@ -265,22 +172,12 @@ type CodelXStats struct {
 	CeMark        uint32
 }
 
-func extractCodelXStats(data []byte, info *CodelXStats) error {
-	b := bytes.NewReader(data)
-	return binary.Read(b, nativeEndian, info)
-}
-
 // HhfXStats from from include/uapi/linux/pkt_sched.h
 type HhfXStats struct {
 	DropOverlimit uint32
 	HhOverlimit   uint32
 	HhTotCount    uint32
 	HhCurCount    uint32
-}
-
-func extractHhfXStats(data []byte, info *HhfXStats) error {
-	b := bytes.NewReader(data)
-	return binary.Read(b, nativeEndian, info)
 }
 
 // PieXStats from from include/uapi/linux/pkt_sched.h
@@ -293,11 +190,6 @@ type PieXStats struct {
 	Overlimit uint32
 	Maxq      uint32
 	EcnMark   uint32
-}
-
-func extractPieXStats(data []byte, info *PieXStats) error {
-	b := bytes.NewReader(data)
-	return binary.Read(b, nativeEndian, info)
 }
 
 // FqCodelQdStats from from include/uapi/linux/pkt_sched.h

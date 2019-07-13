@@ -59,7 +59,7 @@ func unmarshalCsum(data []byte, info *Csum) error {
 			info.Parms = parms
 		case tcaCsumTm:
 			tcft := &Tcft{}
-			if err := extractTcft(ad.Bytes(), tcft); err != nil {
+			if err := unmarshalStruct(ad.Bytes(), tcft); err != nil {
 				return err
 			}
 			info.Tm = tcft
