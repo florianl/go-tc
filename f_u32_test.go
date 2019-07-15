@@ -19,7 +19,7 @@ func TestU32(t *testing.T) {
 		"policy": {val: U32{
 			Sel: &U32Sel{
 				Flags: 0x1,
-				NKeys: 0x1,
+				NKeys: 0x0,
 			},
 			Police: &Police{
 				Tbf: &Policy{
@@ -34,6 +34,16 @@ func TestU32(t *testing.T) {
 				},
 			},
 		}},
+		"multiple Keys": {val: U32{ClassID: 0xFFFF, Mark: &U32Mark{Val: 0x55, Mask: 0xAA, Success: 0x1},
+			Sel: &U32Sel{
+				Flags: 0x0,
+				NKeys: 0x3,
+				Keys: []U32Key{
+					U32Key{Mask: 0xFF, Val: 0x55, Off: 0x1, OffMask: 0x2},
+					U32Key{Mask: 0xFF00, Val: 0xAA00, Off: 0x3, OffMask: 0x5},
+					U32Key{Mask: 0xF0F0, Val: 0x5050, Off: 0xC, OffMask: 0xC},
+				},
+			}}},
 	}
 
 	for name, testcase := range tests {

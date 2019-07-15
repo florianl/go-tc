@@ -57,7 +57,7 @@ func marshalU32(info *U32) ([]byte, error) {
 	}
 
 	if info.Mark != nil {
-		data, err := validateU32MarkOptions(info.Mark)
+		data, err := marshalStruct(info.Mark)
 		if err != nil {
 			return []byte{}, err
 		}
@@ -113,7 +113,7 @@ func unmarshalU32(data []byte, info *U32) error {
 			info.Pcnt = ad.Uint64()
 		case tcaU32Mark:
 			arg := &U32Mark{}
-			if err := extractU32Mark(ad.Bytes(), arg); err != nil {
+			if err := unmarshalStruct(ad.Bytes(), arg); err != nil {
 				return err
 			}
 			info.Mark = arg
@@ -130,26 +130,60 @@ func unmarshalU32(data []byte, info *U32) error {
 
 // U32Sel from include/uapi/linux/pkt_sched.h
 type U32Sel struct {
-	Flags    byte
-	Offshift byte
-	NKeys    byte
+	Flags    uint8
+	Offshift uint8
+	NKeys    uint8
 	OffMask  uint16
 	Off      uint16
 	Offoff   uint16
 	Hoff     uint16
 	Hmask    uint32
-	U32Key
+	Keys     []U32Key
 }
 
 func validateU32SelOptions(info *U32Sel) ([]byte, error) {
-	var buf bytes.Buffer
-	err := binary.Write(&buf, nativeEndian, *info)
-	return buf.Bytes(), err
+	buf := new(bytes.Buffer)
+	binary.Write(buf, nativeEndian, info.Flags)
+	binary.Write(buf, nativeEndian, info.Offshift)
+	binary.Write(buf, nativeEndian, info.NKeys)
+	binary.Write(buf, nativeEndian, info.OffMask)
+	binary.Write(buf, nativeEndian, info.Off)
+	binary.Write(buf, nativeEndian, info.Offoff)
+	binary.Write(buf, nativeEndian, info.Hoff)
+	binary.Write(buf, nativeEndian, info.Hmask)
+	for _, v := range info.Keys {
+		data, err := marshalStruct(v)
+		if err != nil {
+			return []byte{}, err
+		}
+		buf.Write(data)
+	}
+	return buf.Bytes(), nil
 }
 
 func extractU32Sel(data []byte, info *U32Sel) error {
-	b := bytes.NewReader(data)
-	return binary.Read(b, nativeEndian, info)
+	if len(data) < 15 {
+		return fmt.Errorf("not enough bytes for U32Sel")
+	}
+	info.Flags = data[0]
+	info.Offshift = data[1]
+	info.NKeys = data[2]
+	info.OffMask = nativeEndian.Uint16(data[3:5])
+	info.Off = nativeEndian.Uint16(data[5:7])
+	info.Offoff = nativeEndian.Uint16(data[7:9])
+	info.Hoff = nativeEndian.Uint16(data[9:11])
+	info.Hmask = nativeEndian.Uint32(data[11:15])
+	if len(data) < int(info.NKeys)*16+15 {
+		return fmt.Errorf("not enough bytes for U32Keys")
+	}
+	for i := 0; i < int(info.NKeys); i++ {
+		key := &U32Key{}
+		if err := unmarshalStruct(data[15+i*16:15+(i+1)*16], key); err != nil {
+			return err
+		}
+		info.Keys = append(info.Keys, *key)
+	}
+	return nil
 }
 
 //U32Mark from include/uapi/linux/pkt_sched.h
@@ -157,17 +191,6 @@ type U32Mark struct {
 	Val     uint32
 	Mask    uint32
 	Success uint32
-}
-
-func validateU32MarkOptions(info *U32Mark) ([]byte, error) {
-	var buf bytes.Buffer
-	err := binary.Write(&buf, nativeEndian, *info)
-	return buf.Bytes(), err
-}
-
-func extractU32Mark(data []byte, info *U32Mark) error {
-	b := bytes.NewReader(data)
-	return binary.Read(b, nativeEndian, info)
 }
 
 // U32Key from include/uapi/linux/pkt_sched.h
