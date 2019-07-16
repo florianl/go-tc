@@ -146,3 +146,90 @@ func Example_cBPF() {
 		return
 	}
 }
+
+func ExampleU32() {
+	// example from http://man7.org/linux/man-pages/man8/tc-police.8.html
+	rtnl, err := tc.Open(&tc.Config{})
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "could not open rtnetlink socket: %v\n", err)
+		return
+	}
+	defer func() {
+		if err := rtnl.Close(); err != nil {
+			fmt.Fprintf(os.Stderr, "could not close rtnetlink socket: %v\n", err)
+		}
+	}()
+
+	devID, err := net.InterfaceByName("lo")
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "could not get interface ID: %v\n", err)
+		return
+	}
+
+	qdisc := tc.Object{
+		tc.Msg{
+			Family:  unix.AF_UNSPEC,
+			Ifindex: uint32(devID.Index),
+			Handle:  0,
+			Parent:  0xFFFF0000,
+			Info:    768,
+		},
+		tc.Attribute{
+			Kind: "u32",
+			U32: &tc.U32{
+				Sel: &tc.U32Sel{
+					Flags: 0x1,
+					NKeys: 0x3,
+					Keys: []tc.U32Key{
+						//  match ip protocol 6 0xff
+						tc.U32Key{Mask: 0xff0000, Val: 0x60000, Off: 0x800, OffMask: 0x0},
+						tc.U32Key{Mask: 0xff000f00, Val: 0x5c0, Off: 0x0, OffMask: 0x0},
+						tc.U32Key{Mask: 0xff0000, Val: 0x100000, Off: 0x2000, OffMask: 0x0},
+					},
+				},
+				Police: &tc.Police{
+					Tbf: &tc.Policy{
+						Action: 0x1,
+						Burst:  0xc35000,
+						Rate: tc.RateSpec{
+							CellLog:   0x3,
+							Linklayer: 0x1,
+							CellAlign: 0xffff,
+							Rate:      0x1e848,
+						},
+					},
+				},
+			},
+		},
+	}
+
+	if err := rtnl.Qdisc().Add(&qdisc); err != nil {
+		fmt.Fprintf(os.Stderr, "could not assign clsact to lo: %v\n", err)
+		return
+	}
+	// when deleting the qdisc, the applied filter will also be gone
+	defer rtnl.Qdisc().Delete(&qdisc)
+
+	filter := tc.Object{
+		tc.Msg{
+			Family:  unix.AF_UNSPEC,
+			Ifindex: uint32(devID.Index),
+			Handle:  0,
+			Parent:  tc.Ingress,
+			Info:    0x300,
+		},
+		tc.Attribute{
+			Kind: "bpf",
+			BPF: &tc.Bpf{
+				Ops:     []byte{0x6, 0x0, 0x0, 0x0, 0xff, 0xff, 0xff, 0xff},
+				OpsLen:  0x1,
+				ClassID: 0x10001,
+				Flags:   0x1,
+			},
+		},
+	}
+	if err := rtnl.Filter().Add(&filter); err != nil {
+		fmt.Fprintf(os.Stderr, "could not assign cBPF: %v\n", err)
+		return
+	}
+}
