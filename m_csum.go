@@ -1,8 +1,6 @@
 package tc
 
 import (
-	"bytes"
-	"encoding/binary"
 	"fmt"
 
 	"github.com/mdlayher/netlink"
@@ -33,7 +31,7 @@ func marshalCsum(info *Csum) ([]byte, error) {
 		return []byte{}, ErrNoArgAlter
 	}
 	if info.Parms != nil {
-		data, err := validateCsumParmsOptions(info.Parms)
+		data, err := marshalStruct(info.Parms)
 		if err != nil {
 			return []byte{}, err
 		}
@@ -53,7 +51,7 @@ func unmarshalCsum(data []byte, info *Csum) error {
 		switch ad.Type() {
 		case tcaCsumParms:
 			parms := &CsumParms{}
-			if err := extractCsumParms(ad.Bytes(), parms); err != nil {
+			if err := unmarshalStruct(ad.Bytes(), parms); err != nil {
 				return err
 			}
 			info.Parms = parms
@@ -80,15 +78,4 @@ type CsumParms struct {
 	RefCnt      uint32
 	BindCnt     uint32
 	UpdateFlags uint32
-}
-
-func validateCsumParmsOptions(info *CsumParms) ([]byte, error) {
-	var buf bytes.Buffer
-	err := binary.Write(&buf, nativeEndian, *info)
-	return buf.Bytes(), err
-}
-
-func extractCsumParms(data []byte, info *CsumParms) error {
-	b := bytes.NewReader(data)
-	return binary.Read(b, nativeEndian, info)
 }
