@@ -1,8 +1,6 @@
 package tc
 
 import (
-	"bytes"
-	"encoding/binary"
 	"fmt"
 
 	"github.com/mdlayher/netlink"
@@ -41,7 +39,7 @@ func unmarshalAtm(data []byte, info *Atm) error {
 			info.Excess = ad.Uint32()
 		case tcaAtmAddr:
 			arg := &AtmPvc{}
-			if err := extractAtmPvc(ad.Bytes(), arg); err != nil {
+			if err := unmarshalStruct(ad.Bytes(), arg); err != nil {
 				return err
 			}
 			info.Addr = arg
@@ -65,7 +63,7 @@ func marshalAtm(info *Atm) ([]byte, error) {
 	// TODO: improve logic and check combinations
 
 	if info.Addr != nil {
-		data, err := validateAtmPvc(info.Addr)
+		data, err := marshalStruct(info.Addr)
 		if err != nil {
 			return []byte{}, err
 		}
@@ -90,15 +88,4 @@ type AtmPvc struct {
 	Itf       byte
 	Vpi       byte
 	Vci       byte
-}
-
-func extractAtmPvc(data []byte, info *AtmPvc) error {
-	b := bytes.NewReader(data)
-	return binary.Read(b, nativeEndian, info)
-}
-
-func validateAtmPvc(info *AtmPvc) ([]byte, error) {
-	var buf bytes.Buffer
-	err := binary.Write(&buf, nativeEndian, *info)
-	return buf.Bytes(), err
 }
