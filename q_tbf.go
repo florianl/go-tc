@@ -1,8 +1,6 @@
 package tc
 
 import (
-	"bytes"
-	"encoding/binary"
 	"fmt"
 
 	"github.com/mdlayher/netlink"
@@ -42,7 +40,7 @@ func unmarshalTbf(data []byte, info *Tbf) error {
 		switch ad.Type() {
 		case tcaTbfParms:
 			qopt := &TbfQopt{}
-			if err := extractTbfQopt(ad.Bytes(), qopt); err != nil {
+			if err := unmarshalStruct(ad.Bytes(), qopt); err != nil {
 				return err
 			}
 			info.Parms = qopt
@@ -77,7 +75,7 @@ func marshalTbf(info *Tbf) ([]byte, error) {
 
 	// TODO: improve logic and check combinations
 	if info.Parms != nil {
-		data, err := validateTbfQopt(info.Parms)
+		data, err := marshalStruct(info.Parms)
 		if err != nil {
 			return []byte{}, err
 		}
@@ -105,15 +103,4 @@ type TbfQopt struct {
 	Limit    uint32
 	Buffer   uint32
 	Mtu      uint32
-}
-
-func extractTbfQopt(data []byte, info *TbfQopt) error {
-	b := bytes.NewReader(data)
-	return binary.Read(b, nativeEndian, info)
-}
-
-func validateTbfQopt(info *TbfQopt) ([]byte, error) {
-	var buf bytes.Buffer
-	err := binary.Write(&buf, nativeEndian, *info)
-	return buf.Bytes(), err
 }
