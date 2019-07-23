@@ -1,8 +1,6 @@
 package tc
 
 import (
-	"bytes"
-	"encoding/binary"
 	"fmt"
 
 	"github.com/mdlayher/netlink"
@@ -41,25 +39,25 @@ func unmarshalCbq(data []byte, info *Cbq) error {
 		switch ad.Type() {
 		case tcaCbqLssOpt:
 			arg := &CbqLssOpt{}
-			if err := extractCbqLssOpt(ad.Bytes(), arg); err != nil {
+			if err := unmarshalStruct(ad.Bytes(), arg); err != nil {
 				return err
 			}
 			info.LssOpt = arg
 		case tcaCbqWrrOpt:
 			arg := &CbqWrrOpt{}
-			if err := extractCbqWrrOpt(ad.Bytes(), arg); err != nil {
+			if err := unmarshalStruct(ad.Bytes(), arg); err != nil {
 				return err
 			}
 			info.WrrOpt = arg
 		case tcaCbqFOpt:
 			arg := &CbqFOpt{}
-			if err := extractCbqFOpt(ad.Bytes(), arg); err != nil {
+			if err := unmarshalStruct(ad.Bytes(), arg); err != nil {
 				return err
 			}
 			info.FOpt = arg
 		case tcaCbqOVLStrategy:
 			arg := &CbqOvl{}
-			if err := extractCbqOvl(ad.Bytes(), arg); err != nil {
+			if err := unmarshalStruct(ad.Bytes(), arg); err != nil {
 				return err
 			}
 			info.OVLStrategy = arg
@@ -73,7 +71,7 @@ func unmarshalCbq(data []byte, info *Cbq) error {
 			info.RTab = ad.Bytes()
 		case tcaCbqPolice:
 			arg := &CbqPolice{}
-			if err := extractCbqPolice(ad.Bytes(), arg); err != nil {
+			if err := unmarshalStruct(ad.Bytes(), arg); err != nil {
 				return err
 			}
 			info.Police = arg
@@ -94,35 +92,35 @@ func marshalCbq(info *Cbq) ([]byte, error) {
 	// TODO: improve logic and check combinations
 
 	if info.LssOpt != nil {
-		data, err := validateCbqLssOpt(info.LssOpt)
+		data, err := marshalStruct(info.LssOpt)
 		if err != nil {
 			return []byte{}, err
 		}
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaCbqLssOpt, Data: data})
 	}
 	if info.WrrOpt != nil {
-		data, err := validateCbqWrrOpt(info.WrrOpt)
+		data, err := marshalStruct(info.WrrOpt)
 		if err != nil {
 			return []byte{}, err
 		}
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaCbqWrrOpt, Data: data})
 	}
 	if info.FOpt != nil {
-		data, err := validateCbqFOpt(info.FOpt)
+		data, err := marshalStruct(info.FOpt)
 		if err != nil {
 			return []byte{}, err
 		}
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaCbqFOpt, Data: data})
 	}
 	if info.OVLStrategy != nil {
-		data, err := validateCbqOvl(info.OVLStrategy)
+		data, err := marshalStruct(info.OVLStrategy)
 		if err != nil {
 			return []byte{}, err
 		}
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaCbqOVLStrategy, Data: data})
 	}
 	if info.Police != nil {
-		data, err := validateCbqPolice(info.Police)
+		data, err := marshalStruct(info.Police)
 		if err != nil {
 			return []byte{}, err
 		}
@@ -144,17 +142,6 @@ type CbqLssOpt struct {
 	Avpkt   uint32
 }
 
-func extractCbqLssOpt(data []byte, info *CbqLssOpt) error {
-	b := bytes.NewReader(data)
-	return binary.Read(b, nativeEndian, info)
-}
-
-func validateCbqLssOpt(info *CbqLssOpt) ([]byte, error) {
-	var buf bytes.Buffer
-	err := binary.Write(&buf, nativeEndian, *info)
-	return buf.Bytes(), err
-}
-
 // CbqWrrOpt from include/uapi/linux/pkt_sched.h
 type CbqWrrOpt struct {
 	Flags     byte
@@ -165,33 +152,11 @@ type CbqWrrOpt struct {
 	Weight    uint32
 }
 
-func extractCbqWrrOpt(data []byte, info *CbqWrrOpt) error {
-	b := bytes.NewReader(data)
-	return binary.Read(b, nativeEndian, info)
-}
-
-func validateCbqWrrOpt(info *CbqWrrOpt) ([]byte, error) {
-	var buf bytes.Buffer
-	err := binary.Write(&buf, nativeEndian, *info)
-	return buf.Bytes(), err
-}
-
 // CbqFOpt from include/uapi/linux/pkt_sched.h
 type CbqFOpt struct {
 	Split     uint32
 	Defmap    uint32
 	Defchange uint32
-}
-
-func extractCbqFOpt(data []byte, info *CbqFOpt) error {
-	b := bytes.NewReader(data)
-	return binary.Read(b, nativeEndian, info)
-}
-
-func validateCbqFOpt(info *CbqFOpt) ([]byte, error) {
-	var buf bytes.Buffer
-	err := binary.Write(&buf, nativeEndian, *info)
-	return buf.Bytes(), err
 }
 
 // CbqOvl from include/uapi/linux/pkt_sched.h
@@ -202,31 +167,9 @@ type CbqOvl struct {
 	Penalty   uint32
 }
 
-func extractCbqOvl(data []byte, info *CbqOvl) error {
-	b := bytes.NewReader(data)
-	return binary.Read(b, nativeEndian, info)
-}
-
-func validateCbqOvl(info *CbqOvl) ([]byte, error) {
-	var buf bytes.Buffer
-	err := binary.Write(&buf, nativeEndian, *info)
-	return buf.Bytes(), err
-}
-
 // CbqPolice from include/uapi/linux/pkt_sched.h
 type CbqPolice struct {
 	Police byte
 	Res1   byte
 	Res2   uint16
-}
-
-func extractCbqPolice(data []byte, info *CbqPolice) error {
-	b := bytes.NewReader(data)
-	return binary.Read(b, nativeEndian, info)
-}
-
-func validateCbqPolice(info *CbqPolice) ([]byte, error) {
-	var buf bytes.Buffer
-	err := binary.Write(&buf, nativeEndian, *info)
-	return buf.Bytes(), err
 }
