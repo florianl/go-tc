@@ -1,8 +1,6 @@
 package tc
 
 import (
-	"bytes"
-	"encoding/binary"
 	"fmt"
 
 	"github.com/mdlayher/netlink"
@@ -33,19 +31,19 @@ func unmarshalHfsc(data []byte, info *Hfsc) error {
 		switch ad.Type() {
 		case tcaHfscRsc:
 			curve := &ServiceCurve{}
-			if err := extractServiceCurve(ad.Bytes(), curve); err != nil {
+			if err := unmarshalStruct(ad.Bytes(), curve); err != nil {
 				return err
 			}
 			info.Rsc = curve
 		case tcaHfscFsc:
 			curve := &ServiceCurve{}
-			if err := extractServiceCurve(ad.Bytes(), curve); err != nil {
+			if err := unmarshalStruct(ad.Bytes(), curve); err != nil {
 				return err
 			}
 			info.Fsc = curve
 		case tcaHfscUsc:
 			curve := &ServiceCurve{}
-			if err := extractServiceCurve(ad.Bytes(), curve); err != nil {
+			if err := unmarshalStruct(ad.Bytes(), curve); err != nil {
 				return err
 			}
 			info.Usc = curve
@@ -67,21 +65,21 @@ func marshalHfsc(info *Hfsc) ([]byte, error) {
 	// TODO: improve logic and check combinations
 
 	if info.Rsc != nil {
-		data, err := validateServiceCurve(info.Rsc)
+		data, err := marshalStruct(info.Rsc)
 		if err != nil {
 			return []byte{}, err
 		}
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaHfscRsc, Data: data})
 	}
 	if info.Fsc != nil {
-		data, err := validateServiceCurve(info.Fsc)
+		data, err := marshalStruct(info.Fsc)
 		if err != nil {
 			return []byte{}, err
 		}
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaHfscFsc, Data: data})
 	}
 	if info.Usc != nil {
-		data, err := validateServiceCurve(info.Usc)
+		data, err := marshalStruct(info.Usc)
 		if err != nil {
 			return []byte{}, err
 		}
@@ -96,15 +94,4 @@ type ServiceCurve struct {
 	M1 uint32
 	D  uint32
 	M2 uint32
-}
-
-func extractServiceCurve(data []byte, info *ServiceCurve) error {
-	b := bytes.NewReader(data)
-	return binary.Read(b, nativeEndian, info)
-}
-
-func validateServiceCurve(info *ServiceCurve) ([]byte, error) {
-	var buf bytes.Buffer
-	err := binary.Write(&buf, nativeEndian, *info)
-	return buf.Bytes(), err
 }
