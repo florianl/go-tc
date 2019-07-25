@@ -1,8 +1,6 @@
 package tc
 
 import (
-	"bytes"
-	"encoding/binary"
 	"fmt"
 
 	"github.com/mdlayher/netlink"
@@ -42,13 +40,13 @@ func unmarshalHtb(data []byte, info *Htb) error {
 		switch ad.Type() {
 		case tcaHtbParms:
 			opt := &HtbOpt{}
-			if err := extractHtbOpt(ad.Bytes(), opt); err != nil {
+			if err := unmarshalStruct(ad.Bytes(), opt); err != nil {
 				return err
 			}
 			info.Parms = opt
 		case tcaHtbInit:
 			glob := &HtbGlob{}
-			if err := extractHtbGlob(ad.Bytes(), glob); err != nil {
+			if err := unmarshalStruct(ad.Bytes(), glob); err != nil {
 				return err
 			}
 			info.Init = glob
@@ -80,14 +78,14 @@ func marshalHtb(info *Htb) ([]byte, error) {
 	}
 	// TODO: improve logic and check combinations
 	if info.Parms != nil {
-		data, err := validateHtbOpt(info.Parms)
+		data, err := marshalStruct(info.Parms)
 		if err != nil {
 			return []byte{}, err
 		}
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaHtbParms, Data: data})
 	}
 	if info.Init != nil {
-		data, err := validateHtbGlob(info.Init)
+		data, err := marshalStruct(info.Init)
 		if err != nil {
 			return []byte{}, err
 		}
@@ -114,17 +112,6 @@ type HtbGlob struct {
 	DirectPkts   uint32
 }
 
-func extractHtbGlob(data []byte, info *HtbGlob) error {
-	b := bytes.NewReader(data)
-	return binary.Read(b, nativeEndian, info)
-}
-
-func validateHtbGlob(info *HtbGlob) ([]byte, error) {
-	var buf bytes.Buffer
-	err := binary.Write(&buf, nativeEndian, *info)
-	return buf.Bytes(), err
-}
-
 // HtbOpt from include/uapi/linux/pkt_sched.h
 type HtbOpt struct {
 	Rate    RateSpec
@@ -134,15 +121,4 @@ type HtbOpt struct {
 	Quantum uint32
 	Level   uint32
 	Prio    uint32
-}
-
-func extractHtbOpt(data []byte, info *HtbOpt) error {
-	b := bytes.NewReader(data)
-	return binary.Read(b, nativeEndian, info)
-}
-
-func validateHtbOpt(info *HtbOpt) ([]byte, error) {
-	var buf bytes.Buffer
-	err := binary.Write(&buf, nativeEndian, *info)
-	return buf.Bytes(), err
 }
