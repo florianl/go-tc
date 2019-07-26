@@ -1,8 +1,6 @@
 package tc
 
 import (
-	"bytes"
-	"encoding/binary"
 	"fmt"
 
 	"github.com/mdlayher/netlink"
@@ -32,7 +30,7 @@ func unmarshalRed(data []byte, info *Red) error {
 		switch ad.Type() {
 		case tcaRedParms:
 			opt := &RedQOpt{}
-			if err := extractRedQOpt(ad.Bytes(), opt); err != nil {
+			if err := unmarshalStruct(ad.Bytes(), opt); err != nil {
 				return err
 			}
 			info.Parms = opt
@@ -55,7 +53,7 @@ func marshalRed(info *Red) ([]byte, error) {
 
 	// TODO: improve logic and check combinations
 	if info.Parms != nil {
-		data, err := validateRedQopt(info.Parms)
+		data, err := marshalStruct(info.Parms)
 		if err != nil {
 			return []byte{}, err
 		}
@@ -76,15 +74,4 @@ type RedQOpt struct {
 	Plog     byte
 	ScellLog byte
 	Flags    byte
-}
-
-func extractRedQOpt(data []byte, info *RedQOpt) error {
-	b := bytes.NewReader(data)
-	return binary.Read(b, nativeEndian, info)
-}
-
-func validateRedQopt(info *RedQOpt) ([]byte, error) {
-	var buf bytes.Buffer
-	err := binary.Write(&buf, nativeEndian, *info)
-	return buf.Bytes(), err
 }
