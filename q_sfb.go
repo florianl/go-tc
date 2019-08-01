@@ -1,8 +1,6 @@
 package tc
 
 import (
-	"bytes"
-	"encoding/binary"
 	"fmt"
 
 	"github.com/mdlayher/netlink"
@@ -29,7 +27,7 @@ func unmarshalSfb(data []byte, info *Sfb) error {
 		switch ad.Type() {
 		case tcaSfbParms:
 			opt := &SfbQopt{}
-			if err := extractSfbQopt(ad.Bytes(), opt); err != nil {
+			if err := unmarshalStruct(ad.Bytes(), opt); err != nil {
 				return err
 			}
 			info.Parms = opt
@@ -49,7 +47,7 @@ func marshalSfb(info *Sfb) ([]byte, error) {
 	}
 
 	if info.Parms != nil {
-		data, err := validateSfbQopt(info.Parms)
+		data, err := marshalStruct(info.Parms)
 		if err != nil {
 			return []byte{}, err
 		}
@@ -71,15 +69,4 @@ type SfbQopt struct {
 	Limit          uint32
 	PenaltyRate    uint32
 	PenaltyBurst   uint32
-}
-
-func extractSfbQopt(data []byte, info *SfbQopt) error {
-	b := bytes.NewReader(data)
-	return binary.Read(b, nativeEndian, info)
-}
-
-func validateSfbQopt(info *SfbQopt) ([]byte, error) {
-	var buf bytes.Buffer
-	err := binary.Write(&buf, nativeEndian, *info)
-	return buf.Bytes(), err
 }
