@@ -99,6 +99,20 @@ func qdiscAlterResponses(t *testing.T, cache *[]netlink.Message) []byte {
 		t.Fatalf("could not encode stats2: %v", err)
 	}
 
+	var stats bytes.Buffer
+	if err := binary.Write(&stats, nativeEndian, &Stats{
+		Bytes:      32,
+		Packets:    1,
+		Drops:      0,
+		Overlimits: 0,
+		Bps:        1,
+		Pps:        1,
+		Qlen:       1,
+		Backlog:    0,
+	}); err != nil {
+		t.Fatalf("could not encode stats: %v", err)
+	}
+
 	// Alter and marshal data
 	for _, obj := range tmp {
 		var data []byte
@@ -106,6 +120,8 @@ func qdiscAlterResponses(t *testing.T, cache *[]netlink.Message) []byte {
 
 		attrs = append(attrs, tcOption{Interpretation: vtString, Type: tcaKind, Data: obj.Kind})
 		attrs = append(attrs, tcOption{Interpretation: vtBytes, Type: tcaStats2, Data: stats2.Bytes()})
+		attrs = append(attrs, tcOption{Interpretation: vtBytes, Type: tcaStats, Data: stats.Bytes()})
+		attrs = append(attrs, tcOption{Interpretation: vtUint8, Type: tcaHwOffload, Data: uint8(0)})
 
 		marshaled, err := marshalAttributes(attrs)
 		if err != nil {
