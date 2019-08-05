@@ -1,8 +1,6 @@
 package tc
 
 import (
-	"bytes"
-	"encoding/binary"
 	"fmt"
 
 	"github.com/mdlayher/netlink"
@@ -50,7 +48,7 @@ func unmarshalActBpf(data []byte, info *ActBpf) error {
 			info.Tm = tm
 		case tcaActBpfParms:
 			parms := &ActBpfParms{}
-			if err := unmarshalActBpfParms(ad.Bytes(), parms); err != nil {
+			if err := unmarshalStruct(ad.Bytes(), parms); err != nil {
 				return err
 			}
 			info.Parms = parms
@@ -101,7 +99,7 @@ func marshalActBpf(info *ActBpf) ([]byte, error) {
 		options = append(options, tcOption{Interpretation: vtUint16, Type: tcaActBpfOpsLen, Data: info.OpsLen})
 	}
 	if info.Parms != nil {
-		data, err := marshalActBpfParms(info.Parms)
+		data, err := marshalStruct(info.Parms)
 		if err != nil {
 			return []byte{}, err
 		}
@@ -117,17 +115,4 @@ type ActBpfParms struct {
 	Action  uint32
 	Refcnt  uint32
 	Bindcnt uint32
-}
-
-// unmarshalActBpfParms parses the ActBpfParms-encoded data and stores the result in the value pointed to by info.
-func unmarshalActBpfParms(data []byte, info *ActBpfParms) error {
-	b := bytes.NewReader(data)
-	return binary.Read(b, nativeEndian, info)
-}
-
-// marshalActBpfParms returns the binary encoding of ActBpfParms
-func marshalActBpfParms(info *ActBpfParms) ([]byte, error) {
-	var buf bytes.Buffer
-	err := binary.Write(&buf, nativeEndian, *info)
-	return buf.Bytes(), err
 }
