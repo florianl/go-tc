@@ -1,0 +1,85 @@
+package tc
+
+import (
+	"fmt"
+
+	"github.com/mdlayher/netlink"
+)
+
+const (
+	tcaDefUnspec = iota
+	tcaDefTm
+	tcaDefParms
+	tcaDefData
+	tcaDefPad
+)
+
+// Defact contains attributes of the defact discipline
+type Defact struct {
+	Parms *DefactParms
+	Tm    *Tcft
+	Data  *string
+}
+
+// DefactParms from include/uapi/linux/tc_act/tc_defact.h
+type DefactParms struct {
+	Index   uint32
+	Capab   uint32
+	Action  uint32
+	RefCnt  uint32
+	BindCnt uint32
+}
+
+// marshalDefact returns the binary encoding of Defact
+func marshalDefact(info *Defact) ([]byte, error) {
+	options := []tcOption{}
+
+	if info == nil {
+		return []byte{}, fmt.Errorf("Defact options are missing")
+	}
+	// TODO: improve logic and check combinations
+	if info.Tm != nil {
+		return []byte{}, ErrNoArgAlter
+	}
+	if info.Parms != nil {
+		data, err := marshalStruct(info.Parms)
+		if err != nil {
+			return []byte{}, err
+		}
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaDefParms, Data: data})
+	}
+	return marshalAttributes(options)
+}
+
+// unmarshalDefact parses the defact-encoded data and stores the result in the value pointed to by info.
+func unmarshalDefact(data []byte, info *Defact) error {
+	ad, err := netlink.NewAttributeDecoder(data)
+	if err != nil {
+		return err
+	}
+	ad.ByteOrder = nativeEndian
+	for ad.Next() {
+		switch ad.Type() {
+		case tcaDefParms:
+			parms := &DefactParms{}
+			if err := unmarshalStruct(ad.Bytes(), parms); err != nil {
+				return err
+			}
+			info.Parms = parms
+		case tcaDefTm:
+			tcft := &Tcft{}
+			if err := unmarshalStruct(ad.Bytes(), tcft); err != nil {
+				return err
+			}
+			info.Tm = tcft
+		case tcaDefData:
+			tmp := ad.String()
+			info.Data = &tmp
+		case tcaDefPad:
+			// padding does not contain data, we just skip it
+		default:
+			return fmt.Errorf("unmarshalDefact()\t%d\n\t%v", ad.Type(), ad.Bytes())
+		}
+	}
+	return nil
+}
