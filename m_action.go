@@ -1,8 +1,6 @@
 package tc
 
 import (
-	"bytes"
-	"encoding/binary"
 	"fmt"
 
 	"github.com/mdlayher/netlink"
@@ -40,7 +38,7 @@ func unmarshalAction(data []byte, info *Action) error {
 			info.Index = ad.Uint32()
 		case tcaActCookie:
 			cookie := &Cookie{}
-			if err := extractCookie(ad.Bytes(), cookie); err != nil {
+			if err := unmarshalStruct(ad.Bytes(), cookie); err != nil {
 				return err
 			}
 			info.Cookie = cookie
@@ -73,9 +71,4 @@ func marshalAction(info *Action) ([]byte, error) {
 type Cookie struct {
 	Data uint8
 	Len  uint32
-}
-
-func extractCookie(data []byte, info *Cookie) error {
-	b := bytes.NewReader(data)
-	return binary.Read(b, nativeEndian, info)
 }
