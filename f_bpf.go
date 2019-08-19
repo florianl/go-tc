@@ -23,7 +23,7 @@ const (
 
 // Bpf contains attributes of the bpf discipline
 type Bpf struct {
-	Action   *BpfAction
+	Action   *Action
 	Police   *Police
 	ClassID  uint32
 	OpsLen   uint16
@@ -111,29 +111,4 @@ func marshalBpf(info *Bpf) ([]byte, error) {
 		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaBpfFlagsGen, Data: info.FlagsGen})
 	}
 	return marshalAttributes(options)
-}
-
-// BpfAction describes a Traffic Control action
-type BpfAction struct {
-	Kind       string
-	Statistics *ActionStats
-	BPFOptions *BPFActionOptions
-}
-
-// BPFActionOptions contains various action attributes
-type BPFActionOptions struct {
-	OpsLen uint16
-	Ops    []byte
-	Tcft   *Tcft
-	FD     uint32
-	Name   string
-	Act    *ActBpf
-}
-
-// ActionStats contains various statistics of a action
-type ActionStats struct {
-	Basic     *GenStatsBasic
-	RateEst   *GenStatsRateEst
-	Queue     *GenStatsQueue
-	RateEst64 *GenStatsRateEst64
 }

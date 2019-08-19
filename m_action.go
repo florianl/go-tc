@@ -20,7 +20,9 @@ const (
 type Action struct {
 	Kind   string
 	Index  uint32
+	Stats  interface{}
 	Cookie *Cookie
+	Bpf    *ActBpf
 }
 
 // unmarshalAction parses the Action-encoded data and stores the result in the value pointed to by info.
@@ -29,6 +31,7 @@ func unmarshalAction(data []byte, info *Action) error {
 	if err != nil {
 		return err
 	}
+	var actOptions []byte
 	ad.ByteOrder = nativeEndian
 	for ad.Next() {
 		switch ad.Type() {
@@ -36,6 +39,8 @@ func unmarshalAction(data []byte, info *Action) error {
 			info.Kind = ad.String()
 		case tcaActIndex:
 			info.Index = ad.Uint32()
+		case tcaActOptions:
+			actOptions = ad.Bytes()
 		case tcaActCookie:
 			cookie := &Cookie{}
 			if err := unmarshalStruct(ad.Bytes(), cookie); err != nil {
@@ -46,6 +51,11 @@ func unmarshalAction(data []byte, info *Action) error {
 			return fmt.Errorf("unmarshalAction()\t%d\n\t%v", ad.Type(), ad.Bytes())
 		}
 	}
+	if len(actOptions) > 0 {
+		if err := extractActOptions(actOptions, info, info.Kind); err != nil {
+			return err
+		}
+	}
 	return nil
 }
 
@@ -53,14 +63,23 @@ func unmarshalAction(data []byte, info *Action) error {
 func marshalAction(info *Action) ([]byte, error) {
 	options := []tcOption{}
 
-	if info == nil {
-		return []byte{}, fmt.Errorf("Action options are missing")
+	if len(info.Kind) == 0 {
+		return []byte{}, fmt.Errorf("kind is missing")
 	}
 
 	// TODO: improve logic and check combinations
-	if len(info.Kind) > 0 {
-		options = append(options, tcOption{Interpretation: vtString, Type: tcaActKind, Data: info.Kind})
+	switch info.Kind {
+	case "bpf":
+		data, err := marshalActBpf(info.Bpf)
+		if err != nil {
+			return []byte{}, err
+		}
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaActOptions, Data: data})
+	default:
+		return []byte{}, fmt.Errorf("unknown kind '%s'", info.Kind)
 	}
+	options = append(options, tcOption{Interpretation: vtString, Type: tcaActKind, Data: info.Kind})
+
 	if info.Index != 0 {
 		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaActIndex, Data: info.Index})
 	}
@@ -71,4 +90,19 @@ func marshalAction(info *Action) ([]byte, error) {
 type Cookie struct {
 	Data uint8
 	Len  uint32
+}
+
+func extractActOptions(data []byte, act *Action, kind string) error {
+	switch kind {
+	case "bpf":
+		info := &ActBpf{}
+		if err := unmarshalActBpf(data, info); err != nil {
+			return err
+		}
+		act.Bpf = info
+	default:
+		return fmt.Errorf("extractActOptions(): unsupported kind: %s", kind)
+
+	}
+	return nil
 }

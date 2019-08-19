@@ -13,8 +13,10 @@ func TestAction(t *testing.T) {
 		err1 error
 		err2 error
 	}{
-		"empty":  {err1: fmt.Errorf("Action options are missing")},
-		"simple": {val: Action{Kind: "test", Index: 123}},
+		"empty":               {err1: fmt.Errorf("kind is missing")},
+		"unknown Kind":        {val: Action{Kind: "test", Index: 123}, err1: fmt.Errorf("unknown kind 'test'")},
+		"bpf Without Options": {val: Action{Kind: "bpf"}, err1: fmt.Errorf("ActBpf options are missing")},
+		"simple Bpf":          {val: Action{Kind: "bpf", Bpf: &ActBpf{FD: 12, Name: "simpleTest", Parms: &ActBpfParms{Action: 2, Index: 4}}}},
 	}
 
 	for name, testcase := range tests {
