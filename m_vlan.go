@@ -1,0 +1,97 @@
+package tc
+
+import (
+	"fmt"
+
+	"github.com/mdlayher/netlink"
+)
+
+const (
+	tcaVLanUnspec = iota
+	tcaVLanTm
+	tcaVLanParms
+	tcaVLanPushVLanID
+	tcaVLanPushVLanProtocol
+	tcaVLanPad
+	tcaVLanPushVLanPriority
+)
+
+// VLan contains attribute of the VLan discipline
+type VLan struct {
+	Parms        *VLanParms
+	Tm           *Tcft
+	PushID       *uint16
+	PushProtocol *uint16
+	PushPriority *uint32
+}
+
+// VLanParms from from include/uapi/linux/tc_act/tc_vlan.h
+type VLanParms struct {
+	Index      uint32
+	Capab      uint32
+	Action     uint32
+	RefCnt     uint32
+	BindCnt    uint32
+	VLanAction uint32
+}
+
+// marshalVLan returns the binary encoding of Vlan
+func marshalVlan(info *VLan) ([]byte, error) {
+	options := []tcOption{}
+
+	if info == nil {
+		return []byte{}, fmt.Errorf("VLan options are missing")
+	}
+	// TODO: improve logic and check combinations
+	if info.Tm != nil {
+		return []byte{}, ErrNoArgAlter
+	}
+	if info.Parms != nil {
+		data, err := marshalStruct(info.Parms)
+		if err != nil {
+			return []byte{}, err
+		}
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaVLanParms, Data: data})
+	}
+	return marshalAttributes(options)
+}
+
+// unmarshalVLan parses the VLan-encoded data and stores the result in the value pointed to by info.
+func unmarshalVLan(data []byte, info *VLan) error {
+	ad, err := netlink.NewAttributeDecoder(data)
+	if err != nil {
+		return err
+	}
+	ad.ByteOrder = nativeEndian
+	for ad.Next() {
+		switch ad.Type() {
+		case tcaVLanParms:
+			parms := &VLanParms{}
+			if err := unmarshalStruct(ad.Bytes(), parms); err != nil {
+				return err
+			}
+			info.Parms = parms
+		case tcaVLanTm:
+			tcft := &Tcft{}
+			if err := unmarshalStruct(ad.Bytes(), tcft); err != nil {
+				return err
+			}
+			info.Tm = tcft
+
+		case tcaVLanPushVLanID:
+			tmp := ad.Uint16()
+			info.PushID = &tmp
+		case tcaVLanPushVLanProtocol:
+			tmp := ad.Uint16()
+			info.PushProtocol = &tmp
+		case tcaVLanPushVLanPriority:
+			tmp := ad.Uint32()
+			info.PushPriority = &tmp
+		case tcaVLanPad:
+			// padding does not contain data, we just skip it
+		default:
+			return fmt.Errorf("unmarshalVLan()\t%d\n\t%v", ad.Type(), ad.Bytes())
+		}
+	}
+	return nil
+}
