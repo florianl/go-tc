@@ -182,9 +182,9 @@ func ExampleU32() {
 					NKeys: 0x3,
 					Keys: []tc.U32Key{
 						//  match ip protocol 6 0xff
-						tc.U32Key{Mask: 0xff0000, Val: 0x60000, Off: 0x800, OffMask: 0x0},
-						tc.U32Key{Mask: 0xff000f00, Val: 0x5c0, Off: 0x0, OffMask: 0x0},
-						tc.U32Key{Mask: 0xff0000, Val: 0x100000, Off: 0x2000, OffMask: 0x0},
+						{Mask: 0xff0000, Val: 0x60000, Off: 0x800, OffMask: 0x0},
+						{Mask: 0xff000f00, Val: 0x5c0, Off: 0x0, OffMask: 0x0},
+						{Mask: 0xff0000, Val: 0x100000, Off: 0x2000, OffMask: 0x0},
 					},
 				},
 				Police: &tc.Police{

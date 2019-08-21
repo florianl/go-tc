@@ -36,7 +36,7 @@ func TestActBpft(t *testing.T) {
 				if err != nil {
 					t.Fatalf("could not generate enrichment: %v", err)
 				}
-				tmp, _ := marshalAttributes([]tcOption{tcOption{
+				tmp, _ := marshalAttributes([]tcOption{{
 					Interpretation: vtBytes, Type: tcaActBpfTm, Data: enrichment}})
 				data = append(data, tmp...)
 				testcase.val.Tm = testcase.enrich
