@@ -134,6 +134,7 @@ type Attribute struct {
 	Stats2       *Stats2
 
 	// Filters
+	Basic  *Basic
 	BPF    *Bpf
 	U32    *U32
 	Rsvp   *Rsvp
