@@ -18,11 +18,21 @@ const (
 
 // Action represents action attributes of various filters and classes
 type Action struct {
-	Kind   string
-	Index  uint32
-	Stats  interface{}
-	Cookie *Cookie
-	Bpf    *ActBpf
+	Kind     string
+	Index    uint32
+	Stats    interface{}
+	Cookie   *Cookie
+	Bpf      *ActBpf
+	ConnMark *Connmark
+	CSum     *Csum
+	Defact   *Defact
+	Ife      *Ife
+	Ipt      *Ipt
+	Mirred   *Mirred
+	Nat      *Nat
+	Sample   *Sample
+	VLan     *VLan
+	Police   *Police
 }
 
 // unmarshalAction parses the Action-encoded data and stores the result in the value pointed to by info.
@@ -75,6 +85,66 @@ func marshalAction(info *Action) ([]byte, error) {
 			return []byte{}, err
 		}
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaActOptions, Data: data})
+	case "connmark":
+		data, err := marshalConnmark(info.ConnMark)
+		if err != nil {
+			return []byte{}, err
+		}
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaActOptions, Data: data})
+	case "csum":
+		data, err := marshalCsum(info.CSum)
+		if err != nil {
+			return []byte{}, err
+		}
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaActOptions, Data: data})
+	case "defact":
+		data, err := marshalDefact(info.Defact)
+		if err != nil {
+			return []byte{}, err
+		}
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaActOptions, Data: data})
+	case "ife":
+		data, err := marshalIfe(info.Ife)
+		if err != nil {
+			return []byte{}, err
+		}
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaActOptions, Data: data})
+	case "ipt":
+		data, err := marshalIpt(info.Ipt)
+		if err != nil {
+			return []byte{}, err
+		}
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaActOptions, Data: data})
+	case "mirred":
+		data, err := marshalMirred(info.Mirred)
+		if err != nil {
+			return []byte{}, err
+		}
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaActOptions, Data: data})
+	case "nat":
+		data, err := marshalNat(info.Nat)
+		if err != nil {
+			return []byte{}, err
+		}
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaActOptions, Data: data})
+	case "sample":
+		data, err := marshalSample(info.Sample)
+		if err != nil {
+			return []byte{}, err
+		}
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaActOptions, Data: data})
+	case "vlan":
+		data, err := marshalVlan(info.VLan)
+		if err != nil {
+			return []byte{}, err
+		}
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaActOptions, Data: data})
+	case "police":
+		data, err := marshalPolice(info.Police)
+		if err != nil {
+			return []byte{}, err
+		}
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaActOptions, Data: data})
 	default:
 		return []byte{}, fmt.Errorf("unknown kind '%s'", info.Kind)
 	}
@@ -100,6 +170,66 @@ func extractActOptions(data []byte, act *Action, kind string) error {
 			return err
 		}
 		act.Bpf = info
+	case "connmark":
+		info := &Connmark{}
+		if err := unmarshalConnmark(data, info); err != nil {
+			return err
+		}
+		act.ConnMark = info
+	case "csum":
+		info := &Csum{}
+		if err := unmarshalCsum(data, info); err != nil {
+			return err
+		}
+		act.CSum = info
+	case "defact":
+		info := &Defact{}
+		if err := unmarshalDefact(data, info); err != nil {
+			return err
+		}
+		act.Defact = info
+	case "ife":
+		info := &Ife{}
+		if err := unmarshalIfe(data, info); err != nil {
+			return err
+		}
+		act.Ife = info
+	case "ipt":
+		info := &Ipt{}
+		if err := unmarshalIpt(data, info); err != nil {
+			return err
+		}
+		act.Ipt = info
+	case "mirred":
+		info := &Mirred{}
+		if err := unmarshalMirred(data, info); err != nil {
+			return err
+		}
+		act.Mirred = info
+	case "nat":
+		info := &Nat{}
+		if err := unmarshalNat(data, info); err != nil {
+			return err
+		}
+		act.Nat = info
+	case "sample":
+		info := &Sample{}
+		if err := unmarshalSample(data, info); err != nil {
+			return err
+		}
+		act.Sample = info
+	case "vlan":
+		info := &VLan{}
+		if err := unmarshalVLan(data, info); err != nil {
+			return err
+		}
+		act.VLan = info
+	case "police":
+		info := &Police{}
+		if err := unmarshalPolice(data, info); err != nil {
+			return err
+		}
+		act.Police = info
 	default:
 		return fmt.Errorf("extractActOptions(): unsupported kind: %s", kind)
 
