@@ -73,6 +73,36 @@ func validateFilterObject(action int, info *Object) ([]tcOption, error) {
 	}
 
 	switch info.Kind {
+	case "basic":
+		data, err := marshalBasic(info.Basic)
+		if err != nil {
+			return options, err
+		}
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaOptions, Data: data})
+	case "flow":
+		data, err := marshalFlow(info.Flow)
+		if err != nil {
+			return options, err
+		}
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaOptions, Data: data})
+	case "fw":
+		data, err := marshalFw(info.Fw)
+		if err != nil {
+			return options, err
+		}
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaOptions, Data: data})
+	case "route4":
+		data, err := marshalRoute4(info.Route4)
+		if err != nil {
+			return options, err
+		}
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaOptions, Data: data})
+	case "rsvp":
+		data, err := marshalRsvp(info.Rsvp)
+		if err != nil {
+			return options, err
+		}
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaOptions, Data: data})
 	case "bpf":
 		data, err := marshalBpf(info.BPF)
 		if err != nil {
