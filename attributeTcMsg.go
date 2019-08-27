@@ -182,6 +182,12 @@ func extractTCAOptions(data []byte, tc *Attribute, kind string) error {
 			return err
 		}
 		tc.Qfq = info
+	case "basic":
+		info := &Basic{}
+		if err := unmarshalBasic(data, info); err != nil {
+			return err
+		}
+		tc.Basic = info
 	case "bpf":
 		info := &Bpf{}
 		if err := unmarshalBpf(data, info); err != nil {
@@ -200,7 +206,7 @@ func extractTCAOptions(data []byte, tc *Attribute, kind string) error {
 			return err
 		}
 		tc.Rsvp = info
-	case "route":
+	case "route4":
 		info := &Route4{}
 		if err := unmarshalRoute4(data, info); err != nil {
 			return err
