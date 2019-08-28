@@ -17,6 +17,16 @@ func TestAction(t *testing.T) {
 		"unknown Kind":        {val: Action{Kind: "test", Index: 123}, err1: fmt.Errorf("unknown kind 'test'")},
 		"bpf Without Options": {val: Action{Kind: "bpf"}, err1: fmt.Errorf("ActBpf options are missing")},
 		"simple Bpf":          {val: Action{Kind: "bpf", Bpf: &ActBpf{FD: 12, Name: "simpleTest", Parms: &ActBpfParms{Action: 2, Index: 4}}}},
+		"connmark":            {val: Action{Kind: "connmark", ConnMark: &Connmark{Parms: &ConnmarkParam{Index: 42, Action: 1}}}},
+		"csum":                {val: Action{Kind: "csum", CSum: &Csum{Parms: &CsumParms{Index: 1, Capab: 2}}}},
+		"defact":              {val: Action{Kind: "defact", Defact: &Defact{Parms: &DefactParms{Index: 42, Action: 1}}}},
+		"ife":                 {val: Action{Kind: "ife", Ife: &Ife{Parms: &IfeParms{Index: 42, Action: 1}}}},
+		"ipt":                 {val: Action{Kind: "ipt", Ipt: &Ipt{Table: "testTable", Hook: 42, Index: 1984}}},
+		"mirred":              {val: Action{Kind: "mirred", Mirred: &Mirred{Parms: &MirredParam{Index: 42, Action: 1}}}},
+		"nat":                 {val: Action{Kind: "nat", Nat: &Nat{Parms: &NatParms{Index: 42, Action: 1}}}},
+		"police":              {val: Action{Kind: "police", Police: &Police{AvRate: 1337, Result: 42}}},
+		"sample":              {val: Action{Kind: "sample", Sample: &Sample{Parms: &SampleParms{Index: 42, Action: 1}}}},
+		"vlan":                {val: Action{Kind: "vlan", VLan: &VLan{Parms: &VLanParms{Index: 42, Action: 1}}}},
 	}
 
 	for name, testcase := range tests {
