@@ -96,6 +96,102 @@ func validateQdiscObject(action int, info *Object) ([]tcOption, error) {
 	// TODO: improve logic and check combinations
 
 	switch info.Kind {
+	case "pfifo":
+		data, err := marshalStruct(info.Pfifo)
+		if err != nil {
+			return options, err
+		}
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaOptions, Data: data})
+	case "bfifo":
+		data, err := marshalStruct(info.Bfifo)
+		if err != nil {
+			return options, err
+		}
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaOptions, Data: data})
+	case "tbf":
+		data, err := marshalTbf(info.Tbf)
+		if err != nil {
+			return options, err
+		}
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaOptions, Data: data})
+	case "sfb":
+		data, err := marshalSfb(info.Sfb)
+		if err != nil {
+			return options, err
+		}
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaOptions, Data: data})
+	case "red":
+		data, err := marshalRed(info.Red)
+		if err != nil {
+			return options, err
+		}
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaOptions, Data: data})
+	case "qfq":
+		data, err := marshalQfq(info.Qfq)
+		if err != nil {
+			return options, err
+		}
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaOptions, Data: data})
+	case "pie":
+		data, err := marshalPie(info.Pie)
+		if err != nil {
+			return options, err
+		}
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaOptions, Data: data})
+	case "mqprio":
+		data, err := marshalMqPrio(info.MqPrio)
+		if err != nil {
+			return options, err
+		}
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaOptions, Data: data})
+	case "hhf":
+		data, err := marshalHhf(info.Hhf)
+		if err != nil {
+			return options, err
+		}
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaOptions, Data: data})
+	case "hfsc":
+		data, err := marshalHfsc(info.Hfsc)
+		if err != nil {
+			return options, err
+		}
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaOptions, Data: data})
+	case "fq":
+		data, err := marshalFq(info.Fq)
+		if err != nil {
+			return options, err
+		}
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaOptions, Data: data})
+	case "dsmark":
+		data, err := marshalDsmark(info.Dsmark)
+		if err != nil {
+			return options, err
+		}
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaOptions, Data: data})
+	case "drr":
+		data, err := marshalDrr(info.Drr)
+		if err != nil {
+			return options, err
+		}
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaOptions, Data: data})
+	case "codel":
+		data, err := marshalCodel(info.Codel)
+		if err != nil {
+			return options, err
+		}
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaOptions, Data: data})
+	case "cbq":
+		data, err := marshalCbq(info.Cbq)
+		if err != nil {
+			return options, err
+		}
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaOptions, Data: data})
+	case "atm":
+		data, err := marshalAtm(info.Atm)
+		if err != nil {
+			return options, err
+		}
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaOptions, Data: data})
 	case "clsact":
 		// clsact is parameterless
 	case "ingress":
