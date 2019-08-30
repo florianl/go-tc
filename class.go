@@ -1,8 +1,6 @@
 package tc
 
 import (
-	"fmt"
-
 	"github.com/mdlayher/netlink"
 )
 
@@ -27,7 +25,7 @@ func (c *Class) Add(info *Object) error {
 	if info == nil {
 		return ErrNoArg
 	}
-	options, err := validateClassObject(rtmNewClass, info)
+	options, err := validateQdiscObject(rtmNewClass, info)
 	if err != nil {
 		return err
 	}
@@ -39,7 +37,7 @@ func (c *Class) Replace(info *Object) error {
 	if info == nil {
 		return ErrNoArg
 	}
-	options, err := validateClassObject(rtmNewClass, info)
+	options, err := validateQdiscObject(rtmNewClass, info)
 	if err != nil {
 		return err
 	}
@@ -51,7 +49,7 @@ func (c *Class) Delete(info *Object) error {
 	if info == nil {
 		return ErrNoArg
 	}
-	options, err := validateClassObject(rtmDelClass, info)
+	options, err := validateQdiscObject(rtmDelClass, info)
 	if err != nil {
 		return err
 	}
@@ -64,12 +62,4 @@ func (c *Class) Get(i *Msg) ([]Object, error) {
 		return []Object{}, ErrNoArg
 	}
 	return c.get(rtmGetClass, i)
-}
-
-func validateClassObject(action int, info *Object) ([]tcOption, error) {
-	options := []tcOption{}
-	if info.Ifindex == 0 {
-		return options, fmt.Errorf("could not set device ID 0")
-	}
-	return options, nil
 }
