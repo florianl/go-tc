@@ -2,6 +2,7 @@ package tc
 
 import (
 	"encoding/binary"
+	"fmt"
 	"unsafe"
 
 	"github.com/mdlayher/netlink"
@@ -182,4 +183,27 @@ type XStats struct {
 	Hhf     *HhfXStats
 	Pie     *PieXStats
 	FqCodel *FqCodelXStats
+}
+
+func marshalXStats(v XStats) ([]byte, error) {
+	if v.Sfb != nil {
+		return marshalStruct(v.Sfb)
+	} else if v.Sfq != nil {
+		return marshalStruct(v.Sfq)
+	} else if v.Red != nil {
+		return marshalStruct(v.Red)
+	} else if v.Choke != nil {
+		return marshalStruct(v.Choke)
+	} else if v.Htb != nil {
+		return marshalStruct(v.Htb)
+	} else if v.Cbq != nil {
+		return marshalStruct(v.Cbq)
+	} else if v.Codel != nil {
+		return marshalStruct(v.Codel)
+	} else if v.Hhf != nil {
+		return marshalStruct(v.Hhf)
+	} else if v.Pie != nil {
+		return marshalStruct(v.Pie)
+	}
+	return []byte{}, fmt.Errorf("could not marshal XStat")
 }
