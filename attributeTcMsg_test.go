@@ -135,3 +135,49 @@ func TestExtractTCAOptions(t *testing.T) {
 		})
 	}
 }
+
+func TestFilterAttribute(t *testing.T) {
+	tests := map[string]struct {
+		val  *Attribute
+		err1 error
+		err2 error
+	}{
+		"basic": {val: &Attribute{Kind: "basic", Basic: &Basic{ClassID: 2}}},
+		"bpf": {val: &Attribute{Kind: "bpf", BPF: &Bpf{Ops: []byte{0x6, 0x0, 0x0, 0x0, 0xff, 0xff, 0xff, 0xff},
+			OpsLen:  0x1,
+			ClassID: 0x10001,
+			Flags:   0x1}}},
+		"flow":   {val: &Attribute{Kind: "flow", Flow: &Flow{Keys: 12, Mode: 34, BaseClass: 56, RShift: 78, Addend: 90, Mask: 21, XOR: 43, Divisor: 65, PerTurb: 87}}},
+		"fw":     {val: &Attribute{Kind: "fw", Fw: &Fw{ClassID: 12, InDev: "lo", Mask: 0xFFFF}}},
+		"route4": {val: &Attribute{Kind: "route4", Route4: &Route4{ClassID: 0xFFFF, To: 2, From: 3, IIf: 4}}},
+		"rsvp":   {val: &Attribute{Kind: "rsvp", Rsvp: &Rsvp{ClassID: 42, Police: &Police{AvRate: 1337, Result: 12}}}},
+		"u32":    {val: &Attribute{Kind: "u32", U32: &U32{ClassID: 0xFFFF, Mark: &U32Mark{Val: 0x55, Mask: 0xAA, Success: 0x1}}}},
+	}
+
+	for name, testcase := range tests {
+		t.Run(name, func(t *testing.T) {
+			options, err1 := validateFilterObject(rtmNewFilter, &Object{Msg{Ifindex: 42}, *testcase.val})
+			if err1 != nil {
+				if testcase.err1 != nil && testcase.err1.Error() == err1.Error() {
+					return
+				}
+				t.Fatalf("Unexpected error: %v", err1)
+			}
+			data, err := marshalAttributes(options)
+			if err != nil {
+				t.Fatalf("Unexpected error: %v", err)
+			}
+			info := &Attribute{}
+			err2 := extractTcmsgAttributes(data, info)
+			if err2 != nil {
+				if testcase.err2 != nil && testcase.err2.Error() == err2.Error() {
+					return
+				}
+				t.Fatalf("Unexpected error: %v", err2)
+			}
+			if diff := cmp.Diff(info, testcase.val); diff != "" {
+				t.Fatalf("Filter missmatch (want +got):\n%s", diff)
+			}
+		})
+	}
+}
