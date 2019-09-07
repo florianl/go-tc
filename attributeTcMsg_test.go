@@ -181,3 +181,59 @@ func TestFilterAttribute(t *testing.T) {
 		})
 	}
 }
+
+func TestQdiscAttribute(t *testing.T) {
+	tests := map[string]struct {
+		val  *Attribute
+		err1 error
+		err2 error
+	}{
+		"clsact":   {val: &Attribute{Kind: "clsact"}},
+		"ingress":  {val: &Attribute{Kind: "ingress"}},
+		"atm":      {val: &Attribute{Kind: "atm", Atm: &Atm{FD: 12, Addr: &AtmPvc{Itf: byte(2)}}}},
+		"cbq":      {val: &Attribute{Kind: "cbq", Cbq: &Cbq{LssOpt: &CbqLssOpt{OffTime: 10}, WrrOpt: &CbqWrrOpt{Weight: 42}, FOpt: &CbqFOpt{Split: 2}, OVLStrategy: &CbqOvl{Penalty: 2}}}},
+		"codel":    {val: &Attribute{Kind: "codel", Codel: &Codel{Target: 1, Limit: 2, Interval: 3, ECN: 4, CEThreshold: 5}}},
+		"drr":      {val: &Attribute{Kind: "drr", Drr: &Drr{Quantum: 345}}},
+		"dsmark":   {val: &Attribute{Kind: "dsmark", Dsmark: &Dsmark{Indices: 12, DefaultIndex: 34, Mask: 56, Value: 78}}},
+		"fq":       {val: &Attribute{Kind: "fq", Fq: &Fq{PLimit: 1, FlowPLimit: 2, Quantum: 3, InitQuantum: 4, RateEnable: 5, FlowDefaultRate: 6, FlowMaxRate: 7, BucketsLog: 8, FlowRefillDelay: 9, OrphanMask: 10, LowRateThreshold: 11, CEThreshold: 12}}},
+		"fq_codel": {val: &Attribute{Kind: "fq_codel", FqCodel: &FqCodel{Target: 1, Limit: 2, Interval: 3, ECN: 4, Flows: 5, Quantum: 6, CEThreshold: 7, DropBatchSize: 8, MemoryLimit: 9}}},
+		"hfsc":     {val: &Attribute{Kind: "hfsc", Hfsc: &Hfsc{Rsc: &ServiceCurve{M1: 12, D: 34, M2: 56}}}},
+		"hhf":      {val: &Attribute{Kind: "hhf", Hhf: &Hhf{BacklogLimit: 1, Quantum: 2, HHFlowsLimit: 3, ResetTimeout: 4, AdmitBytes: 5, EVICTTimeout: 6, NonHHWeight: 7}}},
+		"htb":      {val: &Attribute{Kind: "htb", Htb: &Htb{Rate64: 123, Parms: &HtbOpt{Buffer: 0xFFFF}}}},
+		"mqprio":   {val: &Attribute{Kind: "mqprio", MqPrio: &MqPrio{Mode: 1, Shaper: 2, MinRate64: 3, MaxRate64: 4}}},
+		"pie":      {val: &Attribute{Kind: "pie", Pie: &Pie{Target: 1, Limit: 2, TUpdate: 3, Alpha: 4, Beta: 5, ECN: 6, Bytemode: 7}}},
+		"qfq":      {val: &Attribute{Kind: "qfq", Qfq: &Qfq{Weight: 2, Lmax: 4}}},
+		"red":      {val: &Attribute{Kind: "red", Red: &Red{MaxP: 2, Parms: &RedQOpt{QthMin: 2, QthMax: 4}}}},
+		"sfb":      {val: &Attribute{Kind: "sfb", Sfb: &Sfb{Parms: &SfbQopt{Max: 0xFF}}}},
+		"tbf":      {val: &Attribute{Kind: "tbf", Tbf: &Tbf{Rate64: 1, Prate64: 2, Burst: 3, Pburst: 4}}},
+		"pfifo":    {val: &Attribute{Kind: "pfifo", Pfifo: &FifoOpt{Limit: 42}}},
+		"bfifo":    {val: &Attribute{Kind: "bfifo", Bfifo: &FifoOpt{Limit: 84}}},
+	}
+
+	for name, testcase := range tests {
+		t.Run(name, func(t *testing.T) {
+			options, err1 := validateQdiscObject(rtmNewQdisc, &Object{Msg{Ifindex: 42}, *testcase.val})
+			if err1 != nil {
+				if testcase.err1 != nil && testcase.err1.Error() == err1.Error() {
+					return
+				}
+				t.Fatalf("Unexpected error: %v", err1)
+			}
+			data, err := marshalAttributes(options)
+			if err != nil {
+				t.Fatalf("Unexpected error: %v", err)
+			}
+			info := &Attribute{}
+			err2 := extractTcmsgAttributes(data, info)
+			if err2 != nil {
+				if testcase.err2 != nil && testcase.err2.Error() == err2.Error() {
+					return
+				}
+				t.Fatalf("Unexpected error: %v", err2)
+			}
+			if diff := cmp.Diff(info, testcase.val); diff != "" {
+				t.Fatalf("Filter missmatch (want +got):\n%s", diff)
+			}
+		})
+	}
+}
