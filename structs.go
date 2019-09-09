@@ -244,3 +244,21 @@ func extractFqCodelXStats(data []byte, info *FqCodelXStats) error {
 	}
 	return nil
 }
+func marshalFqCodelXStats(v *FqCodelXStats) ([]byte, error) {
+	var buf bytes.Buffer
+	err := binary.Write(&buf, nativeEndian, v.Type)
+	var subStat []byte
+	switch v.Type {
+	case tcaFqCodelXStatsQdisc:
+		subStat, err = marshalStruct(v.Qd)
+	case tcaFqCodelXStatsClass:
+		subStat, err = marshalStruct(v.Cl)
+	default:
+		err = fmt.Errorf("marshalFqCodelXStats(): unknown FqCodelXStat type: %d", v.Type)
+	}
+	if err != nil {
+		return []byte{}, err
+	}
+	_, err = buf.Write(subStat)
+	return buf.Bytes(), err
+}
