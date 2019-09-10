@@ -18,6 +18,7 @@ func TestBpf(t *testing.T) {
 			OpsLen:  0x1,
 			ClassID: 0x10001,
 			Flags:   0x1}},
+		"da obj /tmp/bpf.o sec foo": {val: Bpf{FD: 8, Name: "bpf.o:[foo]", Flags: 0x1, FlagsGen: 0x0}},
 	}
 
 	for name, testcase := range tests {
