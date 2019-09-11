@@ -24,10 +24,20 @@ func TestQdisc(t *testing.T) {
 		kind    string
 		fqCodel *FqCodel
 		red     *Red
+		sfb     *Sfb
+		cbq     *Cbq
+		codel   *Codel
+		hhf     *Hhf
+		pie     *Pie
 	}{
 		"clsact":   {kind: "clsact"},
 		"fq_codel": {kind: "fq_codel", fqCodel: &FqCodel{Target: 42, Limit: 0xCAFE}},
 		"red":      {kind: "red", red: &Red{MaxP: 42}},
+		"sfb":      {kind: "sfb", sfb: &Sfb{Parms: &SfbQopt{Max: 0xFF}}},
+		"cbq":      {kind: "cbq", cbq: &Cbq{LssOpt: &CbqLssOpt{OffTime: 10}, WrrOpt: &CbqWrrOpt{Weight: 42}, FOpt: &CbqFOpt{Split: 2}, OVLStrategy: &CbqOvl{Penalty: 2}}},
+		"codel":    {kind: "codel", codel: &Codel{Target: 1, Limit: 2, Interval: 3, ECN: 4, CEThreshold: 5}},
+		"hhf":      {kind: "hhf", hhf: &Hhf{BacklogLimit: 1, Quantum: 2, HHFlowsLimit: 3, ResetTimeout: 4, AdmitBytes: 5, EVICTTimeout: 6, NonHHWeight: 7}},
+		"pie":      {kind: "pie", pie: &Pie{Target: 1, Limit: 2, TUpdate: 3, Alpha: 4, Beta: 5, ECN: 6, Bytemode: 7}},
 	}
 
 	tcMsg := Msg{
@@ -46,6 +56,11 @@ func TestQdisc(t *testing.T) {
 					Kind:    testcase.kind,
 					FqCodel: testcase.fqCodel,
 					Red:     testcase.red,
+					Sfb:     testcase.sfb,
+					Cbq:     testcase.cbq,
+					Codel:   testcase.codel,
+					Hhf:     testcase.hhf,
+					Pie:     testcase.pie,
 				},
 			}
 
@@ -122,6 +137,12 @@ func qdiscAlterResponses(t *testing.T, cache *[]netlink.Message) []byte {
 
 		// add XStats
 		switch obj.Kind {
+		case "fq_codel":
+			data, err := marshalXStats(XStats{FqCodel: &FqCodelXStats{Type: 0, Qd: &FqCodelQdStats{}}})
+			if err != nil {
+				t.Fatalf("could not marshal Xstats struct: %v", err)
+			}
+			attrs = append(attrs, tcOption{Interpretation: vtBytes, Type: tcaXstats, Data: data})
 		case "sfq":
 			data, err := marshalXStats(XStats{Sfq: &SfqXStats{Allot: 42}})
 			if err != nil {
