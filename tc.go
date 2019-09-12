@@ -1,11 +1,14 @@
 package tc
 
 import (
+	"context"
 	"encoding/binary"
 	"fmt"
+	"time"
 	"unsafe"
 
 	"github.com/mdlayher/netlink"
+	"golang.org/x/sys/unix"
 )
 
 // Tc represents a RTNETLINK wrapper
@@ -204,6 +207,91 @@ func marshalXStats(v XStats) ([]byte, error) {
 		return marshalStruct(v.Hhf)
 	} else if v.Pie != nil {
 		return marshalStruct(v.Pie)
+	} else if v.FqCodel != nil {
+		return marshalFqCodelXStats(v.FqCodel)
 	}
 	return []byte{}, fmt.Errorf("could not marshal XStat")
+}
+
+// HookFunc is a function, which is called for each altered RTNETLINK Object.
+// Return something different than 0, to stop receiving messages.
+// action will have the value of unix.RTM_[NEW|GET|DEL][QDISC|TCLASS|FILTER].
+type HookFunc func(action uint16, m Object) int
+
+// Monitor NETLINK_ROUTE messages
+func (tc *Tc) Monitor(ctx context.Context, deadline time.Duration, fn HookFunc) error {
+	ifinfomsg, err := marshalStruct(unix.IfInfomsg{
+		Family: unix.AF_UNSPEC,
+	})
+	if err != nil {
+		return err
+	}
+
+	rtattr, err := marshalAttributes([]tcOption{tcOption{Interpretation: vtUint32, Type: unix.IFLA_EXT_MASK, Data: uint32(1)}})
+	if err != nil {
+		return err
+	}
+
+	data := ifinfomsg
+	data = append(data, rtattr...)
+
+	req := netlink.Message{
+		Header: netlink.Header{
+			Type:  netlink.HeaderType(unix.RTM_GETLINK),
+			Flags: netlink.Request | netlink.Dump,
+		},
+		Data: data,
+	}
+
+	if err := tc.con.JoinGroup(unix.RTNLGRP_TC); err != nil {
+		return err
+	}
+
+	verify, err := tc.con.Send(req)
+	if err != nil {
+		return err
+	}
+	_ = verify
+	if err := netlink.Validate(req, []netlink.Message{verify}); err != nil {
+		return err
+	}
+
+	go func() {
+		defer func() {
+			tc.con.LeaveGroup(unix.RTNLGRP_TC)
+		}()
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			default:
+			}
+			deadline := time.Now().Add(deadline)
+			tc.con.SetReadDeadline(deadline)
+			msgs, err := tc.con.Receive()
+			if err != nil {
+				if oerr, ok := err.(*netlink.OpError); ok {
+					if oerr.Timeout() {
+						continue
+					}
+				}
+				return
+			}
+			for _, msg := range msgs {
+				var monitored Object
+				if err := tcmsgDecode(msg.Data[:20], &monitored.Msg); err != nil {
+					// TODO: add to logging
+					continue
+				}
+				if err := extractTcmsgAttributes(msg.Data[20:], &monitored.Attribute); err != nil {
+					// TODO: add to logging
+					continue
+				}
+				if fn(uint16(msg.Header.Type), monitored) != 0 {
+					return
+				}
+			}
+		}
+	}()
+	return nil
 }
