@@ -247,6 +247,9 @@ func extractFqCodelXStats(data []byte, info *FqCodelXStats) error {
 func marshalFqCodelXStats(v *FqCodelXStats) ([]byte, error) {
 	var buf bytes.Buffer
 	err := binary.Write(&buf, nativeEndian, v.Type)
+	if err != nil {
+		return []byte{}, err
+	}
 	var subStat []byte
 	switch v.Type {
 	case tcaFqCodelXStatsQdisc:
