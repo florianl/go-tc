@@ -1,8 +1,6 @@
 package tc
 
 import (
-	"bytes"
-	"encoding/binary"
 	"fmt"
 
 	"github.com/mdlayher/netlink"
@@ -44,7 +42,7 @@ func unmarshalRsvp(data []byte, info *Rsvp) error {
 			info.Src = ad.Bytes()
 		case tcaRsvpPInfo:
 			arg := &RsvpPInfo{}
-			if err := marshalRsvpPInfo(ad.Bytes(), arg); err != nil {
+			if err := unmarshalStruct(ad.Bytes(), arg); err != nil {
 				return err
 			}
 			info.PInfo = arg
@@ -75,7 +73,7 @@ func marshalRsvp(info *Rsvp) ([]byte, error) {
 		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaRoute4ClassID, Data: info.ClassID})
 	}
 	if info.PInfo != nil {
-		data, err := unmarshalRsvpPInfo(info.PInfo)
+		data, err := marshalStruct(info.PInfo)
 		if err != nil {
 			return []byte{}, err
 		}
@@ -99,17 +97,6 @@ type RsvpPInfo struct {
 	TunnelID  uint8
 	TunnelHdr uint8
 	Pad       uint8
-}
-
-func marshalRsvpPInfo(data []byte, info *RsvpPInfo) error {
-	b := bytes.NewReader(data)
-	return binary.Read(b, nativeEndian, info)
-}
-
-func unmarshalRsvpPInfo(info *RsvpPInfo) ([]byte, error) {
-	var buf bytes.Buffer
-	err := binary.Write(&buf, nativeEndian, *info)
-	return buf.Bytes(), err
 }
 
 // RsvpGpi from include/uapi/linux/pkt_sched.h

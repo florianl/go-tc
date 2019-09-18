@@ -13,8 +13,9 @@ func TestRsvp(t *testing.T) {
 		err1 error
 		err2 error
 	}{
-		"empty":  {err1: fmt.Errorf("Rsvp options are missing")},
-		"simple": {val: Rsvp{ClassID: 42, Police: &Police{AvRate: 1337, Result: 12}}},
+		"empty":    {err1: fmt.Errorf("Rsvp options are missing")},
+		"simple":   {val: Rsvp{ClassID: 42, Police: &Police{AvRate: 1337, Result: 12}}},
+		"extended": {val: Rsvp{ClassID: 13, PInfo: &RsvpPInfo{Dpi: RsvpGpi{Mask: 1234, Key: 4321, Offset: 1}, Protocol: 42}}},
 	}
 
 	for name, testcase := range tests {
