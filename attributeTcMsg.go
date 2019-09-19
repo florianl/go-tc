@@ -70,6 +70,12 @@ func extractTcmsgAttributes(data []byte, info *Attribute) error {
 
 func extractTCAOptions(data []byte, tc *Attribute, kind string) error {
 	switch kind {
+	case "choke":
+		info := &Choke{}
+		if err := unmarshalChoke(data, info); err != nil {
+			return err
+		}
+		tc.Choke = info
 	case "fq_codel":
 		info := &FqCodel{}
 		if err := unmarshalFqCodel(data, info); err != nil {
@@ -233,12 +239,6 @@ func extractTCAOptions(data []byte, tc *Attribute, kind string) error {
 
 func extractXStats(data []byte, tc *XStats, kind string) error {
 	switch kind {
-	case "sfq":
-		info := &SfqXStats{}
-		if err := unmarshalStruct(data, info); err != nil {
-			return err
-		}
-		tc.Sfq = info
 	case "sfb":
 		info := &SfbXStats{}
 		if err := unmarshalStruct(data, info); err != nil {
