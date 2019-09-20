@@ -96,6 +96,12 @@ func validateQdiscObject(action int, info *Object) ([]tcOption, error) {
 	// TODO: improve logic and check combinations
 
 	switch info.Kind {
+	case "choke":
+		data, err := marshalChoke(info.Choke)
+		if err != nil {
+			return options, err
+		}
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaOptions, Data: data})
 	case "pfifo":
 		data, err := marshalStruct(info.Pfifo)
 		if err != nil {
