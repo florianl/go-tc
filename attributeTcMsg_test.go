@@ -81,6 +81,7 @@ func TestExtractTcmsgAttributes(t *testing.T) {
 		expected *Attribute
 		err      error
 	}{
+		"empty":  {input: []byte{}, expected: &Attribute{}},
 		"clsact": {input: generateClsact(t), expected: &Attribute{Kind: "clsact", HwOffload: 0x60, EgressBlock: 0x1337, IngressBlock: 0xcafe, Chain: 42}},
 		"htb": {input: generateHtb(t), expected: &Attribute{Kind: "htb",
 			XStats: &XStats{Htb: &HtbXStats{Lends: 0x02, Borrows: 0x03, Giants: 0x04, Tokens: 0x05, CTokens: 0x06}},
