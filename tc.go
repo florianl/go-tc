@@ -158,6 +158,7 @@ type Attribute struct {
 	MqPrio  *MqPrio
 	Pfifo   *FifoOpt
 	Bfifo   *FifoOpt
+	Choke   *Choke
 
 	// Classful qdiscs
 	Htb    *Htb
