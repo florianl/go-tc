@@ -48,7 +48,7 @@ func testConn(t *testing.T) (*Tc, func()) {
 			}
 			emptyMsg := make([]netlink.Message, 0, 1)
 			var data []byte
-			tcmsg, err := tcmsgEncode(&Msg{
+			tcmsg, err := marshalStruct(&Msg{
 				Family:  unix.AF_UNSPEC,
 				Ifindex: 0,
 				Handle:  0xC001,

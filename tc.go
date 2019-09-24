@@ -47,7 +47,7 @@ func (tc *Tc) query(req netlink.Message) ([]netlink.Message, error) {
 }
 
 func (tc *Tc) action(action int, flags netlink.HeaderFlags, msg *Msg, opts []tcOption) error {
-	tcminfo, err := tcmsgEncode(msg)
+	tcminfo, err := marshalStruct(msg)
 	if err != nil {
 		return err
 	}
@@ -85,7 +85,7 @@ func (tc *Tc) action(action int, flags netlink.HeaderFlags, msg *Msg, opts []tcO
 func (tc *Tc) get(action int, i *Msg) ([]Object, error) {
 	var results []Object
 
-	tcminfo, err := tcmsgEncode(i)
+	tcminfo, err := marshalStruct(i)
 	if err != nil {
 		return results, err
 	}
@@ -108,7 +108,7 @@ func (tc *Tc) get(action int, i *Msg) ([]Object, error) {
 
 	for _, msg := range msgs {
 		var result Object
-		if err := tcmsgDecode(msg.Data[:20], &result.Msg); err != nil {
+		if err := unmarshalStruct(msg.Data[:20], &result.Msg); err != nil {
 			return results, err
 		}
 		if err := extractTcmsgAttributes(msg.Data[20:], &result.Attribute); err != nil {
@@ -124,6 +124,15 @@ func (tc *Tc) get(action int, i *Msg) ([]Object, error) {
 type Object struct {
 	Msg
 	Attribute
+}
+
+// Msg represents a Traffic Control Message
+type Msg struct {
+	Family  uint32
+	Ifindex uint32
+	Handle  uint32
+	Parent  uint32
+	Info    uint32
 }
 
 // Attribute contains various elements for traffic control
@@ -280,7 +289,7 @@ func (tc *Tc) Monitor(ctx context.Context, deadline time.Duration, fn HookFunc) 
 			}
 			for _, msg := range msgs {
 				var monitored Object
-				if err := tcmsgDecode(msg.Data[:20], &monitored.Msg); err != nil {
+				if err := unmarshalStruct(msg.Data[:20], &monitored.Msg); err != nil {
 					// TODO: add to logging
 					continue
 				}
