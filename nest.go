@@ -15,6 +15,7 @@ const (
 	vtUint64
 	vtString
 	vtBytes
+	vtFlag
 )
 
 type tcOption struct {
@@ -40,6 +41,8 @@ func marshalAttributes(options []tcOption) ([]byte, error) {
 			ad.String(option.Type, (option.Data).(string))
 		case vtBytes:
 			ad.Bytes(option.Type, (option.Data).([]byte))
+		case vtFlag:
+			ad.Bytes(option.Type, []byte{})
 		default:
 			return []byte{}, fmt.Errorf("unknown interpretation: %d", option.Interpretation)
 		}

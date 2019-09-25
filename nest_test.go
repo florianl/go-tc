@@ -20,7 +20,8 @@ func TestMarshalAttributes(t *testing.T) {
 		"uint64":  {interpretation: vtUint64, attributeType: 4, data: uint64(126), result: []byte{0xc, 0x0, 0x4, 0x0, 0x7e, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0}},
 		"string":  {interpretation: vtString, attributeType: 5, data: string("hello world"), result: []byte{0x10, 0x0, 0x5, 0x0, 0x68, 0x65, 0x6c, 0x6c, 0x6f, 0x20, 0x77, 0x6f, 0x72, 0x6c, 0x64, 0x0}},
 		"bytes":   {interpretation: vtBytes, attributeType: 6, data: []byte{0x60, 0x0D, 0xCA, 0xFE}, result: []byte{0x8, 0x0, 0x6, 0x0, 0x60, 0xd, 0xca, 0xfe}},
-		"unknown": {interpretation: vtBytes + 1, attributeType: 42, data: nil, err: fmt.Errorf("Unknown interpretation: 6")},
+		"flags":   {interpretation: vtFlag, attributeType: 7, data: []byte{}, result: []byte{0x04, 0x00, 0x07, 0x00}},
+		"unknown": {interpretation: vtFlag + 1, attributeType: 42, data: nil, err: fmt.Errorf("Unknown interpretation: 7")},
 	}
 
 	for name, tc := range tests {
@@ -34,6 +35,7 @@ func TestMarshalAttributes(t *testing.T) {
 			})
 			if err != nil {
 				if tc.err != nil {
+					t.Logf("recv: %v\n", err)
 					// TODO compare resulting errors
 					return
 				}
