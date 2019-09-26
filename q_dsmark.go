@@ -19,9 +19,9 @@ const (
 type Dsmark struct {
 	Indices      uint16
 	DefaultIndex uint16
-	// SetTCIndex NLA_FLAG
-	Mask  uint8
-	Value uint8
+	SetTCIndex   bool
+	Mask         uint8
+	Value        uint8
 }
 
 // unmarshalDsmark parses the Dsmark-encoded data and stores the result in the value pointed to by info.
@@ -38,7 +38,7 @@ func unmarshalDsmark(data []byte, info *Dsmark) error {
 		case tcaDsmarkDefaultIndex:
 			info.DefaultIndex = ad.Uint16()
 		case tcaDsmarkSetTCIndex:
-			// TODO: NLA_FLAG not yet supported
+			info.SetTCIndex = true
 		case tcaDsmarkMask:
 			info.Mask = ad.Uint8()
 		case tcaDsmarkValue:
@@ -70,6 +70,9 @@ func marshalDsmark(info *Dsmark) ([]byte, error) {
 	}
 	if info.Value != 0 {
 		options = append(options, tcOption{Interpretation: vtUint8, Type: tcaDsmarkValue, Data: info.Value})
+	}
+	if info.SetTCIndex == true {
+		options = append(options, tcOption{Interpretation: vtFlag, Type: tcaDsmarkSetTCIndex})
 	}
 	return marshalAttributes(options)
 }

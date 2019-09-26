@@ -13,8 +13,9 @@ func TestDsmark(t *testing.T) {
 		err1 error
 		err2 error
 	}{
-		"empty":  {err1: fmt.Errorf("Dsmark options are missing")},
-		"simple": {val: Dsmark{Indices: 12, DefaultIndex: 34, Mask: 56, Value: 78}},
+		"empty":          {err1: fmt.Errorf("Dsmark options are missing")},
+		"simple":         {val: Dsmark{Indices: 12, DefaultIndex: 34, Mask: 56, Value: 78}},
+		"simpleWithFlag": {val: Dsmark{Indices: 12, DefaultIndex: 34, SetTCIndex: true}},
 	}
 
 	for name, testcase := range tests {
