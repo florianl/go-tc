@@ -48,7 +48,7 @@ func marshalChoke(info *Choke) ([]byte, error) {
 	options := []tcOption{}
 
 	if info == nil {
-		return []byte{}, fmt.Errorf("Choke options are missing")
+		return []byte{}, nil
 	}
 	// TODO: improve logic and check combinations
 

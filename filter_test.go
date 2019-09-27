@@ -32,17 +32,23 @@ func TestFilter(t *testing.T) {
 		},
 	}
 
-	u32ExactMatch := &U32{}
+	u32ExactMatch := &U32{
+		ClassID: 13,
+	}
 
 	if err := tcSocket.Qdisc().Add(&testQdisc); err != nil {
 		t.Fatalf("could not add new qdisc: %v", err)
 	}
 
 	tests := map[string]struct {
-		kind string
-		u32  *U32
+		kind       string
+		u32        *U32
+		errAdd     error
+		errReplace error
 	}{
-		"u32-exactMatch": {kind: "u32", u32: u32ExactMatch},
+		"unknown":         {kind: "unknown", errAdd: ErrNotImplemented},
+		"missingArgument": {kind: "bpf", errAdd: ErrNoArg},
+		"u32-exactMatch":  {kind: "u32", u32: u32ExactMatch},
 	}
 
 	for name, testcase := range tests {
@@ -57,7 +63,11 @@ func TestFilter(t *testing.T) {
 			}
 
 			if err := tcSocket.Filter().Add(&testFilter); err != nil {
-				t.Fatalf("could not add new filter: %v", err)
+				if testcase.errAdd == nil {
+					t.Fatalf("could not add new filter: %v", err)
+				}
+				// TODO: compare the returned error with the expected one
+				return
 			}
 
 			filters, err := tcSocket.Filter().Get(&tcMsg)
@@ -67,6 +77,15 @@ func TestFilter(t *testing.T) {
 			for _, filter := range filters {
 				t.Logf("%#v\n", filter)
 			}
+
+			if err := tcSocket.Filter().Replace(&testFilter); err != nil {
+				if testcase.errReplace == nil {
+					t.Fatalf("could not replace filter: %v", err)
+				}
+				// TODO: compare the returned error with the expected one
+				return
+			}
+
 			if err := tcSocket.Filter().Delete(&testFilter); err != nil {
 				t.Fatalf("could not delete filter: %v", err)
 			}

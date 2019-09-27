@@ -72,51 +72,35 @@ func validateFilterObject(action int, info *Object) ([]tcOption, error) {
 		return options, fmt.Errorf("could not set device ID 0")
 	}
 
+	var data []byte
+	var err error
 	switch info.Kind {
 	case "basic":
-		data, err := marshalBasic(info.Basic)
-		if err != nil {
-			return options, err
-		}
-		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaOptions, Data: data})
+		data, err = marshalBasic(info.Basic)
 	case "flow":
-		data, err := marshalFlow(info.Flow)
-		if err != nil {
-			return options, err
-		}
-		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaOptions, Data: data})
+		data, err = marshalFlow(info.Flow)
 	case "fw":
-		data, err := marshalFw(info.Fw)
-		if err != nil {
-			return options, err
-		}
-		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaOptions, Data: data})
+		data, err = marshalFw(info.Fw)
 	case "route4":
-		data, err := marshalRoute4(info.Route4)
-		if err != nil {
-			return options, err
-		}
-		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaOptions, Data: data})
+		data, err = marshalRoute4(info.Route4)
 	case "rsvp":
-		data, err := marshalRsvp(info.Rsvp)
-		if err != nil {
-			return options, err
-		}
-		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaOptions, Data: data})
+		data, err = marshalRsvp(info.Rsvp)
 	case "bpf":
-		data, err := marshalBpf(info.BPF)
-		if err != nil {
-			return options, err
-		}
-		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaOptions, Data: data})
+		data, err = marshalBpf(info.BPF)
 	case "u32":
-		data, err := marshalU32(info.U32)
-		if err != nil {
-			return options, err
-		}
-		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaOptions, Data: data})
+		data, err = marshalU32(info.U32)
 	default:
 		return options, ErrNotImplemented
+	}
+	if err != nil {
+		return options, err
+	}
+	if len(data) < 1 {
+		if action == rtmNewFilter {
+			return options, ErrNoArg
+		}
+	} else {
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaOptions, Data: data})
 	}
 	options = append(options, tcOption{Interpretation: vtString, Type: tcaKind, Data: info.Kind})
 

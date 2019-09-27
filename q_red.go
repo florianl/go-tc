@@ -48,7 +48,7 @@ func marshalRed(info *Red) ([]byte, error) {
 	options := []tcOption{}
 
 	if info == nil {
-		return []byte{}, fmt.Errorf("Red options are missing")
+		return []byte{}, nil
 	}
 
 	// TODO: improve logic and check combinations

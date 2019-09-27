@@ -1,7 +1,6 @@
 package tc
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -13,7 +12,7 @@ func TestChoke(t *testing.T) {
 		err1 error
 		err2 error
 	}{
-		"empty":  {err1: fmt.Errorf("Choke options are missing")},
+		"empty":  {},
 		"simple": {val: Choke{MaxP: 42}},
 	}
 

@@ -59,7 +59,7 @@ func marshalHfsc(info *Hfsc) ([]byte, error) {
 	options := []tcOption{}
 
 	if info == nil {
-		return []byte{}, fmt.Errorf("Hfsc options are missing")
+		return []byte{}, nil
 	}
 
 	// TODO: improve logic and check combinations

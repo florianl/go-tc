@@ -1,7 +1,6 @@
 package tc
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -13,7 +12,7 @@ func TestHtb(t *testing.T) {
 		err1 error
 		err2 error
 	}{
-		"empty":    {err1: fmt.Errorf("Htb options are missing")},
+		"empty":    {},
 		"simple":   {val: Htb{Rate64: 123, Parms: &HtbOpt{Buffer: 0xFFFF}}},
 		"extended": {val: Htb{Rate64: 123, Parms: &HtbOpt{Buffer: 0xFFFF}, Init: &HtbGlob{DirectPkts: 6789}}},
 	}

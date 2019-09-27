@@ -1,7 +1,6 @@
 package tc
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -13,7 +12,7 @@ func TestTbf(t *testing.T) {
 		err1 error
 		err2 error
 	}{
-		"empty":    {err1: fmt.Errorf("Tbf options are missing")},
+		"empty":    {},
 		"simple":   {val: Tbf{Rate64: 1, Prate64: 2, Burst: 3, Pburst: 4}},
 		"extended": {val: Tbf{Rate64: 1, Prate64: 2, Burst: 3, Pburst: 4, Parms: &TbfQopt{Buffer: 2, Limit: 3, Mtu: 4}}},
 	}

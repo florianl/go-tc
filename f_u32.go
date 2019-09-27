@@ -43,7 +43,7 @@ func marshalU32(info *U32) ([]byte, error) {
 	options := []tcOption{}
 
 	if info == nil {
-		return []byte{}, fmt.Errorf("U32 options are missing")
+		return []byte{}, nil
 	}
 
 	// TODO: improve logic and check combinations

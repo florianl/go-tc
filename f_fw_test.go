@@ -1,7 +1,6 @@
 package tc
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -13,7 +12,7 @@ func TestFw(t *testing.T) {
 		err1 error
 		err2 error
 	}{
-		"empty":    {err1: fmt.Errorf("Flow options are missing")},
+		"empty":    {},
 		"simple":   {val: Fw{ClassID: 12, InDev: "lo", Mask: 0xFFFF}},
 		"extended": {val: Fw{ClassID: 12, InDev: "lo", Mask: 0xFFFF, Police: &Police{AvRate: 1337, Result: 12}}},
 	}

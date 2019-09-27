@@ -87,7 +87,7 @@ func marshalCbq(info *Cbq) ([]byte, error) {
 	options := []tcOption{}
 
 	if info == nil {
-		return []byte{}, fmt.Errorf("Cbq options are missing")
+		return []byte{}, nil
 	}
 	// TODO: improve logic and check combinations
 

@@ -1,7 +1,6 @@
 package tc
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -13,7 +12,7 @@ func TestRed(t *testing.T) {
 		err1 error
 		err2 error
 	}{
-		"empty":  {err1: fmt.Errorf("Red options are missing")},
+		"empty":  {},
 		"simple": {val: Red{MaxP: 2, Parms: &RedQOpt{QthMin: 2, QthMax: 4}}},
 	}
 

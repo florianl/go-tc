@@ -1,7 +1,6 @@
 package tc
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -13,7 +12,7 @@ func TestSfb(t *testing.T) {
 		err1 error
 		err2 error
 	}{
-		"empty":  {err1: fmt.Errorf("Sfb options are missing")},
+		"empty":  {},
 		"simple": {val: Sfb{Parms: &SfbQopt{Max: 0xFF}}},
 	}
 

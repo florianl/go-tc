@@ -1,7 +1,6 @@
 package tc
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -13,7 +12,7 @@ func TestMqPrio(t *testing.T) {
 		err1 error
 		err2 error
 	}{
-		"empty":  {err1: fmt.Errorf("MqPrio options are missing")},
+		"empty":  {},
 		"simple": {val: MqPrio{Mode: 1, Shaper: 2, MinRate64: 3, MaxRate64: 4}},
 	}
 

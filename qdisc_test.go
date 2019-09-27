@@ -22,6 +22,7 @@ func TestQdisc(t *testing.T) {
 
 	tests := map[string]struct {
 		kind    string
+		err     error
 		fqCodel *FqCodel
 		red     *Red
 		sfb     *Sfb
@@ -32,6 +33,7 @@ func TestQdisc(t *testing.T) {
 		choke   *Choke
 	}{
 		"clsact":   {kind: "clsact"},
+		"emptyHtb": {kind: "htb", err: ErrNoArg},
 		"fq_codel": {kind: "fq_codel", fqCodel: &FqCodel{Target: 42, Limit: 0xCAFE}},
 		"red":      {kind: "red", red: &Red{MaxP: 42}},
 		"sfb":      {kind: "sfb", sfb: &Sfb{Parms: &SfbQopt{Max: 0xFF}}},
@@ -68,6 +70,10 @@ func TestQdisc(t *testing.T) {
 			}
 
 			if err := tcSocket.Qdisc().Add(&testQdisc); err != nil {
+				if testcase.err != nil && testcase.err.Error() == err.Error() {
+					// we received the expected error
+					return
+				}
 				t.Fatalf("could not add new qdisc: %v", err)
 			}
 

@@ -1,7 +1,6 @@
 package tc
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -13,7 +12,7 @@ func TestBpf(t *testing.T) {
 		err1 error
 		err2 error
 	}{
-		"empty": {err1: fmt.Errorf("Bpf options are missing")},
+		"empty": {},
 		"simple": {val: Bpf{Ops: []byte{0x6, 0x0, 0x0, 0x0, 0xff, 0xff, 0xff, 0xff},
 			OpsLen:  0x1,
 			ClassID: 0x10001,
