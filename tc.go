@@ -237,7 +237,7 @@ func (tc *Tc) Monitor(ctx context.Context, deadline time.Duration, fn HookFunc) 
 		return err
 	}
 
-	rtattr, err := marshalAttributes([]tcOption{tcOption{Interpretation: vtUint32, Type: unix.IFLA_EXT_MASK, Data: uint32(1)}})
+	rtattr, err := marshalAttributes([]tcOption{{Interpretation: vtUint32, Type: unix.IFLA_EXT_MASK, Data: uint32(1)}})
 	if err != nil {
 		return err
 	}

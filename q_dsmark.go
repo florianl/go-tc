@@ -71,7 +71,7 @@ func marshalDsmark(info *Dsmark) ([]byte, error) {
 	if info.Value != 0 {
 		options = append(options, tcOption{Interpretation: vtUint8, Type: tcaDsmarkValue, Data: info.Value})
 	}
-	if info.SetTCIndex == true {
+	if info.SetTCIndex {
 		options = append(options, tcOption{Interpretation: vtFlag, Type: tcaDsmarkSetTCIndex})
 	}
 	return marshalAttributes(options)

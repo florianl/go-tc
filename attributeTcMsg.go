@@ -332,14 +332,3 @@ const (
 	tcaIngressBlock
 	tcaEgressBlock
 )
-
-const (
-	tcaStatsUnspec = iota
-	tcaStatsBasic
-	tcaStatsRateEst
-	tcaStatsQueue
-	tcaStatsApp
-	tcaStatsRateEst64
-	tcaStatsPAD
-	tcaStatsBasicHw
-)

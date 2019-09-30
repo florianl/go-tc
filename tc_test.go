@@ -138,7 +138,7 @@ func TestMonitor(t *testing.T) {
 	}
 
 	// the deadline of 10 * time.Millisecond does not have an effect for the test,
-	// as the functionallity is not implemented for the test socket
+	// as the functionality is not implemented for the test socket
 	err := tcSocket.Monitor(ctx, 10*time.Millisecond, testHook)
 	if err != nil {
 		t.Fatalf("could not start tc monitor: %v", err)
