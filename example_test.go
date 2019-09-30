@@ -107,8 +107,8 @@ func Example_cBPF() {
 		tc.Msg{
 			Family:  unix.AF_UNSPEC,
 			Ifindex: uint32(devID.Index),
-			Handle:  tc.BuildHandle(0xFFFF, 0x0000),
-			Parent:  0xFFFFFFF1,
+			Handle:  tc.BuildHandle(tc.HandleIngress, 0x0000),
+			Parent:  tc.HandleIngress,
 			Info:    0,
 		},
 		tc.Attribute{
@@ -128,7 +128,7 @@ func Example_cBPF() {
 			Family:  unix.AF_UNSPEC,
 			Ifindex: uint32(devID.Index),
 			Handle:  0,
-			Parent:  tc.Ingress,
+			Parent:  tc.HandleIngress,
 			Info:    0x300,
 		},
 		tc.Attribute{
@@ -215,7 +215,7 @@ func ExampleU32() {
 			Family:  unix.AF_UNSPEC,
 			Ifindex: uint32(devID.Index),
 			Handle:  0,
-			Parent:  tc.Ingress,
+			Parent:  tc.HandleIngress,
 			Info:    0x300,
 		},
 		tc.Attribute{

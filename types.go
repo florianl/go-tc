@@ -18,13 +18,19 @@ type Config struct {
 
 // Constants to define the direction
 const (
-	HandleRoot    = 0xFFFFFFFF
-	HandleIngress = 0xFFFFFFF1
+	HandleRoot    uint32 = 0xFFFFFFFF
+	HandleIngress uint32 = 0xFFFFFFF1
 
-	HandleMinPriority = 0xFFE0
-	HandleMinIngress  = 0xFFF2
-	HandleMinEgress   = 0xFFF3
+	HandleMinPriority uint32 = 0xFFE0
+	HandleMinIngress  uint32 = 0xFFF2
+	HandleMinEgress   uint32 = 0xFFF3
 
 	// To alter filter in shared blocks, set Msg.Ifindex to MagicBlock
 	MagicBlock = 0xFFFFFFFF
+)
+
+// constants from include/uapi/linux/pkt_sched.h
+const (
+	handleMajMask uint32 = 0xFFFF0000
+	handleMinMask uint32 = 0x0000FFFF
 )

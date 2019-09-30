@@ -180,8 +180,8 @@ type Attribute struct {
 }
 
 // BuildHandle is a simple helper function to construct the handle for the Tcmsg struct
-func BuildHandle(major, minor uint16) uint32 {
-	return uint32(major)<<16 | uint32(minor)
+func BuildHandle(maj, min uint32) uint32 {
+	return ((maj & handleMajMask) | (min & handleMinMask))
 }
 
 // XStats contains further statistics to the TCA_KIND
