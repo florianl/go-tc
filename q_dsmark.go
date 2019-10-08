@@ -38,7 +38,7 @@ func unmarshalDsmark(data []byte, info *Dsmark) error {
 		case tcaDsmarkDefaultIndex:
 			info.DefaultIndex = ad.Uint16()
 		case tcaDsmarkSetTCIndex:
-			info.SetTCIndex = true
+			info.SetTCIndex = ad.Flag()
 		case tcaDsmarkMask:
 			info.Mask = ad.Uint8()
 		case tcaDsmarkValue:

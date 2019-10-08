@@ -42,7 +42,7 @@ func marshalAttributes(options []tcOption) ([]byte, error) {
 		case vtBytes:
 			ad.Bytes(option.Type, (option.Data).([]byte))
 		case vtFlag:
-			ad.Bytes(option.Type, []byte{})
+			ad.Flag(option.Type, true)
 		default:
 			return []byte{}, fmt.Errorf("unknown interpretation: %d", option.Interpretation)
 		}
