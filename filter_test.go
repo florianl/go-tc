@@ -1,11 +1,9 @@
-//+build linux
-
 package tc
 
 import (
 	"testing"
 
-	"golang.org/x/sys/unix"
+	"github.com/florianl/go-tc/internal/unix"
 )
 
 func TestFilter(t *testing.T) {

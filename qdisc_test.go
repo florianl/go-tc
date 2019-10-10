@@ -1,5 +1,3 @@
-//+build linux
-
 package tc
 
 import (
@@ -7,8 +5,9 @@ import (
 	"encoding/binary"
 	"testing"
 
+	"github.com/florianl/go-tc/internal/unix"
+
 	"github.com/mdlayher/netlink"
-	"golang.org/x/sys/unix"
 )
 
 func TestQdisc(t *testing.T) {

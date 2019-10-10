@@ -1,5 +1,3 @@
-//+build linux
-
 package tc
 
 import (
@@ -7,10 +5,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/florianl/go-tc/internal/unix"
 	"github.com/google/go-cmp/cmp"
 	"github.com/mdlayher/netlink"
 	"github.com/mdlayher/netlink/nltest"
-	"golang.org/x/sys/unix"
 )
 
 func testConn(t *testing.T) (*Tc, func()) {
