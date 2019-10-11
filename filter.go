@@ -3,6 +3,7 @@ package tc
 import (
 	"fmt"
 
+	"github.com/florianl/go-tc/internal/unix"
 	"github.com/mdlayher/netlink"
 )
 
@@ -10,12 +11,6 @@ import (
 type Filter struct {
 	Tc
 }
-
-const (
-	rtmNewFilter = 44
-	rtmDelFilter = 45
-	rtmGetFilter = 46
-)
 
 // Filter allows to read and alter filters
 func (tc *Tc) Filter() *Filter {
@@ -27,11 +22,11 @@ func (f *Filter) Add(info *Object) error {
 	if info == nil {
 		return ErrNoArg
 	}
-	options, err := validateFilterObject(rtmNewFilter, info)
+	options, err := validateFilterObject(unix.RTM_NEWTFILTER, info)
 	if err != nil {
 		return err
 	}
-	return f.action(rtmNewFilter, netlink.Create|netlink.Excl, &info.Msg, options)
+	return f.action(unix.RTM_NEWTFILTER, netlink.Create|netlink.Excl, &info.Msg, options)
 }
 
 // Replace add/remove a filter. If the node does not exist yet it is created
@@ -39,11 +34,11 @@ func (f *Filter) Replace(info *Object) error {
 	if info == nil {
 		return ErrNoArg
 	}
-	options, err := validateFilterObject(rtmNewFilter, info)
+	options, err := validateFilterObject(unix.RTM_NEWTFILTER, info)
 	if err != nil {
 		return err
 	}
-	return f.action(rtmNewFilter, netlink.Create, &info.Msg, options)
+	return f.action(unix.RTM_NEWTFILTER, netlink.Create, &info.Msg, options)
 }
 
 // Delete removes a filter
@@ -51,11 +46,11 @@ func (f *Filter) Delete(info *Object) error {
 	if info == nil {
 		return ErrNoArg
 	}
-	options, err := validateFilterObject(rtmDelFilter, info)
+	options, err := validateFilterObject(unix.RTM_DELTFILTER, info)
 	if err != nil {
 		return err
 	}
-	return f.action(rtmDelFilter, netlink.HeaderFlags(0), &info.Msg, options)
+	return f.action(unix.RTM_DELTFILTER, netlink.HeaderFlags(0), &info.Msg, options)
 }
 
 // Get fetches all filters
@@ -63,7 +58,7 @@ func (f *Filter) Get(i *Msg) ([]Object, error) {
 	if i == nil {
 		return []Object{}, ErrNoArg
 	}
-	return f.get(rtmGetFilter, i)
+	return f.get(unix.RTM_GETTFILTER, i)
 }
 
 func validateFilterObject(action int, info *Object) ([]tcOption, error) {
@@ -96,7 +91,7 @@ func validateFilterObject(action int, info *Object) ([]tcOption, error) {
 		return options, err
 	}
 	if len(data) < 1 {
-		if action == rtmNewFilter {
+		if action == unix.RTM_NEWTFILTER {
 			return options, ErrNoArg
 		}
 	} else {

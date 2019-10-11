@@ -4,6 +4,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/florianl/go-tc/internal/unix"
 	"github.com/google/go-cmp/cmp"
 )
 
@@ -157,7 +158,7 @@ func TestFilterAttribute(t *testing.T) {
 
 	for name, testcase := range tests {
 		t.Run(name, func(t *testing.T) {
-			options, err1 := validateFilterObject(rtmNewFilter, &Object{Msg{Ifindex: 42}, *testcase.val})
+			options, err1 := validateFilterObject(unix.RTM_NEWTFILTER, &Object{Msg{Ifindex: 42}, *testcase.val})
 			if err1 != nil {
 				if testcase.err1 != nil && testcase.err1.Error() == err1.Error() {
 					return
@@ -213,7 +214,7 @@ func TestQdiscAttribute(t *testing.T) {
 
 	for name, testcase := range tests {
 		t.Run(name, func(t *testing.T) {
-			options, err1 := validateQdiscObject(rtmNewQdisc, &Object{Msg{Ifindex: 42}, *testcase.val})
+			options, err1 := validateQdiscObject(unix.RTM_NEWQDISC, &Object{Msg{Ifindex: 42}, *testcase.val})
 			if err1 != nil {
 				if testcase.err1 != nil && testcase.err1.Error() == err1.Error() {
 					return

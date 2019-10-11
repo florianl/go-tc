@@ -1,6 +1,7 @@
 package tc
 
 import (
+	"github.com/florianl/go-tc/internal/unix"
 	"github.com/mdlayher/netlink"
 )
 
@@ -8,12 +9,6 @@ import (
 type Class struct {
 	Tc
 }
-
-const (
-	rtmNewClass = 40
-	rtmDelClass = 41
-	rtmGetClass = 42
-)
 
 // Class allows to read and alter classes
 func (tc *Tc) Class() *Class {
@@ -25,11 +20,11 @@ func (c *Class) Add(info *Object) error {
 	if info == nil {
 		return ErrNoArg
 	}
-	options, err := validateQdiscObject(rtmNewClass, info)
+	options, err := validateQdiscObject(unix.RTM_NEWTCLASS, info)
 	if err != nil {
 		return err
 	}
-	return c.action(rtmNewClass, netlink.Create|netlink.Excl, &info.Msg, options)
+	return c.action(unix.RTM_NEWTCLASS, netlink.Create|netlink.Excl, &info.Msg, options)
 }
 
 // Replace add/remove a class. If the node does not exist yet it is created
@@ -37,11 +32,11 @@ func (c *Class) Replace(info *Object) error {
 	if info == nil {
 		return ErrNoArg
 	}
-	options, err := validateQdiscObject(rtmNewClass, info)
+	options, err := validateQdiscObject(unix.RTM_NEWTCLASS, info)
 	if err != nil {
 		return err
 	}
-	return c.action(rtmNewClass, netlink.Create, &info.Msg, options)
+	return c.action(unix.RTM_NEWTCLASS, netlink.Create, &info.Msg, options)
 }
 
 // Delete removes a class
@@ -49,11 +44,11 @@ func (c *Class) Delete(info *Object) error {
 	if info == nil {
 		return ErrNoArg
 	}
-	options, err := validateQdiscObject(rtmDelClass, info)
+	options, err := validateQdiscObject(unix.RTM_DELTCLASS, info)
 	if err != nil {
 		return err
 	}
-	return c.action(rtmDelClass, netlink.HeaderFlags(0), &info.Msg, options)
+	return c.action(unix.RTM_DELTCLASS, netlink.HeaderFlags(0), &info.Msg, options)
 }
 
 // Get fetches all classes
@@ -61,5 +56,5 @@ func (c *Class) Get(i *Msg) ([]Object, error) {
 	if i == nil {
 		return []Object{}, ErrNoArg
 	}
-	return c.get(rtmGetClass, i)
+	return c.get(unix.RTM_GETTCLASS, i)
 }
