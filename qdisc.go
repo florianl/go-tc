@@ -1,8 +1,6 @@
 package tc
 
 import (
-	"fmt"
-
 	"github.com/florianl/go-tc/internal/unix"
 	"github.com/mdlayher/netlink"
 )
@@ -85,7 +83,7 @@ func (qd *Qdisc) Get() ([]Object, error) {
 func validateQdiscObject(action int, info *Object) ([]tcOption, error) {
 	options := []tcOption{}
 	if info.Ifindex == 0 {
-		return options, fmt.Errorf("could not set device ID 0")
+		return options, ErrInvalidDev
 	}
 
 	// TODO: improve logic and check combinations

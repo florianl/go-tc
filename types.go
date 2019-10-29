@@ -8,6 +8,7 @@ var (
 	ErrNoArg          = errors.New("missing argument")
 	ErrNoArgAlter     = errors.New("argument cannot be altered")
 	ErrNotLinux       = errors.New("not implemented for OS other than linux")
+	ErrInvalidDev     = errors.New("invalid device ID")
 )
 
 // Config contains options for RTNETLINK

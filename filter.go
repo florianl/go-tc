@@ -1,8 +1,6 @@
 package tc
 
 import (
-	"fmt"
-
 	"github.com/florianl/go-tc/internal/unix"
 	"github.com/mdlayher/netlink"
 )
@@ -64,7 +62,7 @@ func (f *Filter) Get(i *Msg) ([]Object, error) {
 func validateFilterObject(action int, info *Object) ([]tcOption, error) {
 	options := []tcOption{}
 	if info.Ifindex == 0 {
-		return options, fmt.Errorf("could not set device ID 0")
+		return options, ErrInvalidDev
 	}
 
 	var data []byte
