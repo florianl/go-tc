@@ -53,6 +53,15 @@ func marshalVlan(info *VLan) ([]byte, error) {
 		}
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaVLanParms, Data: data})
 	}
+	if info.PushID != nil {
+		options = append(options, tcOption{Interpretation: vtUint16, Type: tcaVLanPushVLanID, Data: *info.PushID})
+	}
+	if info.PushProtocol != nil {
+		options = append(options, tcOption{Interpretation: vtUint16, Type: tcaVLanPushVLanProtocol, Data: *info.PushProtocol})
+	}
+	if info.PushPriority != nil {
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaVLanPushVLanPriority, Data: *info.PushPriority})
+	}
 	return marshalAttributes(options)
 }
 
