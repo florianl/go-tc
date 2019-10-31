@@ -48,6 +48,9 @@ func marshalDefact(info *Defact) ([]byte, error) {
 		}
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaDefParms, Data: data})
 	}
+	if info.Data != nil {
+		options = append(options, tcOption{Interpretation: vtString, Type: tcaDefData, Data: *info.Data})
+	}
 	return marshalAttributes(options)
 }
 
