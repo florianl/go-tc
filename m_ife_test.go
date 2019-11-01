@@ -8,6 +8,8 @@ import (
 )
 
 func TestIfe(t *testing.T) {
+	var mac []byte = []byte{0xc, 0x0, 0xf, 0xf, 0xe, 0xe}
+	var ifeType uint16 = 1
 	tests := map[string]struct {
 		val  Ife
 		err1 error
@@ -16,6 +18,7 @@ func TestIfe(t *testing.T) {
 		"empty":           {err1: fmt.Errorf("Ife options are missing")},
 		"simple":          {val: Ife{Parms: &IfeParms{Index: 42, Action: 1}}},
 		"invalidArgument": {val: Ife{Tm: &Tcft{Install: 1}}, err1: ErrNoArgAlter},
+		"macs":            {val: Ife{SMac: &mac, DMac: &mac, Type: &ifeType}},
 	}
 	for name, testcase := range tests {
 		t.Run(name, func(t *testing.T) {
