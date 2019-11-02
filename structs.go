@@ -96,7 +96,7 @@ type Policy struct {
 	Burst    uint32
 	Mtu      uint32
 	Rate     RateSpec
-	PeakRage RateSpec
+	PeakRate RateSpec
 	RefCnt   uint32
 	BindCnt  uint32
 	Capab    uint32
