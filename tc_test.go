@@ -124,6 +124,9 @@ func testHookConn(t *testing.T) (*Tc, func()) {
 }
 
 func TestMonitor(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping test in short mode.")
+	}
 	tcSocket, done := testHookConn(t)
 	defer done()
 
