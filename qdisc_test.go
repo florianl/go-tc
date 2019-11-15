@@ -19,6 +19,19 @@ func TestQdisc(t *testing.T) {
 		t.Fatalf("expected ErrNoArg, received: %v", err)
 	}
 
+	faultyQdisc := Object{
+		Msg: Msg{
+			Family:  unix.AF_UNSPEC,
+			Ifindex: 0,
+			Handle:  BuildHandle(0xFFFF, 0x0000),
+			Parent:  0xFFFFFFF1,
+			Info:    0,
+		},
+	}
+	if err := tcSocket.Qdisc().Replace(&faultyQdisc); err != ErrInvalidDev {
+		t.Fatalf("expected ErrInvalidDev, received: %v", err)
+	}
+
 	tests := map[string]struct {
 		kind    string
 		err     error
