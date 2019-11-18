@@ -87,6 +87,10 @@ func TestClass(t *testing.T) {
 				t.Logf("%#v\n", class)
 			}
 
+			if err := tcSocket.Class().Replace(&testClass); err != nil {
+				t.Fatalf("could not replace exisiting class: %v", err)
+			}
+
 			if err := tcSocket.Class().Delete(&testClass); err != nil {
 				t.Fatalf("could not delete class: %v", err)
 			}
