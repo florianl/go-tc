@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/binary"
 	"fmt"
+	"log"
 	"time"
 	"unsafe"
 
@@ -14,6 +15,8 @@ import (
 // Tc represents a RTNETLINK wrapper
 type Tc struct {
 	con *netlink.Conn
+
+	logger *log.Logger
 }
 
 // for detailes see https://github.com/tensorflow/tensorflow/blob/master/tensorflow/go/tensor.go#L488-L505
@@ -33,6 +36,13 @@ func init() {
 	}
 }
 
+// devNull satisfies io.Writer, in case *log.Logger is not provided
+type devNull struct{}
+
+func (devNull) Write(p []byte) (int, error) {
+	return 0, nil
+}
+
 // Open establishes a RTNETLINK socket for traffic control
 func Open(config *Config) (*Tc, error) {
 	var tc Tc
@@ -46,6 +56,12 @@ func Open(config *Config) (*Tc, error) {
 		return nil, err
 	}
 	tc.con = con
+
+	if config.Logger == nil {
+		tc.logger = log.New(new(devNull), "", 0)
+	} else {
+		tc.logger = config.Logger
+	}
 
 	return &tc, nil
 }
