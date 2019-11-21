@@ -1,6 +1,7 @@
 package tc
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -12,7 +13,6 @@ func TestBpf(t *testing.T) {
 		err1 error
 		err2 error
 	}{
-		"empty": {},
 		"simple": {val: Bpf{Ops: []byte{0x6, 0x0, 0x0, 0x0, 0xff, 0xff, 0xff, 0xff},
 			OpsLen:  0x1,
 			ClassID: 0x10001,
@@ -43,4 +43,10 @@ func TestBpf(t *testing.T) {
 			}
 		})
 	}
+	t.Run("nil", func(t *testing.T) {
+		_, err := marshalBpf(nil)
+		if !errors.Is(err, ErrNoArg) {
+			t.Fatalf("unexpected error: %v", err)
+		}
+	})
 }

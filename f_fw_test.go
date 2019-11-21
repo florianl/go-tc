@@ -1,6 +1,7 @@
 package tc
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -12,7 +13,6 @@ func TestFw(t *testing.T) {
 		err1 error
 		err2 error
 	}{
-		"empty":    {},
 		"simple":   {val: Fw{ClassID: 12, InDev: "lo", Mask: 0xFFFF}},
 		"extended": {val: Fw{ClassID: 12, InDev: "lo", Mask: 0xFFFF, Police: &Police{AvRate: 1337, Result: 12}}},
 	}
@@ -40,4 +40,10 @@ func TestFw(t *testing.T) {
 			}
 		})
 	}
+	t.Run("nil", func(t *testing.T) {
+		_, err := marshalFw(nil)
+		if !errors.Is(err, ErrNoArg) {
+			t.Fatalf("unexpected error: %v", err)
+		}
+	})
 }

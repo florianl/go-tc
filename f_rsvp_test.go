@@ -1,6 +1,7 @@
 package tc
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -12,7 +13,6 @@ func TestRsvp(t *testing.T) {
 		err1 error
 		err2 error
 	}{
-		"empty":    {},
 		"simple":   {val: Rsvp{ClassID: 42, Police: &Police{AvRate: 1337, Result: 12}}},
 		"extended": {val: Rsvp{ClassID: 13, PInfo: &RsvpPInfo{Dpi: RsvpGpi{Mask: 1234, Key: 4321, Offset: 1}, Protocol: 42}}},
 	}
@@ -40,4 +40,10 @@ func TestRsvp(t *testing.T) {
 			}
 		})
 	}
+	t.Run("nil", func(t *testing.T) {
+		_, err := marshalRsvp(nil)
+		if !errors.Is(err, ErrNoArg) {
+			t.Fatalf("unexpected error: %v", err)
+		}
+	})
 }

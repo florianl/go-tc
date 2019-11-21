@@ -1,6 +1,7 @@
 package tc
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -12,7 +13,6 @@ func TestRoute4(t *testing.T) {
 		err1 error
 		err2 error
 	}{
-		"empty":  {},
 		"simple": {val: Route4{ClassID: 0xFFFF, To: 2, From: 3, IIf: 4}},
 	}
 
@@ -39,4 +39,10 @@ func TestRoute4(t *testing.T) {
 			}
 		})
 	}
+	t.Run("nil", func(t *testing.T) {
+		_, err := marshalRoute4(nil)
+		if !errors.Is(err, ErrNoArg) {
+			t.Fatalf("unexpected error: %v", err)
+		}
+	})
 }

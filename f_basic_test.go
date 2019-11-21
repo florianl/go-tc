@@ -1,6 +1,7 @@
 package tc
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -12,7 +13,6 @@ func TestBasic(t *testing.T) {
 		err1 error
 		err2 error
 	}{
-		"empty":  {},
 		"simple": {val: Basic{ClassID: 2}},
 	}
 
@@ -39,4 +39,10 @@ func TestBasic(t *testing.T) {
 			}
 		})
 	}
+	t.Run("nil", func(t *testing.T) {
+		_, err := marshalBasic(nil)
+		if !errors.Is(err, ErrNoArg) {
+			t.Fatalf("unexpected error: %v", err)
+		}
+	})
 }
