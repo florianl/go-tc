@@ -43,7 +43,7 @@ func marshalQfq(info *Qfq) ([]byte, error) {
 	options := []tcOption{}
 
 	if info == nil {
-		return []byte{}, nil
+		return []byte{}, fmt.Errorf("Qfq: %w", ErrNoArg)
 	}
 
 	// TODO: improve logic and check combinations

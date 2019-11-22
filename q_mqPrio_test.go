@@ -1,6 +1,7 @@
 package tc
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -12,7 +13,6 @@ func TestMqPrio(t *testing.T) {
 		err1 error
 		err2 error
 	}{
-		"empty":  {},
 		"simple": {val: MqPrio{Mode: 1, Shaper: 2, MinRate64: 3, MaxRate64: 4}},
 	}
 
@@ -39,4 +39,10 @@ func TestMqPrio(t *testing.T) {
 			}
 		})
 	}
+	t.Run("nil", func(t *testing.T) {
+		_, err := marshalMqPrio(nil)
+		if !errors.Is(err, ErrNoArg) {
+			t.Fatalf("unexpected error: %v", err)
+		}
+	})
 }

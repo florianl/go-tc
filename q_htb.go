@@ -74,7 +74,7 @@ func marshalHtb(info *Htb) ([]byte, error) {
 	options := []tcOption{}
 
 	if info == nil {
-		return []byte{}, nil
+		return []byte{}, fmt.Errorf("Htb: %w", ErrNoArg)
 	}
 	// TODO: improve logic and check combinations
 	if info.Parms != nil {

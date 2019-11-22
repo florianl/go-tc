@@ -43,7 +43,7 @@ func marshalSfb(info *Sfb) ([]byte, error) {
 	options := []tcOption{}
 
 	if info == nil {
-		return []byte{}, nil
+		return []byte{}, fmt.Errorf("Sfb: %w", ErrNoArg)
 	}
 
 	if info.Parms != nil {

@@ -63,7 +63,7 @@ func marshalHhf(info *Hhf) ([]byte, error) {
 	options := []tcOption{}
 
 	if info == nil {
-		return []byte{}, nil
+		return []byte{}, fmt.Errorf("Hhf: %w", ErrNoArg)
 	}
 	// TODO: improve logic and check combinations
 	if info.BacklogLimit != 0 {

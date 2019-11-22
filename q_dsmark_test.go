@@ -1,6 +1,7 @@
 package tc
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -12,7 +13,6 @@ func TestDsmark(t *testing.T) {
 		err1 error
 		err2 error
 	}{
-		"empty":          {},
 		"simple":         {val: Dsmark{Indices: 12, DefaultIndex: 34, Mask: 56, Value: 78}},
 		"simpleWithFlag": {val: Dsmark{Indices: 12, DefaultIndex: 34, SetTCIndex: true}},
 	}
@@ -40,4 +40,10 @@ func TestDsmark(t *testing.T) {
 			}
 		})
 	}
+	t.Run("nil", func(t *testing.T) {
+		_, err := marshalDsmark(nil)
+		if !errors.Is(err, ErrNoArg) {
+			t.Fatalf("unexpected error: %v", err)
+		}
+	})
 }

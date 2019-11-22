@@ -1,6 +1,7 @@
 package tc
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -12,10 +13,9 @@ func TestHfsc(t *testing.T) {
 		err1 error
 		err2 error
 	}{
-		"empty": {},
-		"Rsc":   {val: Hfsc{Rsc: &ServiceCurve{M1: 12, D: 34, M2: 56}}},
-		"Fsc":   {val: Hfsc{Fsc: &ServiceCurve{M1: 13, D: 35, M2: 57}}},
-		"Usc":   {val: Hfsc{Usc: &ServiceCurve{M1: 14, D: 36, M2: 58}}},
+		"Rsc": {val: Hfsc{Rsc: &ServiceCurve{M1: 12, D: 34, M2: 56}}},
+		"Fsc": {val: Hfsc{Fsc: &ServiceCurve{M1: 13, D: 35, M2: 57}}},
+		"Usc": {val: Hfsc{Usc: &ServiceCurve{M1: 14, D: 36, M2: 58}}},
 	}
 
 	for name, testcase := range tests {
@@ -41,4 +41,10 @@ func TestHfsc(t *testing.T) {
 			}
 		})
 	}
+	t.Run("nil", func(t *testing.T) {
+		_, err := marshalHfsc(nil)
+		if !errors.Is(err, ErrNoArg) {
+			t.Fatalf("unexpected error: %v", err)
+		}
+	})
 }

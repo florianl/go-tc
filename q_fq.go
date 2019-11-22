@@ -83,7 +83,7 @@ func marshalFq(info *Fq) ([]byte, error) {
 	options := []tcOption{}
 
 	if info == nil {
-		return []byte{}, nil
+		return []byte{}, fmt.Errorf("Fq: %w", ErrNoArg)
 	}
 
 	// TODO: improve logic and check combinations

@@ -55,7 +55,7 @@ func marshalDsmark(info *Dsmark) ([]byte, error) {
 	options := []tcOption{}
 
 	if info == nil {
-		return []byte{}, nil
+		return []byte{}, fmt.Errorf("Dsmark: %w", ErrNoArg)
 	}
 
 	// TODO: improve logic and check combinations
