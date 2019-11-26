@@ -40,7 +40,7 @@ func marshalVlan(info *VLan) ([]byte, error) {
 	options := []tcOption{}
 
 	if info == nil {
-		return []byte{}, fmt.Errorf("Vlan: %w", ErrNoArg)
+		return []byte{}, fmt.Errorf("VLan: %w", ErrNoArg)
 	}
 	// TODO: improve logic and check combinations
 	if info.Tm != nil {
