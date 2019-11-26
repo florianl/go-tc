@@ -41,7 +41,7 @@ func marshalIfe(info *Ife) ([]byte, error) {
 	options := []tcOption{}
 
 	if info == nil {
-		return []byte{}, fmt.Errorf("Ife options are missing")
+		return []byte{}, fmt.Errorf("Ife: %w", ErrNoArg)
 	}
 	// TODO: improve logic and check combinations
 	if info.Tm != nil {

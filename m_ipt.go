@@ -73,7 +73,7 @@ func marshalIpt(info *Ipt) ([]byte, error) {
 	options := []tcOption{}
 
 	if info == nil {
-		return []byte{}, fmt.Errorf("Ipt options are missing")
+		return []byte{}, fmt.Errorf("Ipt: %w", ErrNoArg)
 	}
 	// TODO: improve logic and check combinations
 	if info.Tm != nil {
@@ -84,6 +84,14 @@ func marshalIpt(info *Ipt) ([]byte, error) {
 	}
 	options = append(options, tcOption{Interpretation: vtUint32, Type: tcaIptHook, Data: info.Hook})
 	options = append(options, tcOption{Interpretation: vtUint32, Type: tcaIptIndex, Data: info.Index})
+	options = append(options, tcOption{Interpretation: vtString, Type: tcaIptTable, Data: info.Table})
+	if info.Cnt != nil {
+		data, err := marshalStruct(info.Cnt)
+		if err != nil {
+			return []byte{}, err
+		}
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaIptCnt, Data: data})
+	}
 
 	return marshalAttributes(options)
 }

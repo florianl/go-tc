@@ -76,7 +76,7 @@ func marshalActBpf(info *ActBpf) ([]byte, error) {
 	options := []tcOption{}
 
 	if info == nil {
-		return []byte{}, fmt.Errorf("ActBpf options are missing")
+		return []byte{}, fmt.Errorf("ActBpf: %w", ErrNoArg)
 	}
 	// TODO: improve logic and check combinations
 	if info.Tm != nil {

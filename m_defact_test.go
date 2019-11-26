@@ -1,7 +1,7 @@
 package tc
 
 import (
-	"fmt"
+	"errors"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -14,7 +14,6 @@ func TestDefact(t *testing.T) {
 		err1 error
 		err2 error
 	}{
-		"empty":           {err1: fmt.Errorf("Defact options are missing")},
 		"simple":          {val: Defact{Parms: &DefactParms{Index: 42, Action: 1}}},
 		"invalidArgument": {val: Defact{Tm: &Tcft{Install: 1}}, err1: ErrNoArgAlter},
 		"data":            {val: Defact{Data: &example}},
@@ -43,4 +42,10 @@ func TestDefact(t *testing.T) {
 			}
 		})
 	}
+	t.Run("nil", func(t *testing.T) {
+		_, err := marshalDefact(nil)
+		if !errors.Is(err, ErrNoArg) {
+			t.Fatalf("unexpected error: %v", err)
+		}
+	})
 }

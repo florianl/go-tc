@@ -1,7 +1,7 @@
 package tc
 
 import (
-	"fmt"
+	"errors"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -13,7 +13,6 @@ func TestNat(t *testing.T) {
 		err1 error
 		err2 error
 	}{
-		"empty":           {err1: fmt.Errorf("Nat options are missing")},
 		"simple":          {val: Nat{Parms: &NatParms{Index: 42, Action: 1}}},
 		"invalidArgument": {val: Nat{Tm: &Tcft{Install: 1}}, err1: ErrNoArgAlter},
 	}
@@ -41,4 +40,10 @@ func TestNat(t *testing.T) {
 			}
 		})
 	}
+	t.Run("nil", func(t *testing.T) {
+		_, err := marshalNat(nil)
+		if !errors.Is(err, ErrNoArg) {
+			t.Fatalf("unexpected error: %v", err)
+		}
+	})
 }

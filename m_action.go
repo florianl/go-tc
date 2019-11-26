@@ -73,6 +73,10 @@ func unmarshalAction(data []byte, info *Action) error {
 func marshalAction(info *Action) ([]byte, error) {
 	options := []tcOption{}
 
+	if info == nil {
+		return []byte{}, fmt.Errorf("Action: %w", ErrNoArg)
+	}
+
 	if len(info.Kind) == 0 {
 		return []byte{}, fmt.Errorf("kind is missing")
 	}

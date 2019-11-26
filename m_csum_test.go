@@ -1,7 +1,7 @@
 package tc
 
 import (
-	"fmt"
+	"errors"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -13,7 +13,6 @@ func TestCsum(t *testing.T) {
 		err1 error
 		err2 error
 	}{
-		"empty":   {err1: fmt.Errorf("Csum options are missing")},
 		"failing": {val: Csum{Tm: &Tcft{Install: 2}}, err1: ErrNoArgAlter},
 		"simple":  {val: Csum{Parms: &CsumParms{Index: 1, Capab: 2}}},
 	}
@@ -41,4 +40,11 @@ func TestCsum(t *testing.T) {
 			}
 		})
 	}
+
+	t.Run("nil", func(t *testing.T) {
+		_, err := marshalCsum(nil)
+		if !errors.Is(err, ErrNoArg) {
+			t.Fatalf("unexpected error: %v", err)
+		}
+	})
 }

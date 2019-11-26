@@ -1,7 +1,7 @@
 package tc
 
 import (
-	"fmt"
+	"errors"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -15,7 +15,6 @@ func TestVLan(t *testing.T) {
 		err1 error
 		err2 error
 	}{
-		"empty":           {err1: fmt.Errorf("VLan options are missing")},
 		"simple":          {val: VLan{Parms: &VLanParms{Index: 42, Action: 1}}},
 		"invalidArgument": {val: VLan{Tm: &Tcft{Install: 1}}, err1: ErrNoArgAlter},
 		"pushs":           {val: VLan{PushID: &one, PushProtocol: &one, PushPriority: &two}},
@@ -44,4 +43,10 @@ func TestVLan(t *testing.T) {
 			}
 		})
 	}
+	t.Run("nil", func(t *testing.T) {
+		_, err := marshalVlan(nil)
+		if !errors.Is(err, ErrNoArg) {
+			t.Fatalf("unexpected error: %v", err)
+		}
+	})
 }

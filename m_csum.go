@@ -24,7 +24,7 @@ func marshalCsum(info *Csum) ([]byte, error) {
 	options := []tcOption{}
 
 	if info == nil {
-		return []byte{}, fmt.Errorf("Csum options are missing")
+		return []byte{}, fmt.Errorf("Csum: %w", ErrNoArg)
 	}
 	// TODO: improve logic and check combinations
 	if info.Tm != nil {

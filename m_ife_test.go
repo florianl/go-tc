@@ -1,6 +1,7 @@
 package tc
 
 import (
+	"errors"
 	"fmt"
 	"testing"
 
@@ -44,4 +45,10 @@ func TestIfe(t *testing.T) {
 			}
 		})
 	}
+	t.Run("nil", func(t *testing.T) {
+		_, err := marshalIfe(nil)
+		if !errors.Is(err, ErrNoArg) {
+			t.Fatalf("unexpected error: %v", err)
+		}
+	})
 }

@@ -1,7 +1,7 @@
 package tc
 
 import (
-	"fmt"
+	"errors"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -13,9 +13,9 @@ func TestIpt(t *testing.T) {
 		err1 error
 		err2 error
 	}{
-		"empty":           {err1: fmt.Errorf("Ipt options are missing")},
 		"simple":          {val: Ipt{Table: "testTable", Hook: 42, Index: 1984}},
 		"invalidArgument": {val: Ipt{Tm: &Tcft{Install: 1}}, err1: ErrNoArgAlter},
+		"simple+Cnt":      {val: Ipt{Table: "testTable", Hook: 42, Index: 1984, Cnt: &IptCnt{RefCnt: 7, BindCnt: 42}}},
 	}
 	for name, testcase := range tests {
 		t.Run(name, func(t *testing.T) {
@@ -41,4 +41,10 @@ func TestIpt(t *testing.T) {
 			}
 		})
 	}
+	t.Run("nil", func(t *testing.T) {
+		_, err := marshalIpt(nil)
+		if !errors.Is(err, ErrNoArg) {
+			t.Fatalf("unexpected error: %v", err)
+		}
+	})
 }

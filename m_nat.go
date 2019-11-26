@@ -37,7 +37,7 @@ func marshalNat(info *Nat) ([]byte, error) {
 	options := []tcOption{}
 
 	if info == nil {
-		return []byte{}, fmt.Errorf("Nat options are missing")
+		return []byte{}, fmt.Errorf("Nat: %w", ErrNoArg)
 	}
 	// TODO: improve logic and check combinations
 	if info.Tm != nil {

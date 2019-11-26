@@ -1,6 +1,7 @@
 package tc
 
 import (
+	"errors"
 	"fmt"
 	"testing"
 
@@ -15,7 +16,7 @@ func TestAction(t *testing.T) {
 	}{
 		"empty":               {err1: fmt.Errorf("kind is missing")},
 		"unknown Kind":        {val: Action{Kind: "test", Index: 123}, err1: fmt.Errorf("unknown kind 'test'")},
-		"bpf Without Options": {val: Action{Kind: "bpf"}, err1: fmt.Errorf("ActBpf options are missing")},
+		"bpf Without Options": {val: Action{Kind: "bpf"}, err1: fmt.Errorf("ActBpf: missing argument")},
 		"simple Bpf":          {val: Action{Kind: "bpf", Bpf: &ActBpf{FD: 12, Name: "simpleTest", Parms: &ActBpfParms{Action: 2, Index: 4}}}},
 		"connmark":            {val: Action{Kind: "connmark", ConnMark: &Connmark{Parms: &ConnmarkParam{Index: 42, Action: 1}}}},
 		"csum":                {val: Action{Kind: "csum", CSum: &Csum{Parms: &CsumParms{Index: 1, Capab: 2}}}},
@@ -52,4 +53,10 @@ func TestAction(t *testing.T) {
 			}
 		})
 	}
+	t.Run("nil", func(t *testing.T) {
+		_, err := marshalAction(nil)
+		if !errors.Is(err, ErrNoArg) {
+			t.Fatalf("unexpected error: %v", err)
+		}
+	})
 }

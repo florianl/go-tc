@@ -63,7 +63,7 @@ func marshalConnmark(info *Connmark) ([]byte, error) {
 	options := []tcOption{}
 
 	if info == nil {
-		return []byte{}, fmt.Errorf("Connmark options are missing")
+		return []byte{}, fmt.Errorf("Connmark: %w", ErrNoArg)
 	}
 	// TODO: improve logic and check combinations
 	if info.Tm != nil {

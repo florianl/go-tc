@@ -1,7 +1,7 @@
 package tc
 
 import (
-	"fmt"
+	"errors"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -14,7 +14,6 @@ func TestActBpft(t *testing.T) {
 		err1   error
 		err2   error
 	}{
-		"empty":           {err1: fmt.Errorf("ActBpft options are missing")},
 		"simple":          {val: ActBpf{FD: 12, Name: "simpleTest"}},
 		"invalidArgument": {val: ActBpf{FD: 12, Name: "simpleTest", Tm: &Tcft{Install: 1}}, err1: ErrNoArgAlter},
 		"extended":        {val: ActBpf{FD: 12, Name: "simpleTest", Parms: &ActBpfParms{Action: 2, Index: 4}}},
@@ -55,4 +54,10 @@ func TestActBpft(t *testing.T) {
 			}
 		})
 	}
+	t.Run("nil", func(t *testing.T) {
+		_, err := marshalActBpf(nil)
+		if !errors.Is(err, ErrNoArg) {
+			t.Fatalf("unexpected error: %v", err)
+		}
+	})
 }
