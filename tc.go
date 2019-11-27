@@ -113,7 +113,8 @@ func (tc *Tc) action(action int, flags netlink.HeaderFlags, msg *Msg, opts []tcO
 
 	for _, msg := range msgs {
 		if msg.Header.Type == netlink.Error {
-			// TODO: validate NLMSG_ERROR - see https://www.infradead.org/~tgr/libnl/doc/core.html#core_errmsg
+			// see https://www.infradead.org/~tgr/libnl/doc/core.html#core_errmsg
+			tc.logger.Printf("received netlink.Error in action()\n")
 		}
 	}
 
@@ -328,11 +329,11 @@ func (tc *Tc) Monitor(ctx context.Context, deadline time.Duration, fn HookFunc) 
 			for _, msg := range msgs {
 				var monitored Object
 				if err := unmarshalStruct(msg.Data[:20], &monitored.Msg); err != nil {
-					// TODO: add to logging
+					tc.logger.Printf("could not extract tc.Msg from %v\n", msg.Data[:20])
 					continue
 				}
 				if err := extractTcmsgAttributes(msg.Data[20:], &monitored.Attribute); err != nil {
-					// TODO: add to logging
+					tc.logger.Printf("could not extract attributes from %v\n", msg.Data[20:36])
 					continue
 				}
 				if fn(uint16(msg.Header.Type), monitored) != 0 {
