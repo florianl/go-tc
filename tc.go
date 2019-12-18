@@ -216,6 +216,8 @@ type Attribute struct {
 	Cbq    *Cbq
 	Atm    *Atm
 	Qfq    *Qfq
+
+	Netem *Netem
 }
 
 // BuildHandle is a simple helper function to construct the handle for the Tcmsg struct
