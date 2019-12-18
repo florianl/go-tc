@@ -168,16 +168,16 @@ func marshalNetem(info *Netem) ([]byte, error) {
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaNetemRate, Data: data})
 	}
 	if info.Ecn != nil {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaNetemEcn, Data: info.Ecn})
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaNetemEcn, Data: *info.Ecn})
 	}
 	if info.Rate64 != nil {
-		options = append(options, tcOption{Interpretation: vtUint64, Type: tcaNetemRate64, Data: info.Rate64})
+		options = append(options, tcOption{Interpretation: vtUint64, Type: tcaNetemRate64, Data: *info.Rate64})
 	}
 	if info.Latency64 != nil {
-		options = append(options, tcOption{Interpretation: vtUint64, Type: tcaNetemLatency64, Data: info.Latency64})
+		options = append(options, tcOption{Interpretation: vtUint64, Type: tcaNetemLatency64, Data: *info.Latency64})
 	}
 	if info.Jitter64 != nil {
-		options = append(options, tcOption{Interpretation: vtUint64, Type: tcaNetemJitter64, Data: info.Jitter64})
+		options = append(options, tcOption{Interpretation: vtUint64, Type: tcaNetemJitter64, Data: *info.Jitter64})
 	}
 	if info.Slot != nil {
 		data, err := marshalStruct(info.Slot)
