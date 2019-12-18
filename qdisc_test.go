@@ -3,6 +3,7 @@ package tc
 import (
 	"bytes"
 	"encoding/binary"
+	"errors"
 	"testing"
 
 	"github.com/florianl/go-tc/internal/unix"
@@ -82,7 +83,7 @@ func TestQdisc(t *testing.T) {
 			}
 
 			if err := tcSocket.Qdisc().Add(&testQdisc); err != nil {
-				if testcase.err != nil && testcase.err.Error() == err.Error() {
+				if testcase.err != nil && !errors.Is(testcase.err, err) {
 					// we received the expected error
 					return
 				}
