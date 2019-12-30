@@ -5,8 +5,8 @@ import (
 	"os"
 )
 
-var tickInUSec uint32
-var clockFactor uint32
+var tickInUSec float64
+var clockFactor float64
 
 const (
 	// iproute2/include/utils.h:timeUnitsPerSec
@@ -27,20 +27,18 @@ func init() {
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "could not read /proc/net/psched: %v\n", err)
 	}
-	fmt.Println(t2us, us2t, clockRes, hiClockRes)
-
-	clockFactor = uint32(float64(clockRes) / float64(timeUnitsPerSec))
-	tickInUSec = uint32(float64(t2us/us2t) * float64(clockFactor))
+	clockFactor = float64(clockRes) / timeUnitsPerSec
+	tickInUSec = float64(t2us) / float64(us2t) * clockFactor
 }
 
 // iproute2/tc/tc_core:tc_core_time2tick()
 func time2tick(time uint32) uint32 {
-	return time * tickInUSec
+	return uint32(float64(time) * tickInUSec)
 }
 
 // iproute2/tc/tc_core:tc_core_tick2time()
 func tick2time(tick uint32) uint32 {
-	return tick / tickInUSec
+	return tick / uint32(tickInUSec)
 }
 
 // iproute2/tc/tc_core:tc_calc_xmittime()
