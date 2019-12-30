@@ -42,4 +42,8 @@ jobs:
       run: |
         export PATH=$PATH:$(go env GOPATH)/bin
         go get -u honnef.co/go/tools/cmd/staticcheck
-        staticcheck ./...
+        staticcheck -checks all .
+        # ignore should not use ALL_CAPS in Go names in internal/
+        staticcheck -checks all,-ST1003 ./internal/...
+        # ignore unused functions in core/
+        staticcheck -checks all,-U1000 ./core/...
