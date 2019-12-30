@@ -1,0 +1,12 @@
+package unix
+
+const (
+	LINKLAYER_UNSPEC = iota
+	LINKLAYER_ETHERNET
+	LINKLAYER_ATM
+)
+
+const (
+	ATM_CELL_PAYLOAD = 48
+	ATM_CELL_SIZE    = 53
+)
