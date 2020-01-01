@@ -36,6 +36,7 @@ type U32 struct {
 	Mark    *U32Mark
 	Flags   uint32
 	Police  *Police
+	Actions *[]*Action
 }
 
 // marshalU32 returns the binary encoding of U32
@@ -119,6 +120,12 @@ func unmarshalU32(data []byte, info *U32) error {
 			info.Mark = arg
 		case tcaU32Flags:
 			info.Flags = ad.Uint32()
+		case tcaU32Act:
+			actions := &[]*Action{}
+			if err := unmarshalActions(ad.Bytes(), actions); err != nil {
+				return err
+			}
+			info.Actions = actions
 		case tcaU32Pad:
 			// padding does not contain data, we just skip it
 		default:
