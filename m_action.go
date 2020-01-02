@@ -90,6 +90,20 @@ func unmarshalAction(data []byte, info *Action) error {
 	return nil
 }
 
+func marshalActions(info []*Action) ([]byte, error) {
+	options := []tcOption{}
+
+	for i, action := range info {
+		data, err := marshalAction(action)
+		if err != nil {
+			return []byte{}, err
+		}
+		options = append(options, tcOption{Interpretation: vtBytes, Type: uint16(i + 1), Data: data})
+	}
+
+	return marshalAttributes(options)
+}
+
 // marshalAction returns the binary encoding of Action
 func marshalAction(info *Action) ([]byte, error) {
 	options := []tcOption{}
