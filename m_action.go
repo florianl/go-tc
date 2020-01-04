@@ -35,6 +35,22 @@ type Action struct {
 	Police   *Police
 }
 
+func unmarshalActions(data []byte, actions *[]*Action) error {
+	ad, err := netlink.NewAttributeDecoder(data)
+	if err != nil {
+		return err
+	}
+	ad.ByteOrder = nativeEndian
+	for ad.Next() {
+		action := &Action{}
+		if err := unmarshalAction(ad.Bytes(), action); err != nil {
+			return err
+		}
+		*actions = append(*actions, action)
+	}
+	return nil
+}
+
 // unmarshalAction parses the Action-encoded data and stores the result in the value pointed to by info.
 func unmarshalAction(data []byte, info *Action) error {
 	ad, err := netlink.NewAttributeDecoder(data)
@@ -42,6 +58,7 @@ func unmarshalAction(data []byte, info *Action) error {
 		return err
 	}
 	var actOptions []byte
+	var actStats []byte
 	ad.ByteOrder = nativeEndian
 	for ad.Next() {
 		switch ad.Type() {
@@ -57,6 +74,8 @@ func unmarshalAction(data []byte, info *Action) error {
 				return err
 			}
 			info.Cookie = cookie
+		case tcaActStats:
+			actStats = ad.Bytes()
 		default:
 			return fmt.Errorf("unmarshalAction()\t%d\n\t%v", ad.Type(), ad.Bytes())
 		}
@@ -66,7 +85,23 @@ func unmarshalAction(data []byte, info *Action) error {
 			return err
 		}
 	}
+	// TODO: use statistics
+	_ = actStats
 	return nil
+}
+
+func marshalActions(info []*Action) ([]byte, error) {
+	options := []tcOption{}
+
+	for i, action := range info {
+		data, err := marshalAction(action)
+		if err != nil {
+			return []byte{}, err
+		}
+		options = append(options, tcOption{Interpretation: vtBytes, Type: uint16(i + 1), Data: data})
+	}
+
+	return marshalAttributes(options)
 }
 
 // marshalAction returns the binary encoding of Action

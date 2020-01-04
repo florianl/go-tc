@@ -8,6 +8,10 @@ import (
 )
 
 func TestU32(t *testing.T) {
+	actions := []*Action{
+		&Action{Kind: "mirred", Mirred: &Mirred{Parms: &MirredParam{Index: 0x1, Capab: 0x0, Action: 0x4, RefCnt: 0x1, BindCnt: 0x1, Eaction: 0x1, IfIndex: 0x2}}},
+	}
+
 	tests := map[string]struct {
 		val  U32
 		err1 error
@@ -44,6 +48,7 @@ func TestU32(t *testing.T) {
 					{Mask: 0xF0F0, Val: 0x5050, Off: 0xC, OffMask: 0xC},
 				},
 			}}},
+		"actions": {val: U32{Flags: 0x8, Actions: &actions}},
 	}
 
 	for name, testcase := range tests {

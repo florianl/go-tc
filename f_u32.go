@@ -36,6 +36,7 @@ type U32 struct {
 	Mark    *U32Mark
 	Flags   uint32
 	Police  *Police
+	Actions *[]*Action
 }
 
 // marshalU32 returns the binary encoding of U32
@@ -73,6 +74,16 @@ func marshalU32(info *U32) ([]byte, error) {
 			return []byte{}, err
 		}
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaU32Police, Data: data})
+	}
+	if info.Flags != 0 {
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaU32Flags, Data: info.Flags})
+	}
+	if info.Actions != nil {
+		data, err := marshalActions(*info.Actions)
+		if err != nil {
+			return []byte{}, err
+		}
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaU32Act, Data: data})
 	}
 
 	return marshalAttributes(options)
@@ -119,6 +130,12 @@ func unmarshalU32(data []byte, info *U32) error {
 			info.Mark = arg
 		case tcaU32Flags:
 			info.Flags = ad.Uint32()
+		case tcaU32Act:
+			actions := &[]*Action{}
+			if err := unmarshalActions(ad.Bytes(), actions); err != nil {
+				return err
+			}
+			info.Actions = actions
 		case tcaU32Pad:
 			// padding does not contain data, we just skip it
 		default:
