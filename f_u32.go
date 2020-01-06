@@ -54,6 +54,10 @@ func marshalU32(info *U32) ([]byte, error) {
 		if err != nil {
 			return []byte{}, err
 		}
+		// align returned data to 4 bytes
+		for len(data)%4 != 0 {
+			data = append(data, 0x0)
+		}
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaU32Sel, Data: data})
 	}
 
