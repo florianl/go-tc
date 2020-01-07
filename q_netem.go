@@ -25,6 +25,7 @@ const (
 
 // Netem contains attributes of the netem discipline
 type Netem struct {
+	Qopt      NetemQopt
 	Corr      *NetemCorr
 	Reorder   *NetemReorder
 	Corrupt   *NetemCorrupt
@@ -34,6 +35,16 @@ type Netem struct {
 	Latency64 *uint64
 	Jitter64  *uint64
 	Slot      *NetemSlot
+}
+
+// NetemQopt from include/uapi/linux/pkt_sched.h
+type NetemQopt struct {
+	Latency   uint32
+	Limit     uint32
+	Loss      uint32
+	Gap       uint32
+	Duplicate uint32
+	Jitter    uint32
 }
 
 // NetemCorr from include/uapi/linux/pkt_sched.h
@@ -75,7 +86,14 @@ type NetemSlot struct {
 
 // unmarshalNetem parses the Netem-encoded data and stores the result in the value pointed to by info.
 func unmarshalNetem(data []byte, info *Netem) error {
-	ad, err := netlink.NewAttributeDecoder(data)
+	qopt := NetemQopt{}
+	if err := unmarshalStruct(data, &qopt); err != nil {
+		return err
+	}
+	info.Qopt = qopt
+
+	// continue decoding attributes after the size of the NetemQopt struct
+	ad, err := netlink.NewAttributeDecoder(data[24:])
 	if err != nil {
 		return err
 	}
@@ -83,29 +101,29 @@ func unmarshalNetem(data []byte, info *Netem) error {
 	for ad.Next() {
 		switch ad.Type() {
 		case tcaNetemCorr:
-			tmp := NetemCorr{}
+			tmp := &NetemCorr{}
 			if err := unmarshalStruct(ad.Bytes(), tmp); err != nil {
 				return err
 			}
-			info.Corr = &tmp
+			info.Corr = tmp
 		case tcaNetemReorder:
-			tmp := NetemReorder{}
+			tmp := &NetemReorder{}
 			if err := unmarshalStruct(ad.Bytes(), tmp); err != nil {
 				return err
 			}
-			info.Reorder = &tmp
+			info.Reorder = tmp
 		case tcaNetemCorrupt:
-			tmp := NetemCorrupt{}
+			tmp := &NetemCorrupt{}
 			if err := unmarshalStruct(ad.Bytes(), tmp); err != nil {
 				return err
 			}
-			info.Corrupt = &tmp
+			info.Corrupt = tmp
 		case tcaNetemRate:
-			tmp := NetemRate{}
+			tmp := &NetemRate{}
 			if err := unmarshalStruct(ad.Bytes(), tmp); err != nil {
 				return err
 			}
-			info.Rate = &tmp
+			info.Rate = tmp
 		case tcaNetemEcn:
 			tmp := ad.Uint32()
 			info.Ecn = &tmp
@@ -119,11 +137,11 @@ func unmarshalNetem(data []byte, info *Netem) error {
 			tmp := ad.Uint64()
 			info.Jitter64 = &tmp
 		case tcaNetemSlot:
-			tmp := NetemSlot{}
+			tmp := &NetemSlot{}
 			if err := unmarshalStruct(ad.Bytes(), tmp); err != nil {
 				return err
 			}
-			info.Slot = &tmp
+			info.Slot = tmp
 		default:
 			return fmt.Errorf("unmarshalNetem()\t%d\n\t%v", ad.Type(), ad.Bytes())
 		}
@@ -187,5 +205,13 @@ func marshalNetem(info *Netem) ([]byte, error) {
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaNetemSlot, Data: data})
 	}
 
-	return marshalAttributes(options)
+	data, err := marshalAttributes(options)
+
+	var qoptErr error
+	var qoptData []byte
+	if qoptData, qoptErr = marshalStruct(info.Qopt); qoptErr != nil {
+		return []byte{}, err
+	}
+
+	return append(qoptData[:], data[:]...), err
 }
