@@ -230,6 +230,12 @@ func extractTCAOptions(data []byte, tc *Attribute, kind string) error {
 			return err
 		}
 		tc.Flow = info
+	case "netem":
+		info := &Netem{}
+		if err := unmarshalNetem(data, info); err != nil {
+			return err
+		}
+		tc.Netem = info
 	default:
 		return fmt.Errorf("extractTCAOptions(): unsupported kind: %s", kind)
 	}
