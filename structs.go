@@ -78,7 +78,7 @@ type GenStatsQueue struct {
 	Overlimits uint32
 }
 
-// RateSpec from from include/uapi/linux/pkt_sched.h
+// RateSpec from include/uapi/linux/pkt_sched.h
 type RateSpec struct {
 	CellLog   uint8
 	Linklayer uint8
@@ -88,7 +88,7 @@ type RateSpec struct {
 	Rate      uint32
 }
 
-// Policy from from include/uapi/linux/pkt_sched.h
+// Policy from include/uapi/linux/pkt_sched.h
 type Policy struct {
 	Index    uint32
 	Action   uint32
@@ -102,17 +102,17 @@ type Policy struct {
 	Capab    uint32
 }
 
-// FifoOpt from from include/uapi/linux/pkt_sched.h
+// FifoOpt from include/uapi/linux/pkt_sched.h
 type FifoOpt struct {
 	Limit uint32
 }
 
-// SfqXStats from from include/uapi/linux/pkt_sched.h
+// SfqXStats from include/uapi/linux/pkt_sched.h
 type SfqXStats struct {
 	Allot int32
 }
 
-// RedXStats from from include/uapi/linux/pkt_sched.h
+// RedXStats from include/uapi/linux/pkt_sched.h
 type RedXStats struct {
 	Early  uint32
 	PDrop  uint32
@@ -120,7 +120,7 @@ type RedXStats struct {
 	Marked uint32
 }
 
-// ChokeXStats from from include/uapi/linux/pkt_sched.h
+// ChokeXStats from include/uapi/linux/pkt_sched.h
 type ChokeXStats struct {
 	Early   uint32
 	PDrop   uint32
@@ -129,7 +129,7 @@ type ChokeXStats struct {
 	Matched uint32
 }
 
-// HtbXStats from from include/uapi/linux/pkt_sched.h
+// HtbXStats from include/uapi/linux/pkt_sched.h
 type HtbXStats struct {
 	Lends   uint32
 	Borrows uint32
@@ -138,7 +138,7 @@ type HtbXStats struct {
 	CTokens uint32
 }
 
-// CbqXStats from from include/uapi/linux/pkt_sched.h
+// CbqXStats from include/uapi/linux/pkt_sched.h
 type CbqXStats struct {
 	Borrows     uint32
 	Overactions uint32
@@ -146,7 +146,7 @@ type CbqXStats struct {
 	Undertime   int32
 }
 
-// SfbXStats from from include/uapi/linux/pkt_sched.h
+// SfbXStats from include/uapi/linux/pkt_sched.h
 type SfbXStats struct {
 	EarlyDrop   uint32
 	PenaltyDrop uint32
@@ -159,7 +159,7 @@ type SfbXStats struct {
 	AvgProb     uint32
 }
 
-// CodelXStats from from include/uapi/linux/pkt_sched.h
+// CodelXStats from include/uapi/linux/pkt_sched.h
 type CodelXStats struct {
 	MaxPacket     uint32
 	Count         uint32
@@ -172,7 +172,7 @@ type CodelXStats struct {
 	CeMark        uint32
 }
 
-// HhfXStats from from include/uapi/linux/pkt_sched.h
+// HhfXStats from include/uapi/linux/pkt_sched.h
 type HhfXStats struct {
 	DropOverlimit uint32
 	HhOverlimit   uint32
@@ -180,7 +180,7 @@ type HhfXStats struct {
 	HhCurCount    uint32
 }
 
-// PieXStats from from include/uapi/linux/pkt_sched.h
+// PieXStats from include/uapi/linux/pkt_sched.h
 type PieXStats struct {
 	Prob      uint64
 	Delay     uint32
@@ -192,7 +192,7 @@ type PieXStats struct {
 	EcnMark   uint32
 }
 
-// FqCodelQdStats from from include/uapi/linux/pkt_sched.h
+// FqCodelQdStats from include/uapi/linux/pkt_sched.h
 type FqCodelQdStats struct {
 	MaxPacket      uint32
 	DropOverlimit  uint32
@@ -205,7 +205,7 @@ type FqCodelQdStats struct {
 	DropOvermemory uint32
 }
 
-// FqCodelClStats from from include/uapi/linux/pkt_sched.h
+// FqCodelClStats from include/uapi/linux/pkt_sched.h
 type FqCodelClStats struct {
 	Deficit   int32
 	LDelay    uint32
@@ -215,7 +215,7 @@ type FqCodelClStats struct {
 	DropNext  int32
 }
 
-// FqCodelXStats from from include/uapi/linux/pkt_sched.h
+// FqCodelXStats from include/uapi/linux/pkt_sched.h
 type FqCodelXStats struct {
 	Type uint32
 	Qd   *FqCodelQdStats
