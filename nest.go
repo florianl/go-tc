@@ -1,6 +1,8 @@
 package tc
 
 import (
+	"bytes"
+	"encoding/binary"
 	"fmt"
 
 	"github.com/mdlayher/netlink"
@@ -16,6 +18,10 @@ const (
 	vtString
 	vtBytes
 	vtFlag
+	vtInt8
+	vtInt16
+	vtInt32
+	vtInt64
 )
 
 type tcOption struct {
@@ -43,6 +49,33 @@ func marshalAttributes(options []tcOption) ([]byte, error) {
 			ad.Bytes(option.Type, (option.Data).([]byte))
 		case vtFlag:
 			ad.Flag(option.Type, true)
+		case vtInt8:
+			data := new(bytes.Buffer)
+			if err := binary.Write(data, nativeEndian, (option.Data).(int8)); err != nil {
+				return []byte{}, err
+			}
+			ad.Bytes(option.Type, data.Bytes())
+		case vtInt16:
+			data := new(bytes.Buffer)
+			data.Grow(2)
+			if err := binary.Write(data, nativeEndian, (option.Data).(int16)); err != nil {
+				return []byte{}, err
+			}
+			ad.Bytes(option.Type, data.Bytes())
+		case vtInt32:
+			data := new(bytes.Buffer)
+			data.Grow(4)
+			if err := binary.Write(data, nativeEndian, (option.Data).(int32)); err != nil {
+				return []byte{}, err
+			}
+			ad.Bytes(option.Type, data.Bytes())
+		case vtInt64:
+			data := new(bytes.Buffer)
+			data.Grow(8)
+			if err := binary.Write(data, nativeEndian, (option.Data).(int64)); err != nil {
+				return []byte{}, err
+			}
+			ad.Bytes(option.Type, data.Bytes())
 		default:
 			return []byte{}, fmt.Errorf("unknown interpretation: %d", option.Interpretation)
 		}
