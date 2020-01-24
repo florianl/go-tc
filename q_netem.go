@@ -1,6 +1,8 @@
 package tc
 
 import (
+	"bytes"
+	"encoding/binary"
 	"fmt"
 
 	"github.com/mdlayher/netlink"
@@ -32,8 +34,8 @@ type Netem struct {
 	Rate      *NetemRate
 	Ecn       *uint32
 	Rate64    *uint64
-	Latency64 *uint64
-	Jitter64  *uint64
+	Latency64 *int64
+	Jitter64  *int64
 	Slot      *NetemSlot
 }
 
@@ -131,11 +133,21 @@ func unmarshalNetem(data []byte, info *Netem) error {
 			tmp := ad.Uint64()
 			info.Rate64 = &tmp
 		case tcaNetemLatency64:
-			tmp := ad.Uint64()
-			info.Latency64 = &tmp
+			tmp := ad.Bytes()
+			var val int64
+			buf := bytes.NewReader(tmp)
+			if err := binary.Read(buf, ad.ByteOrder, &val); err != nil {
+				return fmt.Errorf("could not interprete attribute %d as type int64: %s", ad.Type(), err)
+			}
+			info.Latency64 = &val
 		case tcaNetemJitter64:
-			tmp := ad.Uint64()
-			info.Jitter64 = &tmp
+			tmp := ad.Bytes()
+			var val int64
+			buf := bytes.NewReader(tmp)
+			if err := binary.Read(buf, ad.ByteOrder, &val); err != nil {
+				return fmt.Errorf("could not interprete attribute %d as type int64: %s", ad.Type(), err)
+			}
+			info.Jitter64 = &val
 		case tcaNetemSlot:
 			tmp := &NetemSlot{}
 			if err := unmarshalStruct(ad.Bytes(), tmp); err != nil {
@@ -192,10 +204,10 @@ func marshalNetem(info *Netem) ([]byte, error) {
 		options = append(options, tcOption{Interpretation: vtUint64, Type: tcaNetemRate64, Data: *info.Rate64})
 	}
 	if info.Latency64 != nil {
-		options = append(options, tcOption{Interpretation: vtUint64, Type: tcaNetemLatency64, Data: *info.Latency64})
+		options = append(options, tcOption{Interpretation: vtInt64, Type: tcaNetemLatency64, Data: *info.Latency64})
 	}
 	if info.Jitter64 != nil {
-		options = append(options, tcOption{Interpretation: vtUint64, Type: tcaNetemJitter64, Data: *info.Jitter64})
+		options = append(options, tcOption{Interpretation: vtInt64, Type: tcaNetemJitter64, Data: *info.Jitter64})
 	}
 	if info.Slot != nil {
 		data, err := marshalStruct(info.Slot)
