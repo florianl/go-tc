@@ -14,14 +14,17 @@ func (tc *Tc) Chain() *Chain {
 	return &Chain{*tc}
 }
 
+// Add creates a new chain
 func (c *Chain) Add(info *Object) error {
 	return ErrNotImplemented
 }
 
+// Delete removes a chain
 func (c *Chain) Delete() error {
 	return ErrNotImplemented
 }
 
+// Get fetches chains
 func (c *Chain) Get() ([]Object, error) {
 	return c.get(unix.RTM_GETCHAIN, nil)
 }
