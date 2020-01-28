@@ -83,3 +83,9 @@ func marshalAttributes(options []tcOption) ([]byte, error) {
 
 	return ad.Encode()
 }
+
+func unmarshalNetlinkAttribute(data []byte, val interface{}) error {
+	buf := bytes.NewReader(data)
+	err := binary.Read(buf, nativeEndian, val)
+	return err
+}

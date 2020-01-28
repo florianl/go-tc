@@ -54,3 +54,36 @@ func TestMarshalAttributes(t *testing.T) {
 		})
 	}
 }
+
+func TestUnmarshalAttributes(t *testing.T) {
+	var valInt8 int8
+	if err := unmarshalNetlinkAttribute([]byte{0xF8}, &valInt8); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if valInt8 != -8 {
+		t.Fatalf("expexted: -8\tgot: %d", valInt8)
+	}
+
+	var valInt16 int16
+	if err := unmarshalNetlinkAttribute([]byte{0xF7, 0xFF}, &valInt16); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if valInt16 != -9 {
+		t.Fatalf("expexted: -8\tgot: %d", valInt8)
+	}
+	var valInt32 int32
+	if err := unmarshalNetlinkAttribute([]byte{0xF6, 0xFF, 0xFF, 0xFF}, &valInt32); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if valInt32 != -10 {
+		t.Fatalf("expexted: -8\tgot: %d", valInt8)
+	}
+	var valInt64 int64
+	if err := unmarshalNetlinkAttribute([]byte{0xF5, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}, &valInt64); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if valInt64 != -11 {
+		t.Fatalf("expexted: -8\tgot: %d", valInt8)
+	}
+
+}
