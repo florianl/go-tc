@@ -1,8 +1,6 @@
 package tc
 
 import (
-	"bytes"
-	"encoding/binary"
 	"fmt"
 
 	"github.com/mdlayher/netlink"
@@ -133,19 +131,15 @@ func unmarshalNetem(data []byte, info *Netem) error {
 			tmp := ad.Uint64()
 			info.Rate64 = &tmp
 		case tcaNetemLatency64:
-			tmp := ad.Bytes()
 			var val int64
-			buf := bytes.NewReader(tmp)
-			if err := binary.Read(buf, ad.ByteOrder, &val); err != nil {
-				return fmt.Errorf("could not interprete attribute %d as type int64: %s", ad.Type(), err)
+			if err := unmarshalNetlinkAttribute(ad.Bytes(), &val); err != nil {
+				return err
 			}
 			info.Latency64 = &val
 		case tcaNetemJitter64:
-			tmp := ad.Bytes()
 			var val int64
-			buf := bytes.NewReader(tmp)
-			if err := binary.Read(buf, ad.ByteOrder, &val); err != nil {
-				return fmt.Errorf("could not interprete attribute %d as type int64: %s", ad.Type(), err)
+			if err := unmarshalNetlinkAttribute(ad.Bytes(), &val); err != nil {
+				return err
 			}
 			info.Jitter64 = &val
 		case tcaNetemSlot:

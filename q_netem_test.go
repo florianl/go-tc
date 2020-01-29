@@ -9,8 +9,8 @@ import (
 
 func TestNetem(t *testing.T) {
 	var ecn uint32 = 123
-	var lat int64 = 4242
-	var jitter int64 = 1337
+	var lat int64 = -4242
+	var jitter int64 = -1337
 
 	tests := map[string]struct {
 		val  Netem
@@ -39,7 +39,7 @@ func TestNetem(t *testing.T) {
 
 			}
 			if diff := cmp.Diff(val, testcase.val); diff != "" {
-				t.Fatalf("Netem missmatch (want +got):\n%s", diff)
+				t.Fatalf("Netem missmatch (-want +got):\n%s", diff)
 			}
 		})
 	}
