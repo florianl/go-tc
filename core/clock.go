@@ -31,23 +31,27 @@ func init() {
 	tickInUSec = float64(t2us) / float64(us2t) * clockFactor
 }
 
-// iproute2/tc/tc_core:tc_core_time2tick()
-func time2tick(time uint32) uint32 {
+// Time2Tick implements iproute2/tc/tc_core:tc_core_time2tick().
+// It returns the number of CPU ticks for a given time in usec.
+func Time2Tick(time uint32) uint32 {
 	return uint32(float64(time) * tickInUSec)
 }
 
-// iproute2/tc/tc_core:tc_core_tick2time()
-func tick2time(tick uint32) uint32 {
-	return tick / uint32(tickInUSec)
+// Tick2Time implements iproute2/tc/tc_core:tc_core_tick2time().
+// It returns a time in usec for a given number of CPU ticks.
+func Tick2Time(tick uint32) uint32 {
+	return uint32(float64(tick) / tickInUSec)
 }
 
-// iproute2/tc/tc_core:tc_calc_xmittime()
-func xmittime(rate uint64, size uint32) uint32 {
-	return time2tick(uint32(timeUnitsPerSec * (float64(size) / float64(rate))))
+// XmitTime implements iproute2/tc/tc_core:tc_calc_xmittime().
+// It returns the time, that is needed to transmit a given size for a given rate.
+func XmitTime(rate uint64, size uint32) uint32 {
+	return Time2Tick(uint32(timeUnitsPerSec * (float64(size) / float64(rate))))
 
 }
 
-// iproute2/tc/tc_core:tc_calc_xmitsize()
-func xmitsize(rate uint64, ticks uint32) uint32 {
-	return uint32(rate*uint64(tick2time(ticks))) / timeUnitsPerSec
+// XmitSize implements iproute2/tc/tc_core:tc_calc_xmitsize().
+// It returns the size that can be transmitted at a given rate during a given time.
+func XmitSize(rate uint64, ticks uint32) uint32 {
+	return uint32(rate*uint64(Tick2Time(ticks))) / timeUnitsPerSec
 }
