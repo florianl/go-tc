@@ -40,3 +40,17 @@ const (
 	handleMajMask uint32 = 0xFFFF0000
 	handleMinMask uint32 = 0x0000FFFF
 )
+
+// Common flags from include/uapi/linux/pkt_cls.h
+const (
+	// don't offload filter to HW
+	SkipHw uint32 = 1 << iota
+	// don't use filter in SW
+	SkipSw
+	// filter is offloaded to HW
+	InHw
+	// filter isn't offloaded to HW
+	NotInHw
+	// verbose logging
+	Verbose
+)
