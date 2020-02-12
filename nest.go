@@ -50,28 +50,25 @@ func marshalAttributes(options []tcOption) ([]byte, error) {
 		case vtFlag:
 			ad.Flag(option.Type, true)
 		case vtInt8:
-			data := new(bytes.Buffer)
+			data := bytes.NewBuffer(make([]byte, 0, 1))
 			if err := binary.Write(data, nativeEndian, (option.Data).(int8)); err != nil {
 				return []byte{}, err
 			}
 			ad.Bytes(option.Type, data.Bytes())
 		case vtInt16:
-			data := new(bytes.Buffer)
-			data.Grow(2)
+			data := bytes.NewBuffer(make([]byte, 0, 2))
 			if err := binary.Write(data, nativeEndian, (option.Data).(int16)); err != nil {
 				return []byte{}, err
 			}
 			ad.Bytes(option.Type, data.Bytes())
 		case vtInt32:
-			data := new(bytes.Buffer)
-			data.Grow(4)
+			data := bytes.NewBuffer(make([]byte, 0, 4))
 			if err := binary.Write(data, nativeEndian, (option.Data).(int32)); err != nil {
 				return []byte{}, err
 			}
 			ad.Bytes(option.Type, data.Bytes())
 		case vtInt64:
-			data := new(bytes.Buffer)
-			data.Grow(8)
+			data := bytes.NewBuffer(make([]byte, 0, 8))
 			if err := binary.Write(data, nativeEndian, (option.Data).(int64)); err != nil {
 				return []byte{}, err
 			}
