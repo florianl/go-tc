@@ -13,4 +13,13 @@ func TestClock(t *testing.T) {
 			t.Fatalf("expected %d, got %d", 0xC0FFEE, time)
 		}
 	})
+
+	t.Run("Ktime", func(t *testing.T) {
+		ktime := Time2Ktime(0xC0FFEE)
+		time := Ktime2Time(ktime)
+		diff := (0xC0FFEE - time) * (0xC0FFEE - time)
+		if diff > 3 {
+			t.Fatalf("expected %d, got %d", 0xC0FFEE, time)
+		}
+	})
 }

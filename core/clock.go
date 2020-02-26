@@ -55,3 +55,13 @@ func XmitTime(rate uint64, size uint32) uint32 {
 func XmitSize(rate uint64, ticks uint32) uint32 {
 	return uint32(rate*uint64(Tick2Time(ticks))) / timeUnitsPerSec
 }
+
+// Time2Ktime implements iproute2/tc/tc_core:tc_core_time2ktime().
+func Time2Ktime(time uint32) uint32 {
+	return uint32(uint64(time) * uint64(clockFactor))
+}
+
+// Ktime2Time implements iproute2/tc/tc_core:tc_core_ktime2time().
+func Ktime2Time(ktime uint32) uint32 {
+	return uint32(float64(ktime) / clockFactor)
+}
