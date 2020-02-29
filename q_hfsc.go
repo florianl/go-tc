@@ -13,7 +13,7 @@ const (
 	tcaHfscUsc
 )
 
-// Hfsc contains attributes of the hfsc discipline
+// Hfsc contains attributes of the hfsc class
 type Hfsc struct {
 	Rsc *ServiceCurve
 	Fsc *ServiceCurve
@@ -94,4 +94,16 @@ type ServiceCurve struct {
 	M1 uint32
 	D  uint32
 	M2 uint32
+}
+
+// HfscQOpt contains attributes of the hfsc qdisc
+type HfscQOpt struct {
+	DefCls uint16
+}
+
+func unmarshalHfscQOpt(data []byte, info *HfscQOpt) error {
+
+	info.DefCls = nativeEndian.Uint16(data)
+
+	return nil
 }
