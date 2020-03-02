@@ -20,7 +20,7 @@ func (c *Class) Add(info *Object) error {
 	if info == nil {
 		return ErrNoArg
 	}
-	options, err := validateQdiscObject(unix.RTM_NEWTCLASS, info)
+	options, err := validateClassObject(unix.RTM_NEWTCLASS, info)
 	if err != nil {
 		return err
 	}
@@ -57,4 +57,31 @@ func (c *Class) Get(i *Msg) ([]Object, error) {
 		return []Object{}, ErrNoArg
 	}
 	return c.get(unix.RTM_GETTCLASS, i)
+}
+
+func validateClassObject(action int, info *Object) ([]tcOption, error) {
+	options := []tcOption{}
+	if info.Ifindex == 0 {
+		return options, ErrInvalidDev
+	}
+
+	// TODO: improve logic and check combinations
+	var data []byte
+	var err error
+	switch info.Kind {
+	case "hfsc":
+		data, err = marshalHfsc(info.Hfsc)
+	default:
+		return options, ErrNotImplemented
+	}
+	if err != nil {
+		return options, err
+	}
+	if len(data) < 1 {
+		return options, ErrNoArg
+	} else {
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaOptions, Data: data})
+	}
+	options = append(options, tcOption{Interpretation: vtString, Type: tcaKind, Data: info.Kind})
+	return options, nil
 }
