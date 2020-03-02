@@ -25,6 +25,7 @@ type SizeSpec struct {
 }
 
 // Stab contains attributes of a stab
+// http://man7.org/linux/man-pages/man8/tc-stab.8.html
 type Stab struct {
 	Base *SizeSpec
 	Data *[]byte
@@ -52,4 +53,23 @@ func unmarshalStab(data []byte, stab *Stab) error {
 		}
 	}
 	return nil
+}
+
+func marshalStab(info *Stab) ([]byte, error) {
+	options := []tcOption{}
+
+	if info == nil {
+		return []byte{}, fmt.Errorf("Stab: %w", ErrNoArg)
+	}
+
+	// TODO: improve logic and check combination
+	if info.Base != nil {
+		data, err := marshalStruct(info.Base)
+		if err != nil {
+			return []byte{}, err
+		}
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaStabBase, Data: data})
+	}
+
+	return marshalAttributes(options)
 }
