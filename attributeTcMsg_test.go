@@ -199,7 +199,7 @@ func TestQdiscAttribute(t *testing.T) {
 		"dsmark":   {val: &Attribute{Kind: "dsmark", Dsmark: &Dsmark{Indices: 12, DefaultIndex: 34, Mask: 56, Value: 78}}},
 		"fq":       {val: &Attribute{Kind: "fq", Fq: &Fq{PLimit: 1, FlowPLimit: 2, Quantum: 3, InitQuantum: 4, RateEnable: 5, FlowDefaultRate: 6, FlowMaxRate: 7, BucketsLog: 8, FlowRefillDelay: 9, OrphanMask: 10, LowRateThreshold: 11, CEThreshold: 12}}},
 		"fq_codel": {val: &Attribute{Kind: "fq_codel", FqCodel: &FqCodel{Target: 1, Limit: 2, Interval: 3, ECN: 4, Flows: 5, Quantum: 6, CEThreshold: 7, DropBatchSize: 8, MemoryLimit: 9}}},
-		"hfsc":     {val: &Attribute{Kind: "hfsc", Hfsc: &Hfsc{Rsc: &ServiceCurve{M1: 12, D: 34, M2: 56}}}},
+		"hfsc":     {val: &Attribute{Kind: "hfsc", HfscQOpt: &HfscQOpt{DefCls: 42}}},
 		"hhf":      {val: &Attribute{Kind: "hhf", Hhf: &Hhf{BacklogLimit: 1, Quantum: 2, HHFlowsLimit: 3, ResetTimeout: 4, AdmitBytes: 5, EVICTTimeout: 6, NonHHWeight: 7}}},
 		"htb":      {val: &Attribute{Kind: "htb", Htb: &Htb{Rate64: 123, Parms: &HtbOpt{Buffer: 0xFFFF}}}},
 		"mqprio":   {val: &Attribute{Kind: "mqprio", MqPrio: &MqPrio{Mode: 1, Shaper: 2, MinRate64: 3, MaxRate64: 4}}},
@@ -226,7 +226,7 @@ func TestQdiscAttribute(t *testing.T) {
 				t.Fatalf("Unexpected error: %v", err)
 			}
 			info := &Attribute{}
-			err2 := extractTcmsgAttributes(0xCAFE, data, info)
+			err2 := extractTcmsgAttributes(unix.RTM_NEWQDISC, data, info)
 			if err2 != nil {
 				if testcase.err2 != nil && testcase.err2.Error() == err2.Error() {
 					return

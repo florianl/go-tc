@@ -43,26 +43,11 @@ func TestClass(t *testing.T) {
 	tcMsg.Parent = 0x10000
 	tcMsg.Handle = BuildHandle(0x1, 0x1)
 
-	testRate := RateSpec{
-		CellLog:   0x3,
-		Linklayer: 0x1,
-		Overhead:  0x0,
-		CellAlign: 0xffff,
-		Rate:      0xb71b0,
-	}
-
 	tests := map[string]struct {
 		kind string
-		htb  *Htb
+		hfsc *Hfsc
 	}{
-		"simple htb test": {kind: "htb", htb: &Htb{
-			Parms: &HtbOpt{
-				Rate:    testRate,
-				Ceil:    testRate,
-				Buffer:  0x4e200,
-				Cbuffer: 0x8230,
-			},
-		}},
+		"hfsc": {kind: "hfsc", hfsc: &Hfsc{Rsc: &ServiceCurve{M1: 12, D: 34, M2: 56}}},
 	}
 
 	for name, testcase := range tests {
@@ -71,7 +56,7 @@ func TestClass(t *testing.T) {
 				tcMsg,
 				Attribute{
 					Kind: testcase.kind,
-					Htb:  testcase.htb,
+					Hfsc: testcase.hfsc,
 				},
 			}
 
