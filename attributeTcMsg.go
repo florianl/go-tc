@@ -3,10 +3,11 @@ package tc
 import (
 	"fmt"
 
+	"github.com/florianl/go-tc/internal/unix"
 	"github.com/mdlayher/netlink"
 )
 
-func extractTcmsgAttributes(data []byte, info *Attribute) error {
+func extractTcmsgAttributes(action int, data []byte, info *Attribute) error {
 	ad, err := netlink.NewAttributeDecoder(data)
 	if err != nil {
 		return err
@@ -20,7 +21,7 @@ func extractTcmsgAttributes(data []byte, info *Attribute) error {
 			info.Kind = ad.String()
 		case tcaOptions:
 			// the evaluation of this field depends on tcaKind.
-			// there is no guarantee, that kind is know at this moment,
+			// there is no guarantee, that kind is known at this moment,
 			// so we save it for later
 			options = ad.Bytes()
 		case tcaChain:
@@ -48,14 +49,28 @@ func extractTcmsgAttributes(data []byte, info *Attribute) error {
 			info.EgressBlock = ad.Uint32()
 		case tcaIngressBlock:
 			info.IngressBlock = ad.Uint32()
+		case tcaStab:
+			stab := &Stab{}
+			if err := unmarshalStab(ad.Bytes(), stab); err != nil {
+				return err
+			}
+			info.Stab = stab
 		default:
 			return fmt.Errorf("extractTcmsgAttributes()\t%d\n\t%v", ad.Type(), ad.Bytes())
 
 		}
 	}
 	if len(options) > 0 {
-		if err := extractTCAOptions(options, info, info.Kind); err != nil {
-			return err
+		if (action == unix.RTM_NEWQDISC || action == unix.RTM_DELQDISC || action == unix.RTM_GETQDISC) &&
+			(info.Kind == "hfsc") {
+			if err := extractQOpt(options, info, info.Kind); err != nil {
+				return err
+			}
+		} else {
+
+			if err := extractTCAOptions(options, info, info.Kind); err != nil {
+				return err
+			}
 		}
 	}
 	if len(xStats) > 0 {
@@ -64,6 +79,22 @@ func extractTcmsgAttributes(data []byte, info *Attribute) error {
 			return err
 		}
 		info.XStats = tcxstats
+	}
+	return nil
+}
+
+func extractQOpt(data []byte, tc *Attribute, kind string) error {
+	switch kind {
+	case "hfsc":
+		info := &HfscQOpt{}
+		if err := unmarshalHfscQOpt(data, info); err != nil {
+			return err
+		}
+		tc.HfscQOpt = info
+	case "htb", "atm", "dsmark", "qfq", "ets", "drr", "cbq":
+		return fmt.Errorf("QOpt for %s: %w", kind, ErrNotImplemented)
+	default:
+		return fmt.Errorf("no QOpts for %s", kind)
 	}
 	return nil
 }
@@ -299,6 +330,12 @@ func extractXStats(data []byte, tc *XStats, kind string) error {
 			return err
 		}
 		tc.FqCodel = info
+	case "hfsc":
+		info := &HfscXStats{}
+		if err := unmarshalStruct(data, info); err != nil {
+			return err
+		}
+		tc.Hfsc = info
 	default:
 		return fmt.Errorf("extractXStats(): unsupported kind: %s", kind)
 	}

@@ -111,7 +111,7 @@ func validateQdiscObject(action int, info *Object) ([]tcOption, error) {
 	case "hhf":
 		data, err = marshalHhf(info.Hhf)
 	case "hfsc":
-		data, err = marshalHfsc(info.Hfsc)
+		data, err = marshalHfscQOpt(info.HfscQOpt)
 	case "fq":
 		data, err = marshalFq(info.Fq)
 	case "dsmark":
@@ -164,6 +164,14 @@ func validateQdiscObject(action int, info *Object) ([]tcOption, error) {
 	}
 	if info.Chain != 0 {
 		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaChain, Data: info.Chain})
+	}
+	if info.Stab != nil {
+		data, err := marshalStab(info.Stab)
+		if err != nil {
+			return options, err
+		}
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaStab, Data: data})
+
 	}
 	return options, nil
 }

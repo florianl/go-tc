@@ -150,7 +150,7 @@ func (tc *Tc) get(action int, i *Msg) ([]Object, error) {
 		if err := unmarshalStruct(msg.Data[:20], &result.Msg); err != nil {
 			return results, err
 		}
-		if err := extractTcmsgAttributes(msg.Data[20:], &result.Attribute); err != nil {
+		if err := extractTcmsgAttributes(action, msg.Data[20:], &result.Attribute); err != nil {
 			return results, err
 		}
 		results = append(results, result)
@@ -184,6 +184,7 @@ type Attribute struct {
 	Stats        *Stats
 	XStats       *XStats
 	Stats2       *Stats2
+	Stab         *Stab
 
 	// Filters
 	Basic  *Basic
@@ -209,13 +210,14 @@ type Attribute struct {
 	Choke   *Choke
 
 	// Classful qdiscs
-	Htb    *Htb
-	Hfsc   *Hfsc
-	Dsmark *Dsmark
-	Drr    *Drr
-	Cbq    *Cbq
-	Atm    *Atm
-	Qfq    *Qfq
+	Htb      *Htb
+	Hfsc     *Hfsc
+	HfscQOpt *HfscQOpt
+	Dsmark   *Dsmark
+	Drr      *Drr
+	Cbq      *Cbq
+	Atm      *Atm
+	Qfq      *Qfq
 
 	Netem *Netem
 }
@@ -237,6 +239,7 @@ type XStats struct {
 	Hhf     *HhfXStats
 	Pie     *PieXStats
 	FqCodel *FqCodelXStats
+	Hfsc    *HfscXStats
 }
 
 func marshalXStats(v XStats) ([]byte, error) {
@@ -334,7 +337,7 @@ func (tc *Tc) Monitor(ctx context.Context, deadline time.Duration, fn HookFunc) 
 					tc.logger.Printf("could not extract tc.Msg from %v\n", msg.Data[:20])
 					continue
 				}
-				if err := extractTcmsgAttributes(msg.Data[20:], &monitored.Attribute); err != nil {
+				if err := extractTcmsgAttributes(int(msg.Header.Type), msg.Data[20:], &monitored.Attribute); err != nil {
 					tc.logger.Printf("could not extract attributes from %v\n", msg.Data[20:36])
 					continue
 				}

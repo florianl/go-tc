@@ -1,6 +1,8 @@
 package tc
 
 import (
+	"bytes"
+	"encoding/binary"
 	"fmt"
 
 	"github.com/mdlayher/netlink"
@@ -101,9 +103,23 @@ type HfscQOpt struct {
 	DefCls uint16
 }
 
+// unmarshalHfscQOpt parses the HfscQOpt-encoded data and stores the result in the value pointed to by info.
 func unmarshalHfscQOpt(data []byte, info *HfscQOpt) error {
 
 	info.DefCls = nativeEndian.Uint16(data)
 
 	return nil
+}
+
+// marshalHfscQOpt returns the binary encoding of HfscQOpt
+func marshalHfscQOpt(info *HfscQOpt) ([]byte, error) {
+	if info == nil {
+		return []byte{}, nil
+	}
+
+	data := bytes.NewBuffer(make([]byte, 0, 2))
+	if err := binary.Write(data, nativeEndian, info.DefCls); err != nil {
+		return []byte{}, err
+	}
+	return data.Bytes(), nil
 }

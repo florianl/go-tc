@@ -51,33 +51,6 @@ type Tcft struct {
 	FirstUse uint64
 }
 
-// GenStatsBasic from include/uapi/linux/gen_stats.h
-type GenStatsBasic struct {
-	Bytes   uint64
-	Packets uint32
-}
-
-// GenStatsRateEst from include/uapi/linux/gen_stats.h
-type GenStatsRateEst struct {
-	BytePerSecond   uint32
-	PacketPerSecond uint32
-}
-
-// GenStatsRateEst64 from include/uapi/linux/gen_stats.h
-type GenStatsRateEst64 struct {
-	BytePerSecond   uint64
-	PacketPerSecond uint64
-}
-
-// GenStatsQueue from include/uapi/linux/gen_stats.h
-type GenStatsQueue struct {
-	QueueLen   uint32
-	Backlog    uint32
-	Drops      uint32
-	Requeues   uint32
-	Overlimits uint32
-}
-
 // RateSpec from include/uapi/linux/pkt_sched.h
 type RateSpec struct {
 	CellLog   uint8
@@ -190,6 +163,14 @@ type PieXStats struct {
 	Overlimit uint32
 	Maxq      uint32
 	EcnMark   uint32
+}
+
+// HfscXStats from include/uapi/linux/pkt_sched.h
+type HfscXStats struct {
+	Work   uint64
+	RtWork uint64
+	Period uint32
+	Level  uint32
 }
 
 // FqCodelQdStats from include/uapi/linux/pkt_sched.h
