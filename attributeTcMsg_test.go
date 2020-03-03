@@ -94,7 +94,7 @@ func TestExtractTcmsgAttributes(t *testing.T) {
 	for name, testcase := range tests {
 		t.Run(name, func(t *testing.T) {
 			value := &Attribute{}
-			if err := extractTcmsgAttributes(testcase.input, value); err != nil {
+			if err := extractTcmsgAttributes(0xCAFE, testcase.input, value); err != nil {
 				if testcase.err != nil && testcase.err.Error() == err.Error() {
 					// we received the expected error. everything is fine
 					return
@@ -170,7 +170,7 @@ func TestFilterAttribute(t *testing.T) {
 				t.Fatalf("Unexpected error: %v", err)
 			}
 			info := &Attribute{}
-			err2 := extractTcmsgAttributes(data, info)
+			err2 := extractTcmsgAttributes(0xCAFE, data, info)
 			if err2 != nil {
 				if testcase.err2 != nil && testcase.err2.Error() == err2.Error() {
 					return
@@ -226,7 +226,7 @@ func TestQdiscAttribute(t *testing.T) {
 				t.Fatalf("Unexpected error: %v", err)
 			}
 			info := &Attribute{}
-			err2 := extractTcmsgAttributes(data, info)
+			err2 := extractTcmsgAttributes(0xCAFE, data, info)
 			if err2 != nil {
 				if testcase.err2 != nil && testcase.err2.Error() == err2.Error() {
 					return
