@@ -79,9 +79,8 @@ func validateClassObject(action int, info *Object) ([]tcOption, error) {
 	}
 	if len(data) < 1 {
 		return options, ErrNoArg
-	} else {
-		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaOptions, Data: data})
 	}
+	options = append(options, tcOption{Interpretation: vtBytes, Type: tcaOptions, Data: data})
 	options = append(options, tcOption{Interpretation: vtString, Type: tcaKind, Data: info.Kind})
 	return options, nil
 }
