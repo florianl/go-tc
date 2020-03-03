@@ -115,7 +115,7 @@ func qdiscAlterResponses(t *testing.T, cache *[]netlink.Message) []byte {
 	// Decode data from cache
 	for _, msg := range *cache {
 		var result Object
-		if err := extractTcmsgAttributes(msg.Data[20:], &result.Attribute); err != nil {
+		if err := extractTcmsgAttributes(0xCAFE, msg.Data[20:], &result.Attribute); err != nil {
 			t.Fatalf("could not decode attributes: %v", err)
 		}
 		tmp = append(tmp, result)
