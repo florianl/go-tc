@@ -1,10 +1,5 @@
 package core
 
-import (
-	"fmt"
-	"os"
-)
-
 var tickInUSec float64
 var clockFactor float64
 
@@ -12,24 +7,6 @@ const (
 	// iproute2/include/utils.h:timeUnitsPerSec
 	timeUnitsPerSec = 1000000
 )
-
-func init() {
-
-	fd, err := os.Open("/proc/net/psched")
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "could not open /proc/net/psched: %v\n", err)
-		return
-	}
-	defer fd.Close()
-
-	var t2us, us2t, clockRes, hiClockRes uint32
-	_, err = fmt.Fscanf(fd, "%08x %08x %08x %08x", &t2us, &us2t, &clockRes, &hiClockRes)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "could not read /proc/net/psched: %v\n", err)
-	}
-	clockFactor = float64(clockRes) / timeUnitsPerSec
-	tickInUSec = float64(t2us) / float64(us2t) * clockFactor
-}
 
 // Time2Tick implements iproute2/tc/tc_core:tc_core_time2tick().
 // It returns the number of CPU ticks for a given time in usec.
