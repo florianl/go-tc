@@ -6,7 +6,7 @@ jobs:
   test:
     strategy:
       matrix:
-        go-version: [1.13.x]
+        go-version: [1.13.x, 1.14.x]
         platform: [ubuntu-latest, macos-latest, windows-latest]
     runs-on: ${{ matrix.platform }}
     steps:
@@ -21,7 +21,8 @@ jobs:
         GOPROXY: "https://proxy.golang.org"
       run: go mod download
     - name: Test with -race
-      run: go test -race -count=1 ./...
+      run: go test -race -count=1 -covermode atomic -coverprofile=profile.cov ./...
+      working-directory: src/github.com/florianl/go-tc
     - name: Integrationtest for linux
       if: matrix.platform == 'ubuntu-latest'
       # https://github.com/actions/setup-go/issues/14
@@ -43,5 +44,14 @@ jobs:
         export PATH=$PATH:$(go env GOPATH)/bin
         go get -u honnef.co/go/tools/cmd/staticcheck
         staticcheck -checks all .
+        staticcheck -checks all core/*
         # ignore should not use ALL_CAPS in Go names in internal/
         staticcheck -checks all,-ST1003 ./internal/...
+    - name: coveralls.io
+      env:
+        COVERALLS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        export PATH=$PATH:$(go env GOPATH)/bin
+        go get -u github.com/mattn/goveralls
+        goveralls -coverprofile=profile.cov -service=github
+        working-directory: src/github.com/florianl/go-tc
