@@ -208,6 +208,7 @@ type Attribute struct {
 	Pfifo   *FifoOpt
 	Bfifo   *FifoOpt
 	Choke   *Choke
+	Netem   *Netem
 
 	// Classful qdiscs
 	Htb      *Htb
@@ -218,8 +219,6 @@ type Attribute struct {
 	Cbq      *Cbq
 	Atm      *Atm
 	Qfq      *Qfq
-
-	Netem *Netem
 }
 
 // BuildHandle is a simple helper function to construct the handle for the Tcmsg struct
