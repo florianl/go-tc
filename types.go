@@ -54,3 +54,9 @@ const (
 	// verbose logging
 	Verbose
 )
+
+const (
+	// mask to differentiate between classes, qdiscs and filters
+	actionMask  = 0x3c
+	actionQdisc = 0x24
+)
