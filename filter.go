@@ -1,6 +1,9 @@
 package tc
 
 import (
+	"errors"
+	"fmt"
+
 	"github.com/florianl/go-tc/internal/unix"
 	"github.com/mdlayher/netlink"
 )
@@ -83,9 +86,12 @@ func validateFilterObject(action int, info *Object) ([]tcOption, error) {
 	case "u32":
 		data, err = marshalU32(info.U32)
 	default:
-		return options, ErrNotImplemented
+		return options, fmt.Errorf("%s: %w", info.Kind, ErrNotImplemented)
 	}
 	if err != nil {
+		if errors.Is(err, ErrNoArg) && action == unix.RTM_DELTFILTER {
+			return options, nil
+		}
 		return options, err
 	}
 	if len(data) < 1 {

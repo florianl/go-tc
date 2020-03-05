@@ -1,6 +1,8 @@
 package tc
 
 import (
+	"fmt"
+
 	"github.com/florianl/go-tc/internal/unix"
 	"github.com/mdlayher/netlink"
 )
@@ -71,8 +73,12 @@ func validateClassObject(action int, info *Object) ([]tcOption, error) {
 	switch info.Kind {
 	case "hfsc":
 		data, err = marshalHfsc(info.Hfsc)
+	case "qfq":
+		data, err = marshalQfq(info.Qfq)
+	case "htb":
+		data, err = marshalHtb(info.Htb)
 	default:
-		return options, ErrNotImplemented
+		return options, fmt.Errorf("%s: %w", info.Kind, ErrNotImplemented)
 	}
 	if err != nil {
 		return options, err

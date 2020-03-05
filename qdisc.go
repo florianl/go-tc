@@ -1,6 +1,8 @@
 package tc
 
 import (
+	"fmt"
+
 	"github.com/florianl/go-tc/internal/unix"
 	"github.com/mdlayher/netlink"
 )
@@ -103,7 +105,8 @@ func validateQdiscObject(action int, info *Object) ([]tcOption, error) {
 	case "red":
 		data, err = marshalRed(info.Red)
 	case "qfq":
-		data, err = marshalQfq(info.Qfq)
+		// qfq is parameterless
+		// parameters are used in its corresponding class
 	case "pie":
 		data, err = marshalPie(info.Pie)
 	case "mqprio":
@@ -135,13 +138,13 @@ func validateQdiscObject(action int, info *Object) ([]tcOption, error) {
 	case "ingress":
 		// ingress is parameterless
 	default:
-		return options, ErrNotImplemented
+		return options, fmt.Errorf("%s: %w", info.Kind, ErrNotImplemented)
 	}
 	if err != nil {
 		return options, err
 	}
 	if len(data) < 1 && action == unix.RTM_NEWQDISC {
-		if info.Kind != "clsact" && info.Kind != "ingress" {
+		if info.Kind != "clsact" && info.Kind != "ingress" && info.Kind != "qfq" {
 			return options, ErrNoArg
 		}
 	} else {
