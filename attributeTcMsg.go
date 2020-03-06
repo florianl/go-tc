@@ -3,7 +3,6 @@ package tc
 import (
 	"fmt"
 
-	"github.com/florianl/go-tc/internal/unix"
 	"github.com/mdlayher/netlink"
 )
 
@@ -61,18 +60,16 @@ func extractTcmsgAttributes(action int, data []byte, info *Attribute) error {
 		}
 	}
 	if len(options) > 0 {
-		if (action == unix.RTM_NEWQDISC || action == unix.RTM_DELQDISC || action == unix.RTM_GETQDISC) &&
-			(info.Kind == "hfsc") {
-			if err := extractQOpt(options, info, info.Kind); err != nil {
-				return err
-			}
+		if (action&actionMask == actionQdisc) && hasQOpt(info.Kind) {
+			err = extractQOpt(options, info, info.Kind)
 		} else {
-
-			if err := extractTCAOptions(options, info, info.Kind); err != nil {
-				return err
-			}
+			err = extractTCAOptions(options, info, info.Kind)
+		}
+		if err != nil {
+			return err
 		}
 	}
+
 	if len(xStats) > 0 {
 		tcxstats := &XStats{}
 		if err := extractXStats(xStats, tcxstats, info.Kind); err != nil {
@@ -83,6 +80,18 @@ func extractTcmsgAttributes(action int, data []byte, info *Attribute) error {
 	return nil
 }
 
+func hasQOpt(kind string) bool {
+	classful := map[string]bool{
+		"hfsc": true,
+		"qfq":  true,
+		"htb":  true,
+	}
+	if _, ok := classful[kind]; ok {
+		return true
+	}
+	return false
+}
+
 func extractQOpt(data []byte, tc *Attribute, kind string) error {
 	switch kind {
 	case "hfsc":
@@ -91,8 +100,18 @@ func extractQOpt(data []byte, tc *Attribute, kind string) error {
 			return err
 		}
 		tc.HfscQOpt = info
-	case "htb", "atm", "dsmark", "qfq", "ets", "drr", "cbq":
-		return fmt.Errorf("QOpt for %s: %w", kind, ErrNotImplemented)
+	case "qfq":
+		info := &Qfq{}
+		if err := unmarshalQfq(data, info); err != nil {
+			return err
+		}
+		tc.Qfq = info
+	case "htb":
+		info := &Htb{}
+		if err := unmarshalHtb(data, info); err != nil {
+			return err
+		}
+		tc.Htb = info
 	default:
 		return fmt.Errorf("no QOpts for %s", kind)
 	}
