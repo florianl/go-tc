@@ -1,6 +1,7 @@
 package tc
 
 import (
+	"errors"
 	"strings"
 	"testing"
 
@@ -76,6 +77,26 @@ func generateClsact(t *testing.T) []byte {
 	return data
 }
 
+func generateClsactStab(t *testing.T) []byte {
+	t.Helper()
+	options := []tcOption{}
+	options = append(options, tcOption{Interpretation: vtString, Type: tcaKind, Data: "clsact"})
+	tmp, _ := marshalStab(&Stab{
+		Base: &SizeSpec{
+			CellLog:   42,
+			LinkLayer: 1,
+			MTU:       1492,
+		},
+	})
+	options = append(options, tcOption{Interpretation: vtBytes, Type: tcaStab, Data: tmp})
+
+	data, err := marshalAttributes(options)
+	if err != nil {
+		t.Fatalf("could not generate test data: %v", err)
+	}
+	return data
+}
+
 func TestExtractTcmsgAttributes(t *testing.T) {
 	tests := map[string]struct {
 		input    []byte
@@ -89,6 +110,7 @@ func TestExtractTcmsgAttributes(t *testing.T) {
 			Htb:    &Htb{DirectQlen: 0x7b, Rate64: 0xea, Ceil64: 0x0159}}},
 		"pfifo": {input: generatePfifo(t), expected: &Attribute{Kind: "pfifo",
 			Pfifo: &FifoOpt{Limit: 123}, Stats: &Stats{Bytes: 123, Packets: 321, Drops: 0, Overlimits: 42}}},
+		"clsact+stab": {input: generateClsactStab(t), expected: &Attribute{Kind: "clsact", Stab: &Stab{Base: &SizeSpec{CellLog: 0x2a, LinkLayer: 0x01, MTU: 0x05d4}}}},
 	}
 
 	for name, testcase := range tests {
@@ -201,10 +223,10 @@ func TestQdiscAttribute(t *testing.T) {
 		"fq_codel": {val: &Attribute{Kind: "fq_codel", FqCodel: &FqCodel{Target: 1, Limit: 2, Interval: 3, ECN: 4, Flows: 5, Quantum: 6, CEThreshold: 7, DropBatchSize: 8, MemoryLimit: 9}}},
 		"hfsc":     {val: &Attribute{Kind: "hfsc", HfscQOpt: &HfscQOpt{DefCls: 42}}},
 		"hhf":      {val: &Attribute{Kind: "hhf", Hhf: &Hhf{BacklogLimit: 1, Quantum: 2, HHFlowsLimit: 3, ResetTimeout: 4, AdmitBytes: 5, EVICTTimeout: 6, NonHHWeight: 7}}},
-		"htb":      {val: &Attribute{Kind: "htb", Htb: &Htb{Rate64: 123, Parms: &HtbOpt{Buffer: 0xFFFF}}}},
+		"htb":      {val: &Attribute{Kind: "htb", Htb: &Htb{Init: &HtbGlob{Version: 0x3, Rate2Quantum: 0xa, Defcls: 0x30}}}},
 		"mqprio":   {val: &Attribute{Kind: "mqprio", MqPrio: &MqPrio{Mode: 1, Shaper: 2, MinRate64: 3, MaxRate64: 4}}},
 		"pie":      {val: &Attribute{Kind: "pie", Pie: &Pie{Target: 1, Limit: 2, TUpdate: 3, Alpha: 4, Beta: 5, ECN: 6, Bytemode: 7}}},
-		"qfq":      {val: &Attribute{Kind: "qfq", Qfq: &Qfq{Weight: 2, Lmax: 4}}},
+		"qfq":      {val: &Attribute{Kind: "qfq"}},
 		"red":      {val: &Attribute{Kind: "red", Red: &Red{MaxP: 2, Parms: &RedQOpt{QthMin: 2, QthMax: 4}}}},
 		"sfb":      {val: &Attribute{Kind: "sfb", Sfb: &Sfb{Parms: &SfbQopt{Max: 0xFF}}}},
 		"tbf":      {val: &Attribute{Kind: "tbf", Tbf: &Tbf{Rate64: 1, Prate64: 2, Burst: 3, Pburst: 4}}},
@@ -229,6 +251,45 @@ func TestQdiscAttribute(t *testing.T) {
 			err2 := extractTcmsgAttributes(unix.RTM_NEWQDISC, data, info)
 			if err2 != nil {
 				if testcase.err2 != nil && testcase.err2.Error() == err2.Error() {
+					return
+				}
+				t.Fatalf("Unexpected error: %v", err2)
+			}
+			if diff := cmp.Diff(info, testcase.val); diff != "" {
+				t.Fatalf("Filter missmatch (want +got):\n%s", diff)
+			}
+		})
+	}
+}
+
+func TestClassAttribute(t *testing.T) {
+	tests := map[string]struct {
+		val  *Attribute
+		err1 error
+		err2 error
+	}{
+		"clsact": {val: &Attribute{Kind: "clsact"}, err1: ErrNotImplemented},
+		"hfsc":   {val: &Attribute{Kind: "hfsc", Hfsc: &Hfsc{Rsc: &ServiceCurve{M1: 12, D: 34, M2: 56}}}},
+		"qfq":    {val: &Attribute{Kind: "qfq", Qfq: &Qfq{Weight: 2, Lmax: 4}}},
+	}
+
+	for name, testcase := range tests {
+		t.Run(name, func(t *testing.T) {
+			options, err1 := validateClassObject(unix.RTM_NEWTCLASS, &Object{Msg{Ifindex: 42}, *testcase.val})
+			if err1 != nil {
+				if errors.Is(err1, testcase.err1) {
+					return
+				}
+				t.Fatalf("Unexpected error: %v", err1)
+			}
+			data, err := marshalAttributes(options)
+			if err != nil {
+				t.Fatalf("Unexpected error: %v", err)
+			}
+			info := &Attribute{}
+			err2 := extractTcmsgAttributes(unix.RTM_NEWTCLASS, data, info)
+			if err2 != nil {
+				if errors.Is(err2, testcase.err2) {
 					return
 				}
 				t.Fatalf("Unexpected error: %v", err2)
