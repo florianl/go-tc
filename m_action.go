@@ -20,7 +20,7 @@ const (
 type Action struct {
 	Kind     string
 	Index    uint32
-	Stats    interface{}
+	Stats    *GenStats
 	Cookie   *Cookie
 	Bpf      *ActBpf
 	ConnMark *Connmark
@@ -75,7 +75,11 @@ func unmarshalAction(data []byte, info *Action) error {
 			}
 			info.Cookie = cookie
 		case tcaActStats:
-			actStats = ad.Bytes()
+			stats := &GenStats{}
+			if err := unmarshalGenStats(actStats, stats); err != nil {
+				return err
+			}
+			info.Stats = stats
 		default:
 			return fmt.Errorf("unmarshalAction()\t%d\n\t%v", ad.Type(), ad.Bytes())
 		}
@@ -85,8 +89,7 @@ func unmarshalAction(data []byte, info *Action) error {
 			return err
 		}
 	}
-	// TODO: use statistics
-	_ = actStats
+
 	return nil
 }
 
@@ -191,6 +194,13 @@ func marshalAction(info *Action) ([]byte, error) {
 
 	if info.Index != 0 {
 		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaActIndex, Data: info.Index})
+	}
+	if info.Stats != nil {
+		data, err := marshalGenStats(info.Stats)
+		if err != nil {
+			return []byte{}, err
+		}
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaActStats, Data: data})
 	}
 	return marshalAttributes(options)
 }
