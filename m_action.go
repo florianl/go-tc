@@ -58,7 +58,6 @@ func unmarshalAction(data []byte, info *Action) error {
 		return err
 	}
 	var actOptions []byte
-	var actStats []byte
 	ad.ByteOrder = nativeEndian
 	for ad.Next() {
 		switch ad.Type() {
@@ -76,7 +75,7 @@ func unmarshalAction(data []byte, info *Action) error {
 			info.Cookie = cookie
 		case tcaActStats:
 			stats := &GenStats{}
-			if err := unmarshalGenStats(actStats, stats); err != nil {
+			if err := unmarshalGenStats(ad.Bytes(), stats); err != nil {
 				return err
 			}
 			info.Stats = stats

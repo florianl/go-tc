@@ -16,7 +16,7 @@ func TestAction(t *testing.T) {
 	}{
 		"empty":               {err1: fmt.Errorf("kind is missing")},
 		"unknown Kind":        {val: Action{Kind: "test", Index: 123}, err1: fmt.Errorf("unknown kind 'test'")},
-		"bpf Without Options": {val: Action{Kind: "bpf"}, err1: fmt.Errorf("ActBpf: missing argument")},
+		"bpf Without Options": {val: Action{Kind: "bpf"}, err1: ErrNoArg},
 		"simple Bpf":          {val: Action{Kind: "bpf", Bpf: &ActBpf{FD: 12, Name: "simpleTest", Parms: &ActBpfParms{Action: 2, Index: 4}}}},
 		"connmark":            {val: Action{Kind: "connmark", ConnMark: &Connmark{Parms: &ConnmarkParam{Index: 42, Action: 1}}}},
 		"csum":                {val: Action{Kind: "csum", CSum: &Csum{Parms: &CsumParms{Index: 1, Capab: 2}}}},
@@ -24,6 +24,7 @@ func TestAction(t *testing.T) {
 		"ife":                 {val: Action{Kind: "ife", Ife: &Ife{Parms: &IfeParms{Index: 42, Action: 1}}}},
 		"ipt":                 {val: Action{Kind: "ipt", Ipt: &Ipt{Table: "testTable", Hook: 42, Index: 1984}}},
 		"mirred":              {val: Action{Kind: "mirred", Mirred: &Mirred{Parms: &MirredParam{Index: 42, Action: 1}}}},
+		"mirred+stats":        {val: Action{Kind: "mirred", Mirred: &Mirred{Parms: &MirredParam{Index: 42, Action: 1}}, Stats: &GenStats{Basic: &GenBasic{Bytes: 8, Packets: 1}, RateEst: &GenRateEst{BytePerSecond: 42, PacketPerSecond: 3}, Queue: &GenQueue{QueueLen: 5, Backlog: 6, Drops: 1, Requeues: 3, Overlimits: 1}, RateEst64: &GenRateEst64{BytePerSecond: 12, PacketPerSecond: 1}, BasicHw: &GenBasic{Bytes: 42, Packets: 3}}}},
 		"nat":                 {val: Action{Kind: "nat", Nat: &Nat{Parms: &NatParms{Index: 42, Action: 1}}}},
 		"police":              {val: Action{Kind: "police", Police: &Police{AvRate: 1337, Result: 42}}},
 		"sample":              {val: Action{Kind: "sample", Sample: &Sample{Parms: &SampleParms{Index: 42, Action: 1}}}},
@@ -32,24 +33,24 @@ func TestAction(t *testing.T) {
 
 	for name, testcase := range tests {
 		t.Run(name, func(t *testing.T) {
-			data, err1 := marshalAction(&testcase.val)
+			data, err1 := marshalActions([]*Action{&testcase.val})
 			if err1 != nil {
-				if testcase.err1 != nil && testcase.err1.Error() == err1.Error() {
+				if !errors.Is(testcase.err1, err1) {
 					return
 				}
 				t.Fatalf("Unexpected error: %v", err1)
 			}
-			val := Action{}
-			err2 := unmarshalAction(data, &val)
+			val := []*Action{}
+			err2 := unmarshalActions(data, &val)
 			if err2 != nil {
-				if testcase.err2 != nil && testcase.err2.Error() == err2.Error() {
+				if !errors.Is(testcase.err2, err2) {
 					return
 				}
 				t.Fatalf("Unexpected error: %v", err2)
 
 			}
-			if diff := cmp.Diff(val, testcase.val); diff != "" {
-				t.Fatalf("Action missmatch (want +got):\n%s", diff)
+			if diff := cmp.Diff(val, []*Action{&testcase.val}); diff != "" {
+				t.Fatalf("Action missmatch (-want +got):\n%s", diff)
 			}
 		})
 	}
