@@ -147,3 +147,27 @@ func TestMonitor(t *testing.T) {
 
 	<-ctx.Done()
 }
+
+// Tests out the HandleStr function
+func TestHandleStr(t *testing.T) {
+	type args struct {
+		handle uint32
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{"handle 0", args{0}, "0:0"},
+		{"handle 65535", args{0x0000ffff}, "0:65535"},
+		{"handle 4294901760", args{0xffff0000}, "65535:0"},
+		{"handle 4294967295", args{0xffffffff}, "65535:65535"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := HandleStr(tt.args.handle); got != tt.want {
+				t.Errorf("HandleStr() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

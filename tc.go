@@ -226,6 +226,11 @@ func BuildHandle(maj, min uint32) uint32 {
 	return ((maj & handleMajMask) | (min & handleMinMask))
 }
 
+// HandleStr is a simple helper function that cinstruct human readable handles
+func HandleStr(handle uint32) string {
+	return fmt.Sprintf("%d:%d", ((handle & handleMajMask) >> 16), (handle & handleMinMask))
+}
+
 // XStats contains further statistics to the TCA_KIND
 type XStats struct {
 	Sfb     *SfbXStats
