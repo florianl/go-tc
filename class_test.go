@@ -3,6 +3,7 @@ package tc
 import (
 	"testing"
 
+	"github.com/florianl/go-tc/core"
 	"github.com/florianl/go-tc/internal/unix"
 )
 
@@ -18,7 +19,7 @@ func TestClass(t *testing.T) {
 	tcMsg := Msg{
 		Family:  unix.AF_UNSPEC,
 		Ifindex: 1337,
-		Handle:  BuildHandle(0x1, 0x0000),
+		Handle:  core.BuildHandle(0x1, 0x0000),
 		Parent:  0xFFFFFFFF,
 		Info:    0,
 	}
@@ -41,7 +42,7 @@ func TestClass(t *testing.T) {
 	}
 
 	tcMsg.Parent = 0x10000
-	tcMsg.Handle = BuildHandle(0x1, 0x1)
+	tcMsg.Handle = core.BuildHandle(0x1, 0x1)
 
 	tests := map[string]struct {
 		kind string
