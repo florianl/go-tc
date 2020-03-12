@@ -8,6 +8,7 @@ import (
 	"os"
 
 	"github.com/florianl/go-tc"
+	"github.com/florianl/go-tc/core"
 	"golang.org/x/sys/unix"
 )
 
@@ -64,7 +65,7 @@ func ExampleQdisc() {
 		tc.Msg{
 			Family:  unix.AF_UNSPEC,
 			Ifindex: uint32(devID.Index),
-			Handle:  tc.BuildHandle(0xFFFF, 0x0000),
+			Handle:  core.BuildHandle(0xFFFF, 0x0000),
 			Parent:  0xFFFFFFF1,
 			Info:    0,
 		},
@@ -107,7 +108,7 @@ func Example_cBPF() {
 		tc.Msg{
 			Family:  unix.AF_UNSPEC,
 			Ifindex: uint32(devID.Index),
-			Handle:  tc.BuildHandle(tc.HandleIngress, 0x0000),
+			Handle:  core.BuildHandle(tc.HandleIngress, 0x0000),
 			Parent:  tc.HandleIngress,
 			Info:    0,
 		},

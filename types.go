@@ -35,12 +35,6 @@ const (
 	MagicBlock = 0xFFFFFFFF
 )
 
-// constants from include/uapi/linux/pkt_sched.h
-const (
-	handleMajMask uint32 = 0xFFFF0000
-	handleMinMask uint32 = 0x0000FFFF
-)
-
 // Common flags from include/uapi/linux/pkt_cls.h
 const (
 	// don't offload filter to HW

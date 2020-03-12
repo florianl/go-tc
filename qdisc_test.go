@@ -6,6 +6,7 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/florianl/go-tc/core"
 	"github.com/florianl/go-tc/internal/unix"
 
 	"github.com/mdlayher/netlink"
@@ -24,7 +25,7 @@ func TestQdisc(t *testing.T) {
 		Msg: Msg{
 			Family:  unix.AF_UNSPEC,
 			Ifindex: 0,
-			Handle:  BuildHandle(0xFFFF, 0x0000),
+			Handle:  core.BuildHandle(0xFFFF, 0x0000),
 			Parent:  0xFFFFFFF1,
 			Info:    0,
 		},
@@ -60,7 +61,7 @@ func TestQdisc(t *testing.T) {
 	tcMsg := Msg{
 		Family:  unix.AF_UNSPEC,
 		Ifindex: 123,
-		Handle:  BuildHandle(0xFFFF, 0x0000),
+		Handle:  core.BuildHandle(0xFFFF, 0x0000),
 		Parent:  0xFFFFFFF1,
 		Info:    0,
 	}

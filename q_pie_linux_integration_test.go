@@ -8,6 +8,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/florianl/go-tc/core"
 	"github.com/jsimonetti/rtnetlink"
 	"golang.org/x/sys/unix"
 )
@@ -74,7 +75,7 @@ func TestLinuxTcQueuePie(t *testing.T) {
 		Msg{
 			Family:  unix.AF_UNSPEC,
 			Ifindex: uint32(devID.Index),
-			Handle:  BuildHandle(0x1, 0x0),
+			Handle:  core.BuildHandle(0x1, 0x0),
 			Parent:  HandleRoot,
 			Info:    0,
 		},

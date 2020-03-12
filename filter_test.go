@@ -3,6 +3,7 @@ package tc
 import (
 	"testing"
 
+	"github.com/florianl/go-tc/core"
 	"github.com/florianl/go-tc/internal/unix"
 )
 
@@ -18,7 +19,7 @@ func TestFilter(t *testing.T) {
 	tcMsg := Msg{
 		Family:  unix.AF_UNSPEC,
 		Ifindex: 1337,
-		Handle:  BuildHandle(0xFFFF, 0x0000),
+		Handle:  core.BuildHandle(0xFFFF, 0x0000),
 		Parent:  0xFFFFFFF1,
 		Info:    0,
 	}

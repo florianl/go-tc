@@ -221,11 +221,6 @@ type Attribute struct {
 	Qfq      *Qfq
 }
 
-// BuildHandle is a simple helper function to construct the handle for the Tcmsg struct
-func BuildHandle(maj, min uint32) uint32 {
-	return (((maj << 16) & handleMajMask) | (min & handleMinMask))
-}
-
 // XStats contains further statistics to the TCA_KIND
 type XStats struct {
 	Sfb     *SfbXStats

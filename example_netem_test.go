@@ -8,6 +8,7 @@ import (
 	"os"
 
 	"github.com/florianl/go-tc"
+	"github.com/florianl/go-tc/core"
 	"golang.org/x/sys/unix"
 )
 
@@ -34,7 +35,7 @@ func ExampleNetem() {
 		tc.Msg{
 			Family:  unix.AF_UNSPEC,
 			Ifindex: uint32(devID.Index),
-			Handle:  tc.BuildHandle(0x1, 0x0),
+			Handle:  core.BuildHandle(0x1, 0x0),
 			Parent:  tc.HandleRoot,
 			Info:    0,
 		},
