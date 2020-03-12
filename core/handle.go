@@ -11,7 +11,9 @@ func BuildHandle(maj, min uint32) uint32 {
 	return (((maj << 16) & handleMajMask) | (min & handleMinMask))
 }
 
-// SplitHandle is a simple helper function that cinstruct human readable handles
-func SplitHandle(handle uint32) (uint32, uint32) {
-	return ((handle & handleMajMask) >> 16), (handle & handleMinMask)
+// SplitHandle extracts the major and minor part from a given handle
+func SplitHandle(handle uint32) (major, minor uint32) {
+	major = (handle & handleMajMask) >> 16
+	minor = handle & handleMinMask
+	return major, minor
 }
