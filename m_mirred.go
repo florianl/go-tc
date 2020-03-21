@@ -59,7 +59,7 @@ func unmarshalMirred(data []byte, info *Mirred) error {
 	return nil
 }
 
-// marshalMirred returns the binary encoding of ActBpf
+// marshalMirred returns the binary encoding of Mirred
 func marshalMirred(info *Mirred) ([]byte, error) {
 	options := []tcOption{}
 
