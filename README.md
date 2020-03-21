@@ -1,4 +1,4 @@
-tc  [![GoDoc](https://godoc.org/github.com/florianl/go-tc?status.svg)](https://godoc.org/github.com/florianl/go-tc) [![Go Report Card](https://goreportcard.com/badge/github.com/florianl/go-tc)](https://goreportcard.com/report/github.com/florianl/go-tc)
+tc  [![GoDoc](https://godoc.org/github.com/florianl/go-tc?status.svg)](https://godoc.org/github.com/florianl/go-tc) [![Go Report Card](https://goreportcard.com/badge/github.com/florianl/go-tc)](https://goreportcard.com/report/github.com/florianl/go-tc) [![GitHub Actions](https://github.com/florianl/go-tc/workflows/Go/badge.svg?branch=master)](https://github.com/florianl/go-tc/actions) [![Coverage Status](https://coveralls.io/repos/github/florianl/go-tc/badge.svg)](https://coveralls.io/github/florianl/go-tc)
 ==
 This is a work in progress version of `tc`.  It provides a [C](https://en.wikipedia.org/wiki/C_(programming_language))-binding free API to the [netlink](http://man7.org/linux/man-pages/man7/netlink.7.html) based [traffic control system](http://man7.org/linux/man-pages/man8/tc.8.html) of [rtnetlink](http://man7.org/linux/man-pages/man7/rtnetlink.7.html).
 
