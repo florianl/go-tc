@@ -13,7 +13,8 @@ func TestCbq(t *testing.T) {
 		err1 error
 		err2 error
 	}{
-		"simple": {val: Cbq{LssOpt: &CbqLssOpt{OffTime: 10}, WrrOpt: &CbqWrrOpt{Weight: 42}, FOpt: &CbqFOpt{Split: 2}, OVLStrategy: &CbqOvl{Penalty: 2}}},
+		"simple":      {val: Cbq{LssOpt: &CbqLssOpt{OffTime: 10}, WrrOpt: &CbqWrrOpt{Weight: 42}, FOpt: &CbqFOpt{Split: 2}, OVLStrategy: &CbqOvl{Penalty: 2}}},
+		"with police": {val: Cbq{Police: &CbqPolice{Res2: 42}}},
 	}
 
 	for name, testcase := range tests {
