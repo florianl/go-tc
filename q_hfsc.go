@@ -114,7 +114,7 @@ func unmarshalHfscQOpt(data []byte, info *HfscQOpt) error {
 // marshalHfscQOpt returns the binary encoding of HfscQOpt
 func marshalHfscQOpt(info *HfscQOpt) ([]byte, error) {
 	if info == nil {
-		return []byte{}, nil
+		return []byte{}, fmt.Errorf("HfscQOpt: %w", ErrNoArg)
 	}
 
 	data := bytes.NewBuffer(make([]byte, 0, 2))
