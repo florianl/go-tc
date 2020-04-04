@@ -79,7 +79,7 @@ func TestHfscQOpt(t *testing.T) {
 
 	t.Run("nil", func(t *testing.T) {
 		_, err := marshalHfscQOpt(nil)
-		if !errors.Is(err, nil) {
+		if !errors.Is(err, ErrNoArg) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 	})
