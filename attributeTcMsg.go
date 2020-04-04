@@ -280,6 +280,12 @@ func extractTCAOptions(data []byte, tc *Attribute, kind string) error {
 			return err
 		}
 		tc.Flow = info
+	case "matchall":
+		info := &Matchall{}
+		if err := unmarshalMatchall(data, info); err != nil {
+			return err
+		}
+		tc.Matchall = info
 	case "netem":
 		info := &Netem{}
 		if err := unmarshalNetem(data, info); err != nil {

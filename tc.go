@@ -187,13 +187,14 @@ type Attribute struct {
 	Stab         *Stab
 
 	// Filters
-	Basic  *Basic
-	BPF    *Bpf
-	U32    *U32
-	Rsvp   *Rsvp
-	Route4 *Route4
-	Fw     *Fw
-	Flow   *Flow
+	Basic    *Basic
+	BPF      *Bpf
+	U32      *U32
+	Rsvp     *Rsvp
+	Route4   *Route4
+	Fw       *Fw
+	Flow     *Flow
+	Matchall *Matchall
 
 	// Classless qdiscs
 	FqCodel *FqCodel

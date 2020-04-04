@@ -85,6 +85,8 @@ func validateFilterObject(action int, info *Object) ([]tcOption, error) {
 		data, err = marshalBpf(info.BPF)
 	case "u32":
 		data, err = marshalU32(info.U32)
+	case "matchall":
+		data, err = marshalMatchall(info.Matchall)
 	default:
 		return options, fmt.Errorf("%s: %w", info.Kind, ErrNotImplemented)
 	}
