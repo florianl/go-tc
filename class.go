@@ -34,7 +34,7 @@ func (c *Class) Replace(info *Object) error {
 	if info == nil {
 		return ErrNoArg
 	}
-	options, err := validateQdiscObject(unix.RTM_NEWTCLASS, info)
+	options, err := validateClassObject(unix.RTM_NEWTCLASS, info)
 	if err != nil {
 		return err
 	}
@@ -46,7 +46,7 @@ func (c *Class) Delete(info *Object) error {
 	if info == nil {
 		return ErrNoArg
 	}
-	options, err := validateQdiscObject(unix.RTM_DELTCLASS, info)
+	options, err := validateClassObject(unix.RTM_DELTCLASS, info)
 	if err != nil {
 		return err
 	}
