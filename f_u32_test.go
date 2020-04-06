@@ -19,6 +19,7 @@ func TestU32(t *testing.T) {
 	}{
 		"empty":    {},
 		"simple":   {val: U32{ClassID: 0xFFFF, Mark: &U32Mark{Val: 0x55, Mask: 0xAA, Success: 0x1}}},
+		"divisor":  {val: U32{Divisor: 1, Link: 42}},
 		"extended": {val: U32{ClassID: 0xFFFF, Mark: &U32Mark{Val: 0x55, Mask: 0xAA, Success: 0x1}, Police: &Police{AvRate: 1337, Result: 12}}},
 		"policy": {val: U32{
 			Sel: &U32Sel{

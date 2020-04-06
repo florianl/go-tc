@@ -89,6 +89,12 @@ func marshalU32(info *U32) ([]byte, error) {
 		}
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaU32Act, Data: data})
 	}
+	if info.Divisor != 0 {
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaU32Divisor, Data: info.Divisor})
+	}
+	if info.Link != 0 {
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaU32Link, Data: info.Link})
+	}
 
 	return marshalAttributes(options)
 }
