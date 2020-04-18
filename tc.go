@@ -197,6 +197,7 @@ type Attribute struct {
 	Matchall *Matchall
 
 	// Classless qdiscs
+	Cake    *Cake
 	FqCodel *FqCodel
 	Codel   *Codel
 	Fq      *Fq

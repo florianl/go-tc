@@ -292,6 +292,12 @@ func extractTCAOptions(data []byte, tc *Attribute, kind string) error {
 			return err
 		}
 		tc.Netem = info
+	case "cake":
+		info := &Cake{}
+		if err := unmarshalCake(data, info); err != nil {
+			return err
+		}
+		tc.Cake = info
 	default:
 		return fmt.Errorf("extractTCAOptions(): unsupported kind: %s", kind)
 	}

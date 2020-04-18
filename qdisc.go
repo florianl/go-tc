@@ -92,6 +92,8 @@ func validateQdiscObject(action int, info *Object) ([]tcOption, error) {
 	var data []byte
 	var err error
 	switch info.Kind {
+	case "cake":
+		data, err = marshalCake(info.Cake)
 	case "choke":
 		data, err = marshalChoke(info.Choke)
 	case "pfifo":
