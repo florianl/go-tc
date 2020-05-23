@@ -3,7 +3,7 @@ on: [push, pull_request]
 name: Go
 jobs:
 
-  test:
+  go-test:
     strategy:
       matrix:
         go-version: [1.13.x, 1.14.x]
@@ -33,6 +33,22 @@ jobs:
         export PATH=$PATH:$(go env GOPATH)/bin
         go test -c -race -tags integration .
         sudo ./go-tc.test -test.v
+  code-check:
+    strategy:
+      matrix:
+        go-version: [1.13.x, 1.14.x]
+    runs-on: ubuntu-latest
+    steps:
+    - name: Install Go
+      uses: actions/setup-go@v1
+      with:
+        go-version: ${{ matrix.go-version }}
+    - name: Checkout code
+      uses: actions/checkout@v1
+    - name: Download Go dependencies
+      env:
+        GOPROXY: "https://proxy.golang.org"
+      run: go mod download
     - name: golint
       if: matrix.platform == 'ubuntu-latest'
       # https://github.com/actions/setup-go/issues/14
