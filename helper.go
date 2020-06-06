@@ -20,3 +20,16 @@ func uint32ToIP(ip uint32) net.IP {
 	nativeEndian.PutUint32(netIP, ip)
 	return netIP
 }
+
+// bytesToIP converts a slice of bytes into a net.IP object.
+func bytesToIP(ip []byte) (net.IP, error) {
+	if len(ip) != net.IPv4len && len(ip) != net.IPv6len {
+		return nil, ErrInvalidArg
+	}
+	return net.IP(ip), nil
+}
+
+// ipToBytes casts a ip object into its byte slice representative.
+func ipToBytes(ip net.IP) []byte {
+	return []byte(ip)
+}
