@@ -16,15 +16,24 @@ func (tc *Tc) Chain() *Chain {
 
 // Add creates a new chain
 func (c *Chain) Add(info *Object) error {
+	if info == nil {
+		return ErrNoArg
+	}
 	return ErrNotImplemented
 }
 
 // Delete removes a chain
-func (c *Chain) Delete() error {
+func (c *Chain) Delete(info *Object) error {
+	if info == nil {
+		return ErrNoArg
+	}
 	return ErrNotImplemented
 }
 
 // Get fetches chains
-func (c *Chain) Get() ([]Object, error) {
-	return c.get(unix.RTM_GETCHAIN, nil)
+func (c *Chain) Get(i *Msg) ([]Object, error) {
+	if i == nil {
+		return []Object{}, ErrNoArg
+	}
+	return c.get(unix.RTM_GETCHAIN, i)
 }
