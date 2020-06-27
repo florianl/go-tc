@@ -2,6 +2,7 @@ package tc
 
 import (
 	"fmt"
+	"net"
 
 	"github.com/mdlayher/netlink"
 )
@@ -102,10 +103,10 @@ type Flower struct {
 	Indev                *string
 	KeyEthType           *uint16
 	KeyIPProto           *uint8
-	KeyIPv4Src           *uint32
-	KeyIPv4SrcMask       *uint32
-	KeyIPv4Dst           *uint32
-	KeyIPv4DstMask       *uint32
+	KeyIPv4Src           *net.IP
+	KeyIPv4SrcMask       *net.IP
+	KeyIPv4Dst           *net.IP
+	KeyIPv4DstMask       *net.IP
 	KeyTCPSrc            *uint16
 	KeyTCPDst            *uint16
 	KeyUDPSrc            *uint16
@@ -114,10 +115,10 @@ type Flower struct {
 	KeyVlanPrio          *uint8
 	KeyVlanEthType       *uint16
 	KeyEncKeyID          *uint32
-	KeyEncIPv4Src        *uint32
-	KeyEncIPv4SrcMask    *uint32
-	KeyEncIPv4Dst        *uint32
-	KeyEncIPv4DstMask    *uint32
+	KeyEncIPv4Src        *net.IP
+	KeyEncIPv4SrcMask    *net.IP
+	KeyEncIPv4Dst        *net.IP
+	KeyEncIPv4DstMask    *net.IP
 	KeyTCPSrcMask        *uint16
 	KeyTCPDstMask        *uint16
 	KeyUDPSrcMask        *uint16
@@ -183,16 +184,16 @@ func unmarshalFlower(data []byte, info *Flower) error {
 			tmp := ad.Uint8()
 			info.KeyIPProto = &tmp
 		case tcaFlowerKeyIPv4Src:
-			tmp := ad.Uint32()
+			tmp := uint32ToIP(ad.Uint32())
 			info.KeyIPv4Src = &tmp
 		case tcaFlowerKeyIPv4SrcMask:
-			tmp := ad.Uint32()
+			tmp := uint32ToIP(ad.Uint32())
 			info.KeyIPv4SrcMask = &tmp
 		case tcaFlowerKeyIPv4Dst:
-			tmp := ad.Uint32()
+			tmp := uint32ToIP(ad.Uint32())
 			info.KeyIPv4Dst = &tmp
 		case tcaFlowerKeyIPv4DstMask:
-			tmp := ad.Uint32()
+			tmp := uint32ToIP(ad.Uint32())
 			info.KeyIPv4DstMask = &tmp
 		case tcaFlowerKeyTCPSrc:
 			tmp := ad.Uint16()
@@ -219,16 +220,16 @@ func unmarshalFlower(data []byte, info *Flower) error {
 			tmp := ad.Uint32()
 			info.KeyEncKeyID = &tmp
 		case tcaFlowerKeyEncIPv4Src:
-			tmp := ad.Uint32()
+			tmp := uint32ToIP(ad.Uint32())
 			info.KeyEncIPv4Src = &tmp
 		case tcaFlowerKeyEncIPv4SrcMask:
-			tmp := ad.Uint32()
+			tmp := uint32ToIP(ad.Uint32())
 			info.KeyEncIPv4SrcMask = &tmp
 		case tcaFlowerKeyEncIPv4Dst:
-			tmp := ad.Uint32()
+			tmp := uint32ToIP(ad.Uint32())
 			info.KeyEncIPv4Dst = &tmp
 		case tcaFlowerKeyEncIPv4DstMask:
-			tmp := ad.Uint32()
+			tmp := uint32ToIP(ad.Uint32())
 			info.KeyEncIPv4DstMask = &tmp
 		case tcaFlowerKeyTCPSrcMask:
 			tmp := ad.Uint16()
@@ -370,187 +371,219 @@ func marshalFlower(info *Flower) ([]byte, error) {
 
 	// TODO: improve logic and check combinations
 	if info.ClassID != nil {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFlowerClassID, Data: info.ClassID})
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFlowerClassID, Data: *info.ClassID})
 	}
 	if info.Indev != nil {
-		options = append(options, tcOption{Interpretation: vtString, Type: tcaFlowerIndev, Data: info.Indev})
+		options = append(options, tcOption{Interpretation: vtString, Type: tcaFlowerIndev, Data: *info.Indev})
 	}
 	if info.KeyEthType != nil {
-		options = append(options, tcOption{Interpretation: vtUint16, Type: tcaFlowerKeyEthType, Data: info.KeyEthType})
+		options = append(options, tcOption{Interpretation: vtUint16, Type: tcaFlowerKeyEthType, Data: *info.KeyEthType})
 	}
 	if info.KeyIPProto != nil {
-		options = append(options, tcOption{Interpretation: vtUint8, Type: tcaFlowerKeyIPProto, Data: info.KeyIPProto})
+		options = append(options, tcOption{Interpretation: vtUint8, Type: tcaFlowerKeyIPProto, Data: *info.KeyIPProto})
 	}
 	if info.KeyIPv4Src != nil {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFlowerKeyIPv4Src, Data: info.KeyIPv4Src})
+		tmp, err := ipToUint32(*info.KeyIPv4Src)
+		if err != nil {
+			return []byte{}, fmt.Errorf("Flower - KeyIPv4Src: %w", err)
+		}
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFlowerKeyIPv4Src, Data: tmp})
 	}
 	if info.KeyIPv4SrcMask != nil {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFlowerKeyIPv4SrcMask, Data: info.KeyIPv4SrcMask})
+		tmp, err := ipToUint32(*info.KeyIPv4SrcMask)
+		if err != nil {
+			return []byte{}, fmt.Errorf("Flower - KeyIPv4SrcMask: %w", err)
+		}
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFlowerKeyIPv4SrcMask, Data: tmp})
 	}
 	if info.KeyIPv4Dst != nil {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFlowerKeyIPv4Dst, Data: info.KeyIPv4Dst})
+		tmp, err := ipToUint32(*info.KeyIPv4Dst)
+		if err != nil {
+			return []byte{}, fmt.Errorf("Flower - KeyIPv4Dst: %w", err)
+		}
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFlowerKeyIPv4Dst, Data: tmp})
 	}
 	if info.KeyIPv4DstMask != nil {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFlowerKeyIPv4DstMask, Data: info.KeyIPv4DstMask})
+		tmp, err := ipToUint32(*info.KeyIPv4DstMask)
+		if err != nil {
+			return []byte{}, fmt.Errorf("Flower - KeyIPv4DstMask: %w", err)
+		}
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFlowerKeyIPv4DstMask, Data: tmp})
 	}
 	if info.KeyTCPSrc != nil {
-		options = append(options, tcOption{Interpretation: vtUint16, Type: tcaFlowerKeyTCPSrc, Data: info.KeyTCPSrc})
+		options = append(options, tcOption{Interpretation: vtUint16, Type: tcaFlowerKeyTCPSrc, Data: *info.KeyTCPSrc})
 	}
 	if info.KeyTCPDst != nil {
-		options = append(options, tcOption{Interpretation: vtUint16, Type: tcaFlowerKeyTCPDst, Data: info.KeyTCPDst})
+		options = append(options, tcOption{Interpretation: vtUint16, Type: tcaFlowerKeyTCPDst, Data: *info.KeyTCPDst})
 	}
 	if info.KeyUDPSrc != nil {
-		options = append(options, tcOption{Interpretation: vtUint16, Type: tcaFlowerKeyUDPSrc, Data: info.KeyUDPSrc})
+		options = append(options, tcOption{Interpretation: vtUint16, Type: tcaFlowerKeyUDPSrc, Data: *info.KeyUDPSrc})
 	}
 	if info.KeyUDPDst != nil {
-		options = append(options, tcOption{Interpretation: vtUint16, Type: tcaFlowerKeyUDPDst, Data: info.KeyUDPDst})
+		options = append(options, tcOption{Interpretation: vtUint16, Type: tcaFlowerKeyUDPDst, Data: *info.KeyUDPDst})
 	}
 	if info.KeyVlanID != nil {
-		options = append(options, tcOption{Interpretation: vtUint16, Type: tcaFlowerKeyVlanID, Data: info.KeyVlanID})
+		options = append(options, tcOption{Interpretation: vtUint16, Type: tcaFlowerKeyVlanID, Data: *info.KeyVlanID})
 	}
 	if info.KeyVlanPrio != nil {
-		options = append(options, tcOption{Interpretation: vtUint8, Type: tcaFlowerKeyVlanPrio, Data: info.KeyVlanPrio})
+		options = append(options, tcOption{Interpretation: vtUint8, Type: tcaFlowerKeyVlanPrio, Data: *info.KeyVlanPrio})
 	}
 	if info.KeyVlanEthType != nil {
-		options = append(options, tcOption{Interpretation: vtUint16, Type: tcaFlowerKeyVlanEthType, Data: info.KeyVlanEthType})
+		options = append(options, tcOption{Interpretation: vtUint16, Type: tcaFlowerKeyVlanEthType, Data: *info.KeyVlanEthType})
 	}
 	if info.KeyEncKeyID != nil {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFlowerKeyEncKeyID, Data: info.KeyEncKeyID})
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFlowerKeyEncKeyID, Data: *info.KeyEncKeyID})
 	}
 	if info.KeyEncIPv4Src != nil {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFlowerKeyEncIPv4Src, Data: info.KeyEncIPv4Src})
+		tmp, err := ipToUint32(*info.KeyEncIPv4Src)
+		if err != nil {
+			return []byte{}, fmt.Errorf("Flower - KeyEncIPv4Src: %w", err)
+		}
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFlowerKeyEncIPv4Src, Data: tmp})
 	}
 	if info.KeyEncIPv4SrcMask != nil {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFlowerKeyEncIPv4SrcMask, Data: info.KeyEncIPv4SrcMask})
+		tmp, err := ipToUint32(*info.KeyEncIPv4SrcMask)
+		if err != nil {
+			return []byte{}, fmt.Errorf("Flower - KeyEncIPv4SrcMask: %w", err)
+		}
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFlowerKeyEncIPv4SrcMask, Data: tmp})
 	}
 	if info.KeyEncIPv4Dst != nil {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFlowerKeyEncIPv4Dst, Data: info.KeyEncIPv4Dst})
+		tmp, err := ipToUint32(*info.KeyEncIPv4Dst)
+		if err != nil {
+			return []byte{}, fmt.Errorf("Flower - KeyEncIPv4Dst: %w", err)
+		}
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFlowerKeyEncIPv4Dst, Data: tmp})
 	}
 	if info.KeyEncIPv4DstMask != nil {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFlowerKeyEncIPv4DstMask, Data: info.KeyEncIPv4DstMask})
+		tmp, err := ipToUint32(*info.KeyEncIPv4DstMask)
+		if err != nil {
+			return []byte{}, fmt.Errorf("Flower - KeyEncIPv4DstMask: %w", err)
+		}
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFlowerKeyEncIPv4DstMask, Data: tmp})
 	}
 	if info.KeyTCPSrcMask != nil {
-		options = append(options, tcOption{Interpretation: vtUint16, Type: tcaFlowerKeyTCPSrcMask, Data: info.KeyTCPSrcMask})
+		options = append(options, tcOption{Interpretation: vtUint16, Type: tcaFlowerKeyTCPSrcMask, Data: *info.KeyTCPSrcMask})
 	}
 	if info.KeyTCPDstMask != nil {
-		options = append(options, tcOption{Interpretation: vtUint16, Type: tcaFlowerKeyTCPDstMask, Data: info.KeyTCPDstMask})
+		options = append(options, tcOption{Interpretation: vtUint16, Type: tcaFlowerKeyTCPDstMask, Data: *info.KeyTCPDstMask})
 	}
 	if info.KeyUDPSrcMask != nil {
-		options = append(options, tcOption{Interpretation: vtUint16, Type: tcaFlowerKeyUDPSrcMask, Data: info.KeyUDPSrcMask})
+		options = append(options, tcOption{Interpretation: vtUint16, Type: tcaFlowerKeyUDPSrcMask, Data: *info.KeyUDPSrcMask})
 	}
 	if info.KeyUDPDstMask != nil {
-		options = append(options, tcOption{Interpretation: vtUint16, Type: tcaFlowerKeyUDPDstMask, Data: info.KeyUDPDstMask})
+		options = append(options, tcOption{Interpretation: vtUint16, Type: tcaFlowerKeyUDPDstMask, Data: *info.KeyUDPDstMask})
 	}
 	if info.KeySctpSrc != nil {
-		options = append(options, tcOption{Interpretation: vtUint16, Type: tcaFlowerKeySCTPSrc, Data: info.KeySctpSrc})
+		options = append(options, tcOption{Interpretation: vtUint16, Type: tcaFlowerKeySCTPSrc, Data: *info.KeySctpSrc})
 	}
 	if info.KeySctpDst != nil {
-		options = append(options, tcOption{Interpretation: vtUint16, Type: tcaFlowerKeySCTPDst, Data: info.KeySctpDst})
+		options = append(options, tcOption{Interpretation: vtUint16, Type: tcaFlowerKeySCTPDst, Data: *info.KeySctpDst})
 	}
 	if info.KeyEncUDPSrcPort != nil {
-		options = append(options, tcOption{Interpretation: vtUint16, Type: tcaFlowerKeyEncUDPSrcPort, Data: info.KeyEncUDPSrcPort})
+		options = append(options, tcOption{Interpretation: vtUint16, Type: tcaFlowerKeyEncUDPSrcPort, Data: *info.KeyEncUDPSrcPort})
 	}
 	if info.KeyEncUDPSrcPortMask != nil {
-		options = append(options, tcOption{Interpretation: vtUint16, Type: tcaFlowerKeyEncUDPSrcPortMask, Data: info.KeyEncUDPSrcPortMask})
+		options = append(options, tcOption{Interpretation: vtUint16, Type: tcaFlowerKeyEncUDPSrcPortMask, Data: *info.KeyEncUDPSrcPortMask})
 	}
 	if info.KeyEncUDPDstPort != nil {
-		options = append(options, tcOption{Interpretation: vtUint16, Type: tcaFlowerKeyEncUDPDstPort, Data: info.KeyEncUDPDstPort})
+		options = append(options, tcOption{Interpretation: vtUint16, Type: tcaFlowerKeyEncUDPDstPort, Data: *info.KeyEncUDPDstPort})
 	}
 	if info.KeyEncUDPDstPortMask != nil {
-		options = append(options, tcOption{Interpretation: vtUint16, Type: tcaFlowerKeyEncUDPDstPortMask, Data: info.KeyEncUDPDstPortMask})
+		options = append(options, tcOption{Interpretation: vtUint16, Type: tcaFlowerKeyEncUDPDstPortMask, Data: *info.KeyEncUDPDstPortMask})
 	}
 	if info.KeyFlags != nil {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFlowerKeyFlags, Data: info.KeyFlags})
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFlowerKeyFlags, Data: *info.KeyFlags})
 	}
 	if info.KeyFlagsMask != nil {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFlowerKeyFlagsMask, Data: info.KeyFlagsMask})
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFlowerKeyFlagsMask, Data: *info.KeyFlagsMask})
 	}
 	if info.KeyIcmpv4Code != nil {
-		options = append(options, tcOption{Interpretation: vtUint8, Type: tcaFlowerKeyIcmpv4Code, Data: info.KeyIcmpv4Code})
+		options = append(options, tcOption{Interpretation: vtUint8, Type: tcaFlowerKeyIcmpv4Code, Data: *info.KeyIcmpv4Code})
 	}
 	if info.KeyIcmpv4CodeMask != nil {
-		options = append(options, tcOption{Interpretation: vtUint8, Type: tcaFlowerKeyIcmpv4Code, Data: info.KeyIcmpv4CodeMask})
+		options = append(options, tcOption{Interpretation: vtUint8, Type: tcaFlowerKeyIcmpv4CodeMask, Data: *info.KeyIcmpv4CodeMask})
 	}
 	if info.KeyIcmpv4Type != nil {
-		options = append(options, tcOption{Interpretation: vtUint8, Type: tcaFlowerKeyIcmpv4Type, Data: info.KeyIcmpv4Type})
+		options = append(options, tcOption{Interpretation: vtUint8, Type: tcaFlowerKeyIcmpv4Type, Data: *info.KeyIcmpv4Type})
 	}
 	if info.KeyIcmpv4TypeMask != nil {
-		options = append(options, tcOption{Interpretation: vtUint8, Type: tcaFlowerKeyIcmpv4TypeMask, Data: info.KeyIcmpv4TypeMask})
+		options = append(options, tcOption{Interpretation: vtUint8, Type: tcaFlowerKeyIcmpv4TypeMask, Data: *info.KeyIcmpv4TypeMask})
 	}
 	if info.KeyIcmpv6Code != nil {
-		options = append(options, tcOption{Interpretation: vtUint8, Type: tcaFlowerKeyIcmpv6Code, Data: info.KeyIcmpv6Code})
+		options = append(options, tcOption{Interpretation: vtUint8, Type: tcaFlowerKeyIcmpv6Code, Data: *info.KeyIcmpv6Code})
 	}
 	if info.KeyIcmpv6CodeMask != nil {
-		options = append(options, tcOption{Interpretation: vtUint8, Type: tcaFlowerKeyIcmpv6CodeMask, Data: info.KeyIcmpv6CodeMask})
+		options = append(options, tcOption{Interpretation: vtUint8, Type: tcaFlowerKeyIcmpv6CodeMask, Data: *info.KeyIcmpv6CodeMask})
 	}
 	if info.KeyArpSIP != nil {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFlowerKeyArpSIP, Data: info.KeyArpSIP})
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFlowerKeyArpSIP, Data: *info.KeyArpSIP})
 	}
 	if info.KeyArpSIPMask != nil {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFlowerKeyArpSIPMask, Data: info.KeyArpSIPMask})
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFlowerKeyArpSIPMask, Data: *info.KeyArpSIPMask})
 	}
 	if info.KeyArpTIP != nil {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFlowerKeyArpTIP, Data: info.KeyArpTIP})
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFlowerKeyArpTIP, Data: *info.KeyArpTIP})
 	}
 	if info.KeyArpTIPMask != nil {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFlowerKeyArpTIPMask, Data: info.KeyArpTIPMask})
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFlowerKeyArpTIPMask, Data: *info.KeyArpTIPMask})
 	}
 	if info.KeyArpOp != nil {
-		options = append(options, tcOption{Interpretation: vtUint8, Type: tcaFlowerKeyArpOp, Data: info.KeyArpOp})
+		options = append(options, tcOption{Interpretation: vtUint8, Type: tcaFlowerKeyArpOp, Data: *info.KeyArpOp})
 	}
 	if info.KeyArpOpMask != nil {
-		options = append(options, tcOption{Interpretation: vtUint8, Type: tcaFlowerKeyArpOpMask, Data: info.KeyArpOpMask})
+		options = append(options, tcOption{Interpretation: vtUint8, Type: tcaFlowerKeyArpOpMask, Data: *info.KeyArpOpMask})
 	}
 	if info.KeyMplsTTL != nil {
-		options = append(options, tcOption{Interpretation: vtUint8, Type: tcaFlowerKeyMplsTTL, Data: info.KeyMplsTTL})
+		options = append(options, tcOption{Interpretation: vtUint8, Type: tcaFlowerKeyMplsTTL, Data: *info.KeyMplsTTL})
 	}
 	if info.KeyMplsBos != nil {
-		options = append(options, tcOption{Interpretation: vtUint8, Type: tcaFlowerKeyMplsBos, Data: info.KeyMplsBos})
+		options = append(options, tcOption{Interpretation: vtUint8, Type: tcaFlowerKeyMplsBos, Data: *info.KeyMplsBos})
 	}
 	if info.KeyMplsTc != nil {
-		options = append(options, tcOption{Interpretation: vtUint8, Type: tcaFlowerKeyMplsTc, Data: info.KeyMplsTc})
+		options = append(options, tcOption{Interpretation: vtUint8, Type: tcaFlowerKeyMplsTc, Data: *info.KeyMplsTc})
 	}
 	if info.KeyMplsLabel != nil {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFlowerKeyMplsLabel, Data: info.KeyMplsLabel})
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFlowerKeyMplsLabel, Data: *info.KeyMplsLabel})
 	}
 	if info.KeyTCPFlags != nil {
-		options = append(options, tcOption{Interpretation: vtUint16, Type: tcaFlowerKeyTCPFlags, Data: info.KeyTCPFlags})
+		options = append(options, tcOption{Interpretation: vtUint16, Type: tcaFlowerKeyTCPFlags, Data: *info.KeyTCPFlags})
 	}
 	if info.KeyTCPFlagsMask != nil {
-		options = append(options, tcOption{Interpretation: vtUint16, Type: tcaFlowerKeyTCPFlagsMask, Data: info.KeyTCPFlagsMask})
+		options = append(options, tcOption{Interpretation: vtUint16, Type: tcaFlowerKeyTCPFlagsMask, Data: *info.KeyTCPFlagsMask})
 	}
 	if info.KeyIPTOS != nil {
-		options = append(options, tcOption{Interpretation: vtUint8, Type: tcaFlowerKeyIPTOS, Data: info.KeyIPTOS})
+		options = append(options, tcOption{Interpretation: vtUint8, Type: tcaFlowerKeyIPTOS, Data: *info.KeyIPTOS})
 	}
 	if info.KeyIPTOSMask != nil {
-		options = append(options, tcOption{Interpretation: vtUint8, Type: tcaFlowerKeyIPTOSMask, Data: info.KeyIPTOSMask})
+		options = append(options, tcOption{Interpretation: vtUint8, Type: tcaFlowerKeyIPTOSMask, Data: *info.KeyIPTOSMask})
 	}
 	if info.KeyIPTTL != nil {
-		options = append(options, tcOption{Interpretation: vtUint8, Type: tcaFlowerKeyIPTTL, Data: info.KeyIPTTL})
+		options = append(options, tcOption{Interpretation: vtUint8, Type: tcaFlowerKeyIPTTL, Data: *info.KeyIPTTL})
 	}
 	if info.KeyIPTTLMask != nil {
-		options = append(options, tcOption{Interpretation: vtUint8, Type: tcaFlowerKeyIPTTLMask, Data: info.KeyIPTTLMask})
+		options = append(options, tcOption{Interpretation: vtUint8, Type: tcaFlowerKeyIPTTLMask, Data: *info.KeyIPTTLMask})
 	}
 	if info.KeyCVlanID != nil {
-		options = append(options, tcOption{Interpretation: vtUint16, Type: tcaFlowerKeyCVlanID, Data: info.KeyCVlanID})
+		options = append(options, tcOption{Interpretation: vtUint16, Type: tcaFlowerKeyCVlanID, Data: *info.KeyCVlanID})
 	}
 	if info.KeyCVlanPrio != nil {
-		options = append(options, tcOption{Interpretation: vtUint8, Type: tcaFlowerKeyCVlanPrio, Data: info.KeyCVlanPrio})
+		options = append(options, tcOption{Interpretation: vtUint8, Type: tcaFlowerKeyCVlanPrio, Data: *info.KeyCVlanPrio})
 	}
 	if info.KeyCVlanEthType != nil {
-		options = append(options, tcOption{Interpretation: vtUint16, Type: tcaFlowerKeyCVlanEthType, Data: info.KeyCVlanEthType})
+		options = append(options, tcOption{Interpretation: vtUint16, Type: tcaFlowerKeyCVlanEthType, Data: *info.KeyCVlanEthType})
 	}
 	if info.KeyEncIPTOS != nil {
-		options = append(options, tcOption{Interpretation: vtUint8, Type: tcaFlowerKeyEncIPTOS, Data: info.KeyEncIPTOS})
+		options = append(options, tcOption{Interpretation: vtUint8, Type: tcaFlowerKeyEncIPTOS, Data: *info.KeyEncIPTOS})
 	}
 	if info.KeyEncIPTOSMask != nil {
-		options = append(options, tcOption{Interpretation: vtUint8, Type: tcaFlowerKeyEncIPTOSMask, Data: info.KeyEncIPTOSMask})
+		options = append(options, tcOption{Interpretation: vtUint8, Type: tcaFlowerKeyEncIPTOSMask, Data: *info.KeyEncIPTOSMask})
 	}
 	if info.KeyEncIPTTL != nil {
-		options = append(options, tcOption{Interpretation: vtUint8, Type: tcaFlowerKeyEncIPTTL, Data: info.KeyEncIPTTL})
+		options = append(options, tcOption{Interpretation: vtUint8, Type: tcaFlowerKeyEncIPTTL, Data: *info.KeyEncIPTTL})
 	}
 	if info.KeyEncIPTTLMask != nil {
-		options = append(options, tcOption{Interpretation: vtUint8, Type: tcaFlowerKeyEncIPTTLMask, Data: info.KeyEncIPTTLMask})
+		options = append(options, tcOption{Interpretation: vtUint8, Type: tcaFlowerKeyEncIPTTLMask, Data: *info.KeyEncIPTTLMask})
 	}
 	return marshalAttributes(options)
 }
