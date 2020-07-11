@@ -53,13 +53,13 @@ func marshalSample(info *Sample) ([]byte, error) {
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaSampleParms, Data: data})
 	}
 	if info.Rate != nil {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaSampleRate, Data: info.Rate})
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaSampleRate, Data: *info.Rate})
 	}
 	if info.TruncSize != nil {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaSampleTruncSize, Data: info.TruncSize})
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaSampleTruncSize, Data: *info.TruncSize})
 	}
 	if info.SampleGroup != nil {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaSamplePSampleGroup, Data: info.SampleGroup})
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaSamplePSampleGroup, Data: *info.SampleGroup})
 	}
 	return marshalAttributes(options)
 }
@@ -85,6 +85,12 @@ func unmarshalSample(data []byte, info *Sample) error {
 				return err
 			}
 			info.Tm = tcft
+		case tcaSampleRate:
+			info.Rate = uint32Ptr(ad.Uint32())
+		case tcaSampleTruncSize:
+			info.TruncSize = uint32Ptr(ad.Uint32())
+		case tcaSamplePSampleGroup:
+			info.SampleGroup = uint32Ptr(ad.Uint32())
 		case tcaSamplePad:
 			// padding does not contain data, we just skip it
 		default:

@@ -14,8 +14,9 @@ func TestSample(t *testing.T) {
 		err1 error
 		err2 error
 	}{
-		"empty":           {err1: fmt.Errorf("Sample options are missing")},
-		"simple":          {val: Sample{Parms: &SampleParms{Index: 42, Action: 1}}},
+		"empty": {err1: fmt.Errorf("Sample options are missing")},
+		"simple": {val: Sample{Parms: &SampleParms{Index: 42, Action: 1},
+			Rate: uint32Ptr(42), TruncSize: uint32Ptr(1337), SampleGroup: uint32Ptr(11)}},
 		"invalidArgument": {val: Sample{Tm: &Tcft{Install: 1}}, err1: ErrNoArgAlter},
 	}
 	for name, testcase := range tests {
