@@ -70,6 +70,9 @@ func marshalStab(info *Stab) ([]byte, error) {
 		}
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaStabBase, Data: data})
 	}
+	if info.Data != nil {
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaStabData, Data: *info.Data})
+	}
 
 	return marshalAttributes(options)
 }
