@@ -158,21 +158,17 @@ func validateQdiscObject(action int, info *Object) ([]tcOption, error) {
 		return options, ErrNotImplemented
 	}
 
-	if info.BPF != nil {
-		return options, ErrNotImplemented
+	if info.EgressBlock != nil {
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaEgressBlock, Data: uint32Value(info.EgressBlock)})
 	}
-
-	if info.EgressBlock != 0 {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaEgressBlock, Data: info.EgressBlock})
+	if info.IngressBlock != nil {
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaIngressBlock, Data: uint32Value(info.IngressBlock)})
 	}
-	if info.IngressBlock != 0 {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaIngressBlock, Data: info.IngressBlock})
+	if info.HwOffload != nil {
+		options = append(options, tcOption{Interpretation: vtUint8, Type: tcaHwOffload, Data: uint8Value(info.HwOffload)})
 	}
-	if info.HwOffload != 0 {
-		options = append(options, tcOption{Interpretation: vtUint8, Type: tcaHwOffload, Data: info.HwOffload})
-	}
-	if info.Chain != 0 {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaChain, Data: info.Chain})
+	if info.Chain != nil {
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaChain, Data: uint32Value(info.Chain)})
 	}
 	if info.Stab != nil {
 		data, err := marshalStab(info.Stab)
