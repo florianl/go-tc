@@ -71,24 +71,28 @@ func validateFilterObject(action int, info *Object) ([]tcOption, error) {
 	var data []byte
 	var err error
 	switch info.Kind {
+	case "bpf":
+		data, err = marshalBpf(info.BPF)
 	case "basic":
 		data, err = marshalBasic(info.Basic)
 	case "flow":
 		data, err = marshalFlow(info.Flow)
+	case "flower":
+		data, err = marshalFlower(info.Flower)
 	case "fw":
 		data, err = marshalFw(info.Fw)
 	case "route4":
 		data, err = marshalRoute4(info.Route4)
 	case "rsvp":
 		data, err = marshalRsvp(info.Rsvp)
-	case "bpf":
-		data, err = marshalBpf(info.BPF)
 	case "u32":
 		data, err = marshalU32(info.U32)
 	case "matchall":
 		data, err = marshalMatchall(info.Matchall)
 	default:
-		return options, fmt.Errorf("%s: %w", info.Kind, ErrNotImplemented)
+		if action != unix.RTM_NEWCHAIN && action != unix.RTM_DELCHAIN {
+			return options, fmt.Errorf("%s: %w", info.Kind, ErrNotImplemented)
+		}
 	}
 	if err != nil {
 		if errors.Is(err, ErrNoArg) && action == unix.RTM_DELTFILTER {
@@ -109,21 +113,17 @@ func validateFilterObject(action int, info *Object) ([]tcOption, error) {
 		return options, ErrNotImplemented
 	}
 
-	if info.FqCodel != nil {
-		return options, ErrNotImplemented
+	if info.EgressBlock != nil {
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaEgressBlock, Data: uint32Value(info.EgressBlock)})
 	}
-
-	if info.EgressBlock != 0 {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaEgressBlock, Data: info.EgressBlock})
+	if info.IngressBlock != nil {
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaIngressBlock, Data: uint32Value(info.IngressBlock)})
 	}
-	if info.IngressBlock != 0 {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaIngressBlock, Data: info.IngressBlock})
+	if info.HwOffload != nil {
+		options = append(options, tcOption{Interpretation: vtUint8, Type: tcaHwOffload, Data: uint8Value(info.HwOffload)})
 	}
-	if info.HwOffload != 0 {
-		options = append(options, tcOption{Interpretation: vtUint8, Type: tcaHwOffload, Data: info.HwOffload})
-	}
-	if info.Chain != 0 {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaChain, Data: info.Chain})
+	if info.Chain != nil {
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaChain, Data: uint32Value(info.Chain)})
 	}
 
 	return options, nil
