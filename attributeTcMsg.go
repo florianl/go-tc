@@ -24,7 +24,7 @@ func extractTcmsgAttributes(action int, data []byte, info *Attribute) error {
 			// so we save it for later
 			options = ad.Bytes()
 		case tcaChain:
-			info.Chain = ad.Uint32()
+			info.Chain = uint32Ptr(ad.Uint32())
 		case tcaXstats:
 			// the evaluation of this field depends on tcaKind.
 			// there is no guarantee, that kind is know at this moment,
@@ -43,11 +43,11 @@ func extractTcmsgAttributes(action int, data []byte, info *Attribute) error {
 			}
 			info.Stats2 = tcstats2
 		case tcaHwOffload:
-			info.HwOffload = ad.Uint8()
+			info.HwOffload = uint8Ptr(ad.Uint8())
 		case tcaEgressBlock:
-			info.EgressBlock = ad.Uint32()
+			info.EgressBlock = uint32Ptr(ad.Uint32())
 		case tcaIngressBlock:
-			info.IngressBlock = ad.Uint32()
+			info.IngressBlock = uint32Ptr(ad.Uint32())
 		case tcaStab:
 			stab := &Stab{}
 			if err := unmarshalStab(ad.Bytes(), stab); err != nil {
