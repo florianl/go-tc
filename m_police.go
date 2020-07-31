@@ -15,16 +15,31 @@ const (
 	tcaPoliceResult
 	tcaPoliceTm
 	tcaPolicePad
+	tcaPoliceRate64
+	tcaPolicePeakRate64
+)
+
+// PolicyAction defines the action that is applied by Policy.
+type PolicyAction uint32
+
+const (
+	/* PolicyUnspec - skipped as it is -1 */
+	PolicyOk PolicyAction = iota
+	PolicyReclassify
+	PolicyShot
+	PolicyPipe
 )
 
 // Police represents policing attributes of various filters and classes
 type Police struct {
-	Tbf      *Policy
-	Rate     *RateSpec
-	PeakRate *RateSpec
-	AvRate   uint32
-	Result   uint32
-	Tm       *Tcft
+	Tbf        *Policy
+	Rate       *RateSpec
+	PeakRate   *RateSpec
+	AvRate     uint32
+	Result     uint32
+	Tm         *Tcft
+	Rate64     uint64
+	PeakRate64 uint64
 }
 
 // unmarshalPolice parses the Police-encoded data and stores the result in the value pointed to by info.
@@ -66,6 +81,12 @@ func unmarshalPolice(data []byte, info *Police) error {
 			info.Tm = tm
 		case tcaPolicePad:
 			// padding does not contain data, we just skip it
+		case tcaPoliceRate64:
+			info.Rate64 = ad.Uint64()
+			return ErrNotImplemented
+		case tcaPolicePeakRate64:
+			info.PeakRate64 = ad.Uint64()
+			return ErrNotImplemented
 		default:
 			return fmt.Errorf("UnmarshalPolice()\t%d\n\t%v", ad.Type(), ad.Bytes())
 
@@ -108,6 +129,12 @@ func marshalPolice(info *Police) ([]byte, error) {
 	}
 	if info.Result != 0 {
 		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaPoliceResult, Data: info.Result})
+	}
+	if info.Rate64 != 0 {
+		options = append(options, tcOption{Interpretation: vtUint64, Type: tcaPoliceRate64, Data: info.Rate64})
+	}
+	if info.PeakRate64 != 0 {
+		options = append(options, tcOption{Interpretation: vtUint64, Type: tcaPolicePeakRate64, Data: info.PeakRate64})
 	}
 	if info.Tm != nil {
 		return []byte{}, ErrNoArgAlter

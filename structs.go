@@ -64,7 +64,7 @@ type RateSpec struct {
 // Policy from include/uapi/linux/pkt_sched.h
 type Policy struct {
 	Index    uint32
-	Action   uint32
+	Action   PolicyAction
 	Limit    uint32
 	Burst    uint32
 	Mtu      uint32
