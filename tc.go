@@ -177,10 +177,10 @@ type Msg struct {
 // Attribute contains various elements for traffic control
 type Attribute struct {
 	Kind         string
-	EgressBlock  uint32
-	IngressBlock uint32
-	HwOffload    uint8
-	Chain        uint32
+	EgressBlock  *uint32
+	IngressBlock *uint32
+	HwOffload    *uint8
+	Chain        *uint32
 	Stats        *Stats
 	XStats       *XStats
 	Stats2       *Stats2
@@ -194,6 +194,7 @@ type Attribute struct {
 	Route4   *Route4
 	Fw       *Fw
 	Flow     *Flow
+	Flower   *Flower
 	Matchall *Matchall
 
 	// Classless qdiscs
