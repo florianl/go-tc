@@ -169,6 +169,10 @@ type U32Sel struct {
 }
 
 func validateU32SelOptions(info *U32Sel) ([]byte, error) {
+	if int(info.NKeys) != len(info.Keys) {
+		return []byte{}, fmt.Errorf("Nkeys != len(Keys)")
+	}
+
 	buf := new(bytes.Buffer)
 	binary.Write(buf, nativeEndian, info.Flags)
 	binary.Write(buf, nativeEndian, info.Offshift)
@@ -178,6 +182,9 @@ func validateU32SelOptions(info *U32Sel) ([]byte, error) {
 	binary.Write(buf, nativeEndian, info.Offoff)
 	binary.Write(buf, nativeEndian, info.Hoff)
 	binary.Write(buf, binary.BigEndian, info.Hmask)
+	if info.NKeys != 0 {
+		buf.WriteByte(0x00)
+	}
 	for _, v := range info.Keys {
 		data, err := marshalStruct(v)
 		if err != nil {
@@ -200,12 +207,12 @@ func extractU32Sel(data []byte, info *U32Sel) error {
 	info.Offoff = nativeEndian.Uint16(data[7:9])
 	info.Hoff = nativeEndian.Uint16(data[9:11])
 	info.Hmask = binary.BigEndian.Uint32(data[11:15])
-	if len(data) < int(info.NKeys)*16+15 {
+	if len(data) < int(info.NKeys)*16+16 {
 		return fmt.Errorf("not enough bytes for U32Keys")
 	}
 	for i := 0; i < int(info.NKeys); i++ {
 		key := &U32Key{}
-		if err := unmarshalStruct(data[15+i*16:15+(i+1)*16], key); err != nil {
+		if err := unmarshalStruct(data[16+i*16:16+(i+1)*16], key); err != nil {
 			return err
 		}
 		info.Keys = append(info.Keys, *key)
