@@ -30,6 +30,11 @@ func ExampleFqCodel() {
 		return
 	}
 
+	target := uint32(0xbb8)
+	limit := uint32(0x7d0)
+	interval := uint32(0x9c40)
+	ecn := uint32(0x0)
+
 	qdisc := tc.Object{
 		tc.Msg{
 			Family:  unix.AF_UNSPEC,
@@ -43,10 +48,10 @@ func ExampleFqCodel() {
 			// http://man7.org/linux/man-pages/man8/tc-fq_codel.8.html
 			// fq_codel limit 2000 target 3ms interval 40ms noecn
 			FqCodel: &tc.FqCodel{
-				Target:   0xbb8,
-				Limit:    0x7d0,
-				Interval: 0x9c40,
-				ECN:      0x0,
+				Target:   &target,
+				Limit:    &limit,
+				Interval: &interval,
+				ECN:      &ecn,
 			},
 		},
 	}

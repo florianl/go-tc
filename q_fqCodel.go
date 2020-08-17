@@ -26,15 +26,15 @@ const (
 
 // FqCodel contains attributes of the fq_codel discipline
 type FqCodel struct {
-	Target        uint32
-	Limit         uint32
-	Interval      uint32
-	ECN           uint32
-	Flows         uint32
-	Quantum       uint32
-	CEThreshold   uint32
-	DropBatchSize uint32
-	MemoryLimit   uint32
+	Target        *uint32
+	Limit         *uint32
+	Interval      *uint32
+	ECN           *uint32
+	Flows         *uint32
+	Quantum       *uint32
+	CEThreshold   *uint32
+	DropBatchSize *uint32
+	MemoryLimit   *uint32
 }
 
 // marshalFqCodel returns the binary encoding of FqCodel
@@ -46,40 +46,40 @@ func marshalFqCodel(info *FqCodel) ([]byte, error) {
 	}
 
 	// TODO: improve logic and check combinations
-	if info.Target != 0 {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFqCodelTarget, Data: info.Target})
+	if info.Target != nil {
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFqCodelTarget, Data: uint32Value(info.Target)})
 	}
 
-	if info.Limit != 0 {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFqCodelLimit, Data: info.Limit})
+	if info.Limit != nil {
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFqCodelLimit, Data: uint32Value(info.Limit)})
 	}
 
-	if info.Interval != 0 {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFqCodelInterval, Data: info.Interval})
+	if info.Interval != nil {
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFqCodelInterval, Data: uint32Value(info.Interval)})
 	}
 
-	if info.ECN != 0 {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFqCodelEcn, Data: info.ECN})
+	if info.ECN != nil {
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFqCodelEcn, Data: uint32Value(info.ECN)})
 	}
 
-	if info.Flows != 0 {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFqCodelFlows, Data: info.Flows})
+	if info.Flows != nil {
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFqCodelFlows, Data: uint32Value(info.Flows)})
 	}
 
-	if info.Quantum != 0 {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFqCodelQuantum, Data: info.Quantum})
+	if info.Quantum != nil {
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFqCodelQuantum, Data: uint32Value(info.Quantum)})
 	}
 
-	if info.CEThreshold != 0 {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFqCodelCeThreshold, Data: info.CEThreshold})
+	if info.CEThreshold != nil {
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFqCodelCeThreshold, Data: uint32Value(info.CEThreshold)})
 	}
 
-	if info.DropBatchSize != 0 {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFqCodelDropBatchSize, Data: info.DropBatchSize})
+	if info.DropBatchSize != nil {
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFqCodelDropBatchSize, Data: uint32Value(info.DropBatchSize)})
 	}
 
-	if info.MemoryLimit != 0 {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFqCodelMemoryLimit, Data: info.MemoryLimit})
+	if info.MemoryLimit != nil {
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFqCodelMemoryLimit, Data: uint32Value(info.MemoryLimit)})
 	}
 
 	return marshalAttributes(options)
@@ -95,23 +95,23 @@ func unmarshalFqCodel(data []byte, info *FqCodel) error {
 	for ad.Next() {
 		switch ad.Type() {
 		case tcaFqCodelTarget:
-			info.Target = ad.Uint32()
+			info.Target = uint32Ptr(ad.Uint32())
 		case tcaFqCodelLimit:
-			info.Limit = ad.Uint32()
+			info.Limit = uint32Ptr(ad.Uint32())
 		case tcaFqCodelInterval:
-			info.Interval = ad.Uint32()
+			info.Interval = uint32Ptr(ad.Uint32())
 		case tcaFqCodelEcn:
-			info.ECN = ad.Uint32()
+			info.ECN = uint32Ptr(ad.Uint32())
 		case tcaFqCodelFlows:
-			info.Flows = ad.Uint32()
+			info.Flows = uint32Ptr(ad.Uint32())
 		case tcaFqCodelQuantum:
-			info.Quantum = ad.Uint32()
+			info.Quantum = uint32Ptr(ad.Uint32())
 		case tcaFqCodelCeThreshold:
-			info.CEThreshold = ad.Uint32()
+			info.CEThreshold = uint32Ptr(ad.Uint32())
 		case tcaFqCodelDropBatchSize:
-			info.DropBatchSize = ad.Uint32()
+			info.DropBatchSize = uint32Ptr(ad.Uint32())
 		case tcaFqCodelMemoryLimit:
-			info.MemoryLimit = ad.Uint32()
+			info.MemoryLimit = uint32Ptr(ad.Uint32())
 		default:
 			return fmt.Errorf("unmarshalFqCodel()\t%d\n\t%v", ad.Type(), ad.Bytes())
 		}

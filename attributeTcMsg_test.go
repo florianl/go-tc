@@ -104,7 +104,7 @@ func TestExtractTcmsgAttributes(t *testing.T) {
 		err      error
 	}{
 		"empty":  {input: []byte{}, expected: &Attribute{}},
-		"clsact": {input: generateClsact(t), expected: &Attribute{Kind: "clsact", HwOffload: 0x60, EgressBlock: 0x1337, IngressBlock: 0xcafe, Chain: 42}},
+		"clsact": {input: generateClsact(t), expected: &Attribute{Kind: "clsact", HwOffload: uint8Ptr(0x60), EgressBlock: uint32Ptr(0x1337), IngressBlock: uint32Ptr(0xcafe), Chain: uint32Ptr(42)}},
 		"htb": {input: generateHtb(t), expected: &Attribute{Kind: "htb",
 			XStats: &XStats{Htb: &HtbXStats{Lends: 0x02, Borrows: 0x03, Giants: 0x04, Tokens: 0x05, CTokens: 0x06}},
 			Htb:    &Htb{DirectQlen: 0x7b, Rate64: 0xea, Ceil64: 0x0159}}},
@@ -220,7 +220,7 @@ func TestQdiscAttribute(t *testing.T) {
 		"drr":      {val: &Attribute{Kind: "drr", Drr: &Drr{Quantum: 345}}},
 		"dsmark":   {val: &Attribute{Kind: "dsmark", Dsmark: &Dsmark{Indices: 12, DefaultIndex: 34, Mask: 56, Value: 78}}},
 		"fq":       {val: &Attribute{Kind: "fq", Fq: &Fq{PLimit: 1, FlowPLimit: 2, Quantum: 3, InitQuantum: 4, RateEnable: 5, FlowDefaultRate: 6, FlowMaxRate: 7, BucketsLog: 8, FlowRefillDelay: 9, OrphanMask: 10, LowRateThreshold: 11, CEThreshold: 12}}},
-		"fq_codel": {val: &Attribute{Kind: "fq_codel", FqCodel: &FqCodel{Target: 1, Limit: 2, Interval: 3, ECN: 4, Flows: 5, Quantum: 6, CEThreshold: 7, DropBatchSize: 8, MemoryLimit: 9}}},
+		"fq_codel": {val: &Attribute{Kind: "fq_codel", FqCodel: &FqCodel{Target: uint32Ptr(1), Limit: uint32Ptr(2), Interval: uint32Ptr(3), ECN: uint32Ptr(4), Flows: uint32Ptr(5), Quantum: uint32Ptr(6), CEThreshold: uint32Ptr(7), DropBatchSize: uint32Ptr(8), MemoryLimit: uint32Ptr(9)}}},
 		"hfsc":     {val: &Attribute{Kind: "hfsc", HfscQOpt: &HfscQOpt{DefCls: 42}}},
 		"hhf":      {val: &Attribute{Kind: "hhf", Hhf: &Hhf{BacklogLimit: 1, Quantum: 2, HHFlowsLimit: 3, ResetTimeout: 4, AdmitBytes: 5, EVICTTimeout: 6, NonHHWeight: 7}}},
 		"htb":      {val: &Attribute{Kind: "htb", Htb: &Htb{Init: &HtbGlob{Version: 0x3, Rate2Quantum: 0xa, Defcls: 0x30}}}},
@@ -229,7 +229,7 @@ func TestQdiscAttribute(t *testing.T) {
 		"qfq":      {val: &Attribute{Kind: "qfq"}},
 		"red":      {val: &Attribute{Kind: "red", Red: &Red{MaxP: 2, Parms: &RedQOpt{QthMin: 2, QthMax: 4}}}},
 		"sfb":      {val: &Attribute{Kind: "sfb", Sfb: &Sfb{Parms: &SfbQopt{Max: 0xFF}}}},
-		"tbf":      {val: &Attribute{Kind: "tbf", Tbf: &Tbf{Rate64: 1, Prate64: 2, Burst: 3, Pburst: 4}}},
+		"tbf":      {val: &Attribute{Kind: "tbf", Tbf: &Tbf{Burst: uint32Ptr(3), Pburst: uint32Ptr(4)}}, err1: ErrNoArg},
 		"pfifo":    {val: &Attribute{Kind: "pfifo", Pfifo: &FifoOpt{Limit: 42}}},
 		"bfifo":    {val: &Attribute{Kind: "bfifo", Bfifo: &FifoOpt{Limit: 84}}},
 	}
@@ -238,7 +238,7 @@ func TestQdiscAttribute(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			options, err1 := validateQdiscObject(unix.RTM_NEWQDISC, &Object{Msg{Ifindex: 42}, *testcase.val})
 			if err1 != nil {
-				if testcase.err1 != nil && testcase.err1.Error() == err1.Error() {
+				if testcase.err1 != nil && errors.Is(err1, testcase.err1) {
 					return
 				}
 				t.Fatalf("Unexpected error: %v", err1)
@@ -250,7 +250,7 @@ func TestQdiscAttribute(t *testing.T) {
 			info := &Attribute{}
 			err2 := extractTcmsgAttributes(unix.RTM_NEWQDISC, data, info)
 			if err2 != nil {
-				if testcase.err2 != nil && testcase.err2.Error() == err2.Error() {
+				if testcase.err2 != nil && errors.Is(err2, testcase.err2) {
 					return
 				}
 				t.Fatalf("Unexpected error: %v", err2)

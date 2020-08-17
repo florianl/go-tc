@@ -48,7 +48,7 @@ func TestQdisc(t *testing.T) {
 	}{
 		"clsact":   {kind: "clsact"},
 		"emptyHtb": {kind: "htb", err: ErrNoArg},
-		"fq_codel": {kind: "fq_codel", fqCodel: &FqCodel{Target: 42, Limit: 0xCAFE}},
+		"fq_codel": {kind: "fq_codel", fqCodel: &FqCodel{Target: uint32Ptr(42), Limit: uint32Ptr(0xCAFE)}},
 		"red":      {kind: "red", red: &Red{MaxP: 42}},
 		"sfb":      {kind: "sfb", sfb: &Sfb{Parms: &SfbQopt{Max: 0xFF}}},
 		"cbq":      {kind: "cbq", cbq: &Cbq{LssOpt: &CbqLssOpt{OffTime: 10}, WrrOpt: &CbqWrrOpt{Weight: 42}, FOpt: &CbqFOpt{Split: 2}, OVLStrategy: &CbqOvl{Penalty: 2}}},

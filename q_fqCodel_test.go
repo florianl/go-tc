@@ -13,7 +13,7 @@ func TestFqCodel(t *testing.T) {
 		err1 error
 		err2 error
 	}{
-		"simple": {val: FqCodel{Target: 1, Limit: 2, Interval: 3, ECN: 4, Flows: 5, Quantum: 6, CEThreshold: 7, DropBatchSize: 8, MemoryLimit: 9}},
+		"simple": {val: FqCodel{Target: uint32Ptr(1), Limit: uint32Ptr(2), Interval: uint32Ptr(3), ECN: uint32Ptr(4), Flows: uint32Ptr(5), Quantum: uint32Ptr(6), CEThreshold: uint32Ptr(7), DropBatchSize: uint32Ptr(8), MemoryLimit: uint32Ptr(9)}},
 	}
 
 	for name, testcase := range tests {
