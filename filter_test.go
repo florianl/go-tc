@@ -32,7 +32,7 @@ func TestFilter(t *testing.T) {
 	}
 
 	u32ExactMatch := &U32{
-		ClassID: 13,
+		ClassID: uint32Ptr(13),
 	}
 
 	if err := tcSocket.Qdisc().Add(&testQdisc); err != nil {
