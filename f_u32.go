@@ -26,15 +26,15 @@ const (
 
 // U32 contains attributes of the u32 discipline
 type U32 struct {
-	ClassID uint32
-	Hash    uint32
-	Link    uint32
-	Divisor uint32
+	ClassID *uint32
+	Hash    *uint32
+	Link    *uint32
+	Divisor *uint32
 	Sel     *U32Sel
-	InDev   string
-	Pcnt    uint64
+	InDev   *string
+	Pcnt    *uint64
 	Mark    *U32Mark
-	Flags   uint32
+	Flags   *uint32
 	Police  *Police
 	Actions *[]*Action
 }
@@ -69,8 +69,8 @@ func marshalU32(info *U32) ([]byte, error) {
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaU32Mark, Data: data})
 	}
 
-	if info.ClassID != 0 {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaU32ClassID, Data: info.ClassID})
+	if info.ClassID != nil {
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaU32ClassID, Data: uint32Value(info.ClassID)})
 	}
 	if info.Police != nil {
 		data, err := marshalPolice(info.Police)
@@ -79,8 +79,8 @@ func marshalU32(info *U32) ([]byte, error) {
 		}
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaU32Police, Data: data})
 	}
-	if info.Flags != 0 {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaU32Flags, Data: info.Flags})
+	if info.Flags != nil {
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaU32Flags, Data: uint32Value(info.Flags)})
 	}
 	if info.Actions != nil {
 		data, err := marshalActions(*info.Actions)
@@ -89,11 +89,11 @@ func marshalU32(info *U32) ([]byte, error) {
 		}
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaU32Act, Data: data})
 	}
-	if info.Divisor != 0 {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaU32Divisor, Data: info.Divisor})
+	if info.Divisor != nil {
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaU32Divisor, Data: uint32Value(info.Divisor)})
 	}
-	if info.Link != 0 {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaU32Link, Data: info.Link})
+	if info.Link != nil {
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaU32Link, Data: uint32Value(info.Link)})
 	}
 
 	return marshalAttributes(options)
@@ -109,13 +109,13 @@ func unmarshalU32(data []byte, info *U32) error {
 	for ad.Next() {
 		switch ad.Type() {
 		case tcaU32ClassID:
-			info.ClassID = ad.Uint32()
+			info.ClassID = uint32Ptr(ad.Uint32())
 		case tcaU32Hash:
-			info.Hash = ad.Uint32()
+			info.Hash = uint32Ptr(ad.Uint32())
 		case tcaU32Link:
-			info.Link = ad.Uint32()
+			info.Link = uint32Ptr(ad.Uint32())
 		case tcaU32Divisor:
-			info.Divisor = ad.Uint32()
+			info.Divisor = uint32Ptr(ad.Uint32())
 		case tcaU32Sel:
 			arg := &U32Sel{}
 			if err := extractU32Sel(ad.Bytes(), arg); err != nil {
@@ -129,9 +129,9 @@ func unmarshalU32(data []byte, info *U32) error {
 			}
 			info.Police = pol
 		case tcaU32InDev:
-			info.InDev = ad.String()
+			info.InDev = stringPtr(ad.String())
 		case tcaU32Pcnt:
-			info.Pcnt = ad.Uint64()
+			info.Pcnt = uint64Ptr(ad.Uint64())
 		case tcaU32Mark:
 			arg := &U32Mark{}
 			if err := unmarshalStruct(ad.Bytes(), arg); err != nil {
@@ -139,7 +139,7 @@ func unmarshalU32(data []byte, info *U32) error {
 			}
 			info.Mark = arg
 		case tcaU32Flags:
-			info.Flags = ad.Uint32()
+			info.Flags = uint32Ptr(ad.Uint32())
 		case tcaU32Act:
 			actions := &[]*Action{}
 			if err := unmarshalActions(ad.Bytes(), actions); err != nil {

@@ -18,10 +18,10 @@ const (
 
 // Route4 contains attributes of the route discipline
 type Route4 struct {
-	ClassID uint32
-	To      uint32
-	From    uint32
-	IIf     uint32
+	ClassID *uint32
+	To      *uint32
+	From    *uint32
+	IIf     *uint32
 }
 
 // unmarshalRoute4 parses the Route4-encoded data and stores the result in the value pointed to by info.
@@ -34,13 +34,13 @@ func unmarshalRoute4(data []byte, info *Route4) error {
 	for ad.Next() {
 		switch ad.Type() {
 		case tcaRoute4ClassID:
-			info.ClassID = ad.Uint32()
+			info.ClassID = uint32Ptr(ad.Uint32())
 		case tcaRoute4To:
-			info.To = ad.Uint32()
+			info.To = uint32Ptr(ad.Uint32())
 		case tcaRoute4From:
-			info.From = ad.Uint32()
+			info.From = uint32Ptr(ad.Uint32())
 		case tcaRoute4IIf:
-			info.IIf = ad.Uint32()
+			info.IIf = uint32Ptr(ad.Uint32())
 		default:
 			return fmt.Errorf("unmarshalRoute4()\t%d\n\t%v", ad.Type(), ad.Bytes())
 		}
@@ -58,17 +58,17 @@ func marshalRoute4(info *Route4) ([]byte, error) {
 
 	// TODO: improve logic and check combinations
 
-	if info.ClassID != 0 {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaRoute4ClassID, Data: info.ClassID})
+	if info.ClassID != nil {
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaRoute4ClassID, Data: uint32Value(info.ClassID)})
 	}
-	if info.To != 0 {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaRoute4To, Data: info.To})
+	if info.To != nil {
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaRoute4To, Data: uint32Value(info.To)})
 	}
-	if info.From != 0 {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaRoute4From, Data: info.From})
+	if info.From != nil {
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaRoute4From, Data: uint32Value(info.From)})
 	}
-	if info.IIf != 0 {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaRoute4IIf, Data: info.IIf})
+	if info.IIf != nil {
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaRoute4IIf, Data: uint32Value(info.IIf)})
 	}
 
 	return marshalAttributes(options)

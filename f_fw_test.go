@@ -13,8 +13,8 @@ func TestFw(t *testing.T) {
 		err1 error
 		err2 error
 	}{
-		"simple":   {val: Fw{ClassID: 12, InDev: "lo", Mask: 0xFFFF}},
-		"extended": {val: Fw{ClassID: 12, InDev: "lo", Mask: 0xFFFF, Police: &Police{AvRate: 1337, Result: 12}}},
+		"simple":   {val: Fw{ClassID: uint32Ptr(12), InDev: stringPtr("lo"), Mask: uint32Ptr(0xFFFF)}},
+		"extended": {val: Fw{ClassID: uint32Ptr(12), InDev: stringPtr("lo"), Mask: uint32Ptr(0xFFFF), Police: &Police{AvRate: 1337, Result: 12}}},
 	}
 
 	for name, testcase := range tests {

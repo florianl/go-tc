@@ -17,8 +17,8 @@ func TestMatchall(t *testing.T) {
 		err1 error
 		err2 error
 	}{
-		"simple":  {val: Matchall{ClassID: 42, Flags: SkipHw}},
-		"actions": {val: Matchall{ClassID: 1337, Flags: SkipHw, Actions: &actions}},
+		"simple":  {val: Matchall{ClassID: uint32Ptr(42), Flags: uint32Ptr(SkipHw)}},
+		"actions": {val: Matchall{ClassID: uint32Ptr(1337), Flags: uint32Ptr(SkipHw), Actions: &actions}},
 	}
 
 	for name, testcase := range tests {

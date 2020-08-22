@@ -13,11 +13,11 @@ func TestBpf(t *testing.T) {
 		err1 error
 		err2 error
 	}{
-		"simple": {val: Bpf{Ops: []byte{0x6, 0x0, 0x0, 0x0, 0xff, 0xff, 0xff, 0xff},
-			OpsLen:  0x1,
-			ClassID: 0x10001,
-			Flags:   0x1}},
-		"da obj /tmp/bpf.o sec foo": {val: Bpf{FD: 8, Name: "bpf.o:[foo]", Flags: 0x1, FlagsGen: 0x0}},
+		"simple": {val: Bpf{Ops: bytesPtr([]byte{0x6, 0x0, 0x0, 0x0, 0xff, 0xff, 0xff, 0xff}),
+			OpsLen:  uint16Ptr(0x1),
+			ClassID: uint32Ptr(0x10001),
+			Flags:   uint32Ptr(0x1)}},
+		"da obj /tmp/bpf.o sec foo": {val: Bpf{FD: uint32Ptr(8), Name: stringPtr("bpf.o:[foo]"), Flags: uint32Ptr(0x1), FlagsGen: uint32Ptr(0x0)}},
 	}
 
 	for name, testcase := range tests {

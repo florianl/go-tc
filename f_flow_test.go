@@ -13,7 +13,8 @@ func TestFlow(t *testing.T) {
 		err1 error
 		err2 error
 	}{
-		"simple": {val: Flow{Keys: 12, Mode: 34, BaseClass: 56, RShift: 78, Addend: 90, Mask: 21, XOR: 43, Divisor: 65, PerTurb: 87}},
+		"simple": {val: Flow{Keys: uint32Ptr(12), Mode: uint32Ptr(34), BaseClass: uint32Ptr(56), RShift: uint32Ptr(78),
+			Addend: uint32Ptr(90), Mask: uint32Ptr(21), XOR: uint32Ptr(43), Divisor: uint32Ptr(65), PerTurb: uint32Ptr(87)}},
 	}
 
 	for name, testcase := range tests {

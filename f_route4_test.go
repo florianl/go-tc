@@ -13,7 +13,7 @@ func TestRoute4(t *testing.T) {
 		err1 error
 		err2 error
 	}{
-		"simple": {val: Route4{ClassID: 0xFFFF, To: 2, From: 3, IIf: 4}},
+		"simple": {val: Route4{ClassID: uint32Ptr(0xFFFF), To: uint32Ptr(2), From: uint32Ptr(3), IIf: uint32Ptr(4)}},
 	}
 
 	for name, testcase := range tests {

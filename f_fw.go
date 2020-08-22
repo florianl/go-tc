@@ -17,10 +17,10 @@ const (
 
 // Fw contains attributes of the fw discipline
 type Fw struct {
-	ClassID uint32
+	ClassID *uint32
 	Police  *Police
-	InDev   string
-	Mask    uint32
+	InDev   *string
+	Mask    *uint32
 }
 
 // unmarshalFw parses the Fw-encoded data and stores the result in the value pointed to by info.
@@ -33,11 +33,11 @@ func unmarshalFw(data []byte, info *Fw) error {
 	for ad.Next() {
 		switch ad.Type() {
 		case tcaFwClassID:
-			info.ClassID = ad.Uint32()
+			info.ClassID = uint32Ptr(ad.Uint32())
 		case tcaFwInDev:
-			info.InDev = ad.String()
+			info.InDev = stringPtr(ad.String())
 		case tcaFwMask:
-			info.Mask = ad.Uint32()
+			info.Mask = uint32Ptr(ad.Uint32())
 		case tcaFwPolice:
 			pol := &Police{}
 			if err := unmarshalPolice(ad.Bytes(), pol); err != nil {
@@ -60,14 +60,14 @@ func marshalFw(info *Fw) ([]byte, error) {
 	}
 
 	// TODO: improve logic and check combinations
-	if info.ClassID != 0 {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFwClassID, Data: info.ClassID})
+	if info.ClassID != nil {
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFwClassID, Data: uint32Value(info.ClassID)})
 	}
-	if info.Mask != 0 {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFwMask, Data: info.Mask})
+	if info.Mask != nil {
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFwMask, Data: uint32Value(info.Mask)})
 	}
-	if len(info.InDev) > 0 {
-		options = append(options, tcOption{Interpretation: vtString, Type: tcaFwInDev, Data: info.InDev})
+	if info.InDev != nil {
+		options = append(options, tcOption{Interpretation: vtString, Type: tcaFwInDev, Data: stringValue(info.InDev)})
 	}
 	if info.Police != nil {
 		data, err := marshalPolice(info.Police)

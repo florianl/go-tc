@@ -17,9 +17,9 @@ const (
 
 // Matchall contains attributes of the matchall discipline
 type Matchall struct {
-	ClassID uint32
+	ClassID *uint32
 	Actions *[]*Action
-	Flags   uint32
+	Flags   *uint32
 }
 
 func unmarshalMatchall(data []byte, info *Matchall) error {
@@ -31,7 +31,7 @@ func unmarshalMatchall(data []byte, info *Matchall) error {
 	for ad.Next() {
 		switch ad.Type() {
 		case tcaMatchallClassID:
-			info.ClassID = ad.Uint32()
+			info.ClassID = uint32Ptr(ad.Uint32())
 		case tcaMatchallAct:
 			actions := &[]*Action{}
 			if err := unmarshalActions(ad.Bytes(), actions); err != nil {
@@ -39,7 +39,7 @@ func unmarshalMatchall(data []byte, info *Matchall) error {
 			}
 			info.Actions = actions
 		case tcaMatchallFlags:
-			info.Flags = ad.Uint32()
+			info.Flags = uint32Ptr(ad.Uint32())
 		case tcaMatchallPad:
 			// padding does not contain data, we just skip it
 		default:
@@ -58,8 +58,8 @@ func marshalMatchall(info *Matchall) ([]byte, error) {
 	}
 
 	// TODO: improve logic and check combinations
-	if info.ClassID != 0 {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaMatchallClassID, Data: info.ClassID})
+	if info.ClassID != nil {
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaMatchallClassID, Data: uint32Value(info.ClassID)})
 	}
 	if info.Actions != nil {
 		data, err := marshalActions(*info.Actions)
@@ -69,8 +69,8 @@ func marshalMatchall(info *Matchall) ([]byte, error) {
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaMatchallAct, Data: data})
 	}
 
-	if info.Flags != 0 {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaMatchallFlags, Data: info.Flags})
+	if info.Flags != nil {
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaMatchallFlags, Data: uint32Value(info.Flags)})
 	}
 
 	return marshalAttributes(options)

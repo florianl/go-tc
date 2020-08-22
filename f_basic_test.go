@@ -13,7 +13,7 @@ func TestBasic(t *testing.T) {
 		err1 error
 		err2 error
 	}{
-		"simple": {val: Basic{ClassID: 2}},
+		"simple": {val: Basic{ClassID: uint32Ptr(2)}},
 	}
 
 	for name, testcase := range tests {

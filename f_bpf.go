@@ -25,15 +25,15 @@ const (
 type Bpf struct {
 	Action   *Action
 	Police   *Police
-	ClassID  uint32
-	OpsLen   uint16
-	Ops      []byte
-	FD       uint32
-	Name     string
-	Flags    uint32
-	FlagsGen uint32
-	Tag      []byte
-	ID       uint32
+	ClassID  *uint32
+	OpsLen   *uint16
+	Ops      *[]byte
+	FD       *uint32
+	Name     *string
+	Flags    *uint32
+	FlagsGen *uint32
+	Tag      *[]byte
+	ID       *uint32
 }
 
 // unmarshalBpf parses the Bpf-encoded data and stores the result in the value pointed to by info.
@@ -52,23 +52,23 @@ func unmarshalBpf(data []byte, info *Bpf) error {
 			}
 			info.Police = pol
 		case tcaBpfClassid:
-			info.ClassID = ad.Uint32()
+			info.ClassID = uint32Ptr(ad.Uint32())
 		case tcaBpfOpsLen:
-			info.OpsLen = ad.Uint16()
+			info.OpsLen = uint16Ptr(ad.Uint16())
 		case tcaBpfOps:
-			info.Ops = ad.Bytes()
+			info.Ops = bytesPtr(ad.Bytes())
 		case tcaBpfFd:
-			info.FD = ad.Uint32()
+			info.FD = uint32Ptr(ad.Uint32())
 		case tcaBpfName:
-			info.Name = ad.String()
+			info.Name = stringPtr(ad.String())
 		case tcaBpfFlags:
-			info.Flags = ad.Uint32()
+			info.Flags = uint32Ptr(ad.Uint32())
 		case tcaBpfFlagsGen:
-			info.FlagsGen = ad.Uint32()
+			info.FlagsGen = uint32Ptr(ad.Uint32())
 		case tcaBpfTag:
-			info.Tag = ad.Bytes()
+			info.Tag = bytesPtr(ad.Bytes())
 		case tcaBpfID:
-			info.ID = ad.Uint32()
+			info.ID = uint32Ptr(ad.Uint32())
 		default:
 			return fmt.Errorf("unmarshalBpf()\t%d\n\t%v", ad.Type(), ad.Bytes())
 		}
@@ -85,30 +85,32 @@ func marshalBpf(info *Bpf) ([]byte, error) {
 	}
 
 	// TODO: improve logic and check combinations
-	if len(info.Ops) > 0 {
-		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaBpfOps, Data: info.Ops})
-		options = append(options, tcOption{Interpretation: vtUint16, Type: tcaBpfOpsLen, Data: info.OpsLen})
+	if info.Ops != nil {
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaBpfOps, Data: bytesValue(info.Ops)})
 	}
-	if info.Name != "" {
-		options = append(options, tcOption{Interpretation: vtString, Type: tcaBpfName, Data: info.Name})
+	if info.OpsLen != nil {
+		options = append(options, tcOption{Interpretation: vtUint16, Type: tcaBpfOpsLen, Data: uint16Value(info.OpsLen)})
 	}
-	if info.FD != 0 {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaBpfFd, Data: info.FD})
+	if info.Name != nil {
+		options = append(options, tcOption{Interpretation: vtString, Type: tcaBpfName, Data: stringValue(info.Name)})
 	}
-	if info.ID != 0 {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaBpfID, Data: info.ID})
+	if info.FD != nil {
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaBpfFd, Data: uint32Value(info.FD)})
 	}
-	if info.ClassID != 0 {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaBpfClassid, Data: info.ClassID})
+	if info.ID != nil {
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaBpfID, Data: uint32Value(info.ID)})
 	}
-	if len(info.Tag) > 0 {
-		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaBpfTag, Data: info.Tag})
+	if info.ClassID != nil {
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaBpfClassid, Data: uint32Value(info.ClassID)})
 	}
-	if info.Flags != 0 {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaBpfFlags, Data: info.Flags})
+	if info.Tag != nil {
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaBpfTag, Data: bytesValue(info.Tag)})
 	}
-	if info.FlagsGen != 0 {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaBpfFlagsGen, Data: info.FlagsGen})
+	if info.Flags != nil {
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaBpfFlags, Data: uint32Value(info.Flags)})
+	}
+	if info.FlagsGen != nil {
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaBpfFlagsGen, Data: uint32Value(info.FlagsGen)})
 	}
 	return marshalAttributes(options)
 }

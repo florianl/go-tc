@@ -16,7 +16,7 @@ const (
 
 // Basic contains attributes of the basic discipline
 type Basic struct {
-	ClassID uint32
+	ClassID *uint32
 	Police  *Police
 }
 
@@ -36,7 +36,7 @@ func unmarshalBasic(data []byte, info *Basic) error {
 			}
 			info.Police = pol
 		case tcaBasicClassID:
-			info.ClassID = ad.Uint32()
+			info.ClassID = uint32Ptr(ad.Uint32())
 		default:
 			return fmt.Errorf("unmarshalBasic()\t%d\n\t%v", ad.Type(), ad.Bytes())
 		}
@@ -53,8 +53,8 @@ func marshalBasic(info *Basic) ([]byte, error) {
 	}
 
 	// TODO: improve logic and check combinations
-	if info.ClassID != 0 {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaBasicClassID, Data: info.ClassID})
+	if info.ClassID != nil {
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaBasicClassID, Data: uint32Value(info.ClassID)})
 	}
 	return marshalAttributes(options)
 }

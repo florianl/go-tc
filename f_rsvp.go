@@ -18,9 +18,9 @@ const (
 
 // Rsvp contains attributes of the rsvp discipline
 type Rsvp struct {
-	ClassID uint32
-	Dst     []byte
-	Src     []byte
+	ClassID *uint32
+	Dst     *[]byte
+	Src     *[]byte
 	PInfo   *RsvpPInfo
 	Police  *Police
 }
@@ -35,11 +35,11 @@ func unmarshalRsvp(data []byte, info *Rsvp) error {
 	for ad.Next() {
 		switch ad.Type() {
 		case tcaRsvpClassID:
-			info.ClassID = ad.Uint32()
+			info.ClassID = uint32Ptr(ad.Uint32())
 		case tcaRsvpDst:
-			info.Dst = ad.Bytes()
+			info.Dst = bytesPtr(ad.Bytes())
 		case tcaRsvpSrc:
-			info.Src = ad.Bytes()
+			info.Src = bytesPtr(ad.Bytes())
 		case tcaRsvpPInfo:
 			arg := &RsvpPInfo{}
 			if err := unmarshalStruct(ad.Bytes(), arg); err != nil {
@@ -69,8 +69,8 @@ func marshalRsvp(info *Rsvp) ([]byte, error) {
 	}
 
 	// TODO: improve logic and check combinations
-	if info.ClassID != 0 {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaRoute4ClassID, Data: info.ClassID})
+	if info.ClassID != nil {
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaRoute4ClassID, Data: uint32Value(info.ClassID)})
 	}
 	if info.PInfo != nil {
 		data, err := marshalStruct(info.PInfo)
@@ -78,6 +78,12 @@ func marshalRsvp(info *Rsvp) ([]byte, error) {
 			return []byte{}, err
 		}
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaRsvpPInfo, Data: data})
+	}
+	if info.Src != nil {
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaRsvpSrc, Data: bytesValue(info.Src)})
+	}
+	if info.Dst != nil {
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaRsvpDst, Data: bytesValue(info.Dst)})
 	}
 	if info.Police != nil {
 		data, err := marshalPolice(info.Police)

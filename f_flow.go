@@ -24,15 +24,15 @@ const (
 
 // Flow contains attributes of the flow discipline
 type Flow struct {
-	Keys      uint32
-	Mode      uint32
-	BaseClass uint32
-	RShift    uint32
-	Addend    uint32
-	Mask      uint32
-	XOR       uint32
-	Divisor   uint32
-	PerTurb   uint32
+	Keys      *uint32
+	Mode      *uint32
+	BaseClass *uint32
+	RShift    *uint32
+	Addend    *uint32
+	Mask      *uint32
+	XOR       *uint32
+	Divisor   *uint32
+	PerTurb   *uint32
 }
 
 // unmarshalFlow parses the Flow-encoded data and stores the result in the value pointed to by info.
@@ -45,23 +45,23 @@ func unmarshalFlow(data []byte, info *Flow) error {
 	for ad.Next() {
 		switch ad.Type() {
 		case tcaFlowKeys:
-			info.Keys = ad.Uint32()
+			info.Keys = uint32Ptr(ad.Uint32())
 		case tcaFlowMode:
-			info.Mode = ad.Uint32()
+			info.Mode = uint32Ptr(ad.Uint32())
 		case tcaFlowBaseClass:
-			info.BaseClass = ad.Uint32()
+			info.BaseClass = uint32Ptr(ad.Uint32())
 		case tcaFlowRShift:
-			info.RShift = ad.Uint32()
+			info.RShift = uint32Ptr(ad.Uint32())
 		case tcaFlowAddend:
-			info.Addend = ad.Uint32()
+			info.Addend = uint32Ptr(ad.Uint32())
 		case tcaFlowMask:
-			info.Mask = ad.Uint32()
+			info.Mask = uint32Ptr(ad.Uint32())
 		case tcaFlowXOR:
-			info.XOR = ad.Uint32()
+			info.XOR = uint32Ptr(ad.Uint32())
 		case tcaFlowDivisor:
-			info.Divisor = ad.Uint32()
+			info.Divisor = uint32Ptr(ad.Uint32())
 		case tcaFlowPerTurb:
-			info.PerTurb = ad.Uint32()
+			info.PerTurb = uint32Ptr(ad.Uint32())
 		default:
 			return fmt.Errorf("unmarshalFlow()\t%d\n\t%v", ad.Type(), ad.Bytes())
 		}
@@ -78,32 +78,32 @@ func marshalFlow(info *Flow) ([]byte, error) {
 	}
 
 	// TODO: improve logic and check combinations
-	if info.Keys != 0 {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFlowKeys, Data: info.Keys})
+	if info.Keys != nil {
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFlowKeys, Data: uint32Value(info.Keys)})
 	}
-	if info.Mode != 0 {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFlowMode, Data: info.Mode})
+	if info.Mode != nil {
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFlowMode, Data: uint32Value(info.Mode)})
 	}
-	if info.BaseClass != 0 {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFlowBaseClass, Data: info.BaseClass})
+	if info.BaseClass != nil {
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFlowBaseClass, Data: uint32Value(info.BaseClass)})
 	}
-	if info.RShift != 0 {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFlowRShift, Data: info.RShift})
+	if info.RShift != nil {
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFlowRShift, Data: uint32Value(info.RShift)})
 	}
-	if info.Addend != 0 {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFlowAddend, Data: info.Addend})
+	if info.Addend != nil {
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFlowAddend, Data: uint32Value(info.Addend)})
 	}
-	if info.Mask != 0 {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFlowMask, Data: info.Mask})
+	if info.Mask != nil {
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFlowMask, Data: uint32Value(info.Mask)})
 	}
-	if info.XOR != 0 {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFlowXOR, Data: info.XOR})
+	if info.XOR != nil {
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFlowXOR, Data: uint32Value(info.XOR)})
 	}
-	if info.Divisor != 0 {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFlowDivisor, Data: info.Divisor})
+	if info.Divisor != nil {
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFlowDivisor, Data: uint32Value(info.Divisor)})
 	}
-	if info.PerTurb != 0 {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFlowPerTurb, Data: info.PerTurb})
+	if info.PerTurb != nil {
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFlowPerTurb, Data: uint32Value(info.PerTurb)})
 	}
 	return marshalAttributes(options)
 }

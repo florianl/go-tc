@@ -18,9 +18,9 @@ func TestU32(t *testing.T) {
 		err2 error
 	}{
 		"empty":    {},
-		"simple":   {val: U32{ClassID: 0xFFFF, Mark: &U32Mark{Val: 0x55, Mask: 0xAA, Success: 0x1}}},
-		"divisor":  {val: U32{Divisor: 1, Link: 42}},
-		"extended": {val: U32{ClassID: 0xFFFF, Mark: &U32Mark{Val: 0x55, Mask: 0xAA, Success: 0x1}, Police: &Police{AvRate: 1337, Result: 12}}},
+		"simple":   {val: U32{ClassID: uint32Ptr(0xFFFF), Mark: &U32Mark{Val: 0x55, Mask: 0xAA, Success: 0x1}}},
+		"divisor":  {val: U32{Divisor: uint32Ptr(1), Link: uint32Ptr(42)}},
+		"extended": {val: U32{ClassID: uint32Ptr(0xFFFF), Mark: &U32Mark{Val: 0x55, Mask: 0xAA, Success: 0x1}, Police: &Police{AvRate: 1337, Result: 12}}},
 		"policy": {val: U32{
 			Sel: &U32Sel{
 				Flags: 0x1,
@@ -39,7 +39,7 @@ func TestU32(t *testing.T) {
 				},
 			},
 		}},
-		"multiple Keys": {val: U32{ClassID: 0xFFFF, Mark: &U32Mark{Val: 0x55, Mask: 0xAA, Success: 0x1},
+		"multiple Keys": {val: U32{ClassID: uint32Ptr(0xFFFF), Mark: &U32Mark{Val: 0x55, Mask: 0xAA, Success: 0x1},
 			Sel: &U32Sel{
 				Flags: 0x0,
 				NKeys: 0x3,
@@ -49,7 +49,7 @@ func TestU32(t *testing.T) {
 					{Mask: 0xF0F0, Val: 0x5050, Off: 0xC, OffMask: 0xC},
 				},
 			}}},
-		"actions": {val: U32{Flags: 0x8, Actions: &actions}},
+		"actions": {val: U32{Flags: uint32Ptr(0x8), Actions: &actions}},
 	}
 
 	for name, testcase := range tests {
