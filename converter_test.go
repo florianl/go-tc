@@ -201,3 +201,42 @@ func TestConvertInt64(t *testing.T) {
 		})
 	}
 }
+
+func TestConvertBytes(t *testing.T) {
+	tests := map[string]struct {
+		value []byte
+	}{
+		"empty":       {value: []byte{}},
+		"single byte": {value: []byte{0xFF}},
+		"disk sync":   {value: []byte{0xAA, 0x55}},
+	}
+
+	for name, testcase := range tests {
+		t.Run(name, func(t *testing.T) {
+			ptr := bytesPtr(testcase.value)
+			value := bytesValue(ptr)
+			if diff := cmp.Diff(value, testcase.value); diff != "" {
+				t.Fatalf("Missmatch (-want +got):\n%s", diff)
+			}
+		})
+	}
+}
+
+func TestConvertBool(t *testing.T) {
+	tests := map[string]struct {
+		value bool
+	}{
+		"true":  {value: true},
+		"false": {value: false},
+	}
+
+	for name, testcase := range tests {
+		t.Run(name, func(t *testing.T) {
+			ptr := boolPtr(testcase.value)
+			value := boolValue(ptr)
+			if diff := cmp.Diff(value, testcase.value); diff != "" {
+				t.Fatalf("Missmatch (-want +got):\n%s", diff)
+			}
+		})
+	}
+}

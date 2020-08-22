@@ -49,13 +49,13 @@ func TestQdisc(t *testing.T) {
 		"clsact":   {kind: "clsact"},
 		"emptyHtb": {kind: "htb", err: ErrNoArg},
 		"fq_codel": {kind: "fq_codel", fqCodel: &FqCodel{Target: uint32Ptr(42), Limit: uint32Ptr(0xCAFE)}},
-		"red":      {kind: "red", red: &Red{MaxP: 42}},
+		"red":      {kind: "red", red: &Red{MaxP: uint32Ptr(42)}},
 		"sfb":      {kind: "sfb", sfb: &Sfb{Parms: &SfbQopt{Max: 0xFF}}},
 		"cbq":      {kind: "cbq", cbq: &Cbq{LssOpt: &CbqLssOpt{OffTime: 10}, WrrOpt: &CbqWrrOpt{Weight: 42}, FOpt: &CbqFOpt{Split: 2}, OVLStrategy: &CbqOvl{Penalty: 2}}},
-		"codel":    {kind: "codel", codel: &Codel{Target: 1, Limit: 2, Interval: 3, ECN: 4, CEThreshold: 5}},
-		"hhf":      {kind: "hhf", hhf: &Hhf{BacklogLimit: 1, Quantum: 2, HHFlowsLimit: 3, ResetTimeout: 4, AdmitBytes: 5, EVICTTimeout: 6, NonHHWeight: 7}},
-		"pie":      {kind: "pie", pie: &Pie{Target: 1, Limit: 2, TUpdate: 3, Alpha: 4, Beta: 5, ECN: 6, Bytemode: 7}},
-		"choke":    {kind: "choke", choke: &Choke{MaxP: 42}},
+		"codel":    {kind: "codel", codel: &Codel{Target: uint32Ptr(1), Limit: uint32Ptr(2), Interval: uint32Ptr(3), ECN: uint32Ptr(4), CEThreshold: uint32Ptr(5)}},
+		"hhf":      {kind: "hhf", hhf: &Hhf{BacklogLimit: uint32Ptr(1), Quantum: uint32Ptr(2), HHFlowsLimit: uint32Ptr(3), ResetTimeout: uint32Ptr(4), AdmitBytes: uint32Ptr(5), EVICTTimeout: uint32Ptr(6), NonHHWeight: uint32Ptr(7)}},
+		"pie":      {kind: "pie", pie: &Pie{Target: uint32Ptr(1), Limit: uint32Ptr(2), TUpdate: uint32Ptr(3), Alpha: uint32Ptr(4), Beta: uint32Ptr(5), ECN: uint32Ptr(6), Bytemode: uint32Ptr(7)}},
+		"choke":    {kind: "choke", choke: &Choke{MaxP: uint32Ptr(42)}},
 	}
 
 	tcMsg := Msg{

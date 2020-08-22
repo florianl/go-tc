@@ -13,6 +13,28 @@ func netIPValue(v *net.IP) net.IP {
 	return net.IP{}
 }
 
+func bytesPtr(v []byte) *[]byte {
+	return &v
+}
+
+func bytesValue(v *[]byte) []byte {
+	if v != nil {
+		return *v
+	}
+	return []byte{}
+}
+
+func boolPtr(v bool) *bool {
+	return &v
+}
+
+func boolValue(v *bool) bool {
+	if v != nil {
+		return *v
+	}
+	return false
+}
+
 func stringPtr(v string) *string {
 	return &v
 }

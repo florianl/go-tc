@@ -124,6 +124,11 @@ func Example_cBPF() {
 	// when deleting the qdisc, the applied filter will also be gone
 	defer rtnl.Qdisc().Delete(&qdisc)
 
+	ops := []byte{0x6, 0x0, 0x0, 0x0, 0xff, 0xff, 0xff, 0xff}
+	opsLen := uint16(1)
+	classID := uint32(0x1001)
+	flags := uint32(0x1)
+
 	filter := tc.Object{
 		tc.Msg{
 			Family:  unix.AF_UNSPEC,
@@ -135,10 +140,10 @@ func Example_cBPF() {
 		tc.Attribute{
 			Kind: "bpf",
 			BPF: &tc.Bpf{
-				Ops:     []byte{0x6, 0x0, 0x0, 0x0, 0xff, 0xff, 0xff, 0xff},
-				OpsLen:  0x1,
-				ClassID: 0x10001,
-				Flags:   0x1,
+				Ops:     &ops,
+				OpsLen:  &opsLen,
+				ClassID: &classID,
+				Flags:   &flags,
 			},
 		},
 	}
@@ -211,6 +216,11 @@ func ExampleU32() {
 	// when deleting the qdisc, the applied filter will also be gone
 	defer rtnl.Qdisc().Delete(&qdisc)
 
+	ops := []byte{0x6, 0x0, 0x0, 0x0, 0xff, 0xff, 0xff, 0xff}
+	opsLen := uint16(1)
+	classID := uint32(0x1001)
+	flags := uint32(0x1)
+
 	filter := tc.Object{
 		tc.Msg{
 			Family:  unix.AF_UNSPEC,
@@ -222,10 +232,10 @@ func ExampleU32() {
 		tc.Attribute{
 			Kind: "bpf",
 			BPF: &tc.Bpf{
-				Ops:     []byte{0x6, 0x0, 0x0, 0x0, 0xff, 0xff, 0xff, 0xff},
-				OpsLen:  0x1,
-				ClassID: 0x10001,
-				Flags:   0x1,
+				Ops:     &ops,
+				OpsLen:  &opsLen,
+				ClassID: &classID,
+				Flags:   &flags,
 			},
 		},
 	}
