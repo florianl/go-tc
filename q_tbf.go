@@ -20,13 +20,9 @@ const (
 
 // Tbf contains attributes of the TBF discipline
 type Tbf struct {
-	Parms   *TbfQopt
-	Rtab    []byte
-	Ptab    []byte
-	Rate64  uint64
-	Prate64 uint64
-	Burst   uint32
-	Pburst  uint32
+	Parms  *TbfQopt
+	Burst  *uint32
+	Pburst *uint32
 }
 
 // unmarshalTbf parses the FqCodel-encoded data and stores the result in the value pointed to by info.
@@ -44,18 +40,10 @@ func unmarshalTbf(data []byte, info *Tbf) error {
 				return err
 			}
 			info.Parms = qopt
-		case tcaTbfRtab:
-			info.Rtab = ad.Bytes()
-		case tcaTbfPtab:
-			info.Ptab = ad.Bytes()
-		case tcaTbfRate64:
-			info.Rate64 = ad.Uint64()
-		case tcaTbfPrate64:
-			info.Prate64 = ad.Uint64()
 		case tcaTbfBurst:
-			info.Burst = ad.Uint32()
+			info.Burst = uint32Ptr(ad.Uint32())
 		case tcaTbfPburst:
-			info.Pburst = ad.Uint32()
+			info.Pburst = uint32Ptr(ad.Uint32())
 		case tcaTbfPad:
 			// padding does not contain data, we just skip it
 		default:
@@ -69,30 +57,50 @@ func unmarshalTbf(data []byte, info *Tbf) error {
 func marshalTbf(info *Tbf) ([]byte, error) {
 	options := []tcOption{}
 
-	if info == nil {
+	if info == nil || info.Parms == nil {
 		return []byte{}, fmt.Errorf("Tbf: %w", ErrNoArg)
 	}
 
 	// TODO: improve logic and check combinations
-	if info.Parms != nil {
-		data, err := marshalStruct(info.Parms)
+	if info.Parms.Rate.Rate != 0 {
+		ratePolicy := Policy{}
+		ratePolicy.Burst = uint32Value(info.Burst)
+		ratePolicy.Action = PolicyOk
+		ratePolicy.Limit = info.Parms.Limit
+		ratePolicy.Rate.Rate = info.Parms.Rate.Rate
+
+		rtab, err := generateRateTable(&ratePolicy)
 		if err != nil {
-			return []byte{}, err
+			return []byte{}, fmt.Errorf("Tbf: %w", err)
 		}
-		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaTbfParms, Data: data})
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaTbfRtab, Data: rtab})
 	}
-	if info.Rate64 != 0 {
-		options = append(options, tcOption{Interpretation: vtUint64, Type: tcaTbfRate64, Data: info.Rate64})
+	if info.Parms.PeakRate.Rate != 0 {
+		ratePolicy := Policy{}
+		ratePolicy.Burst = uint32Value(info.Burst)
+		ratePolicy.Action = PolicyOk
+		ratePolicy.Limit = info.Parms.Limit
+		ratePolicy.PeakRate.Rate = info.Parms.PeakRate.Rate
+
+		ptab, err := generateRateTable(&ratePolicy)
+		if err != nil {
+			return []byte{}, fmt.Errorf("Tbf: %w", err)
+		}
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaTbfPtab, Data: ptab})
 	}
-	if info.Prate64 != 0 {
-		options = append(options, tcOption{Interpretation: vtUint64, Type: tcaTbfPrate64, Data: info.Prate64})
+	data, err := marshalStruct(info.Parms)
+	if err != nil {
+		return []byte{}, fmt.Errorf("Tbf: %v", err)
 	}
-	if info.Burst != 0 {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaTbfBurst, Data: info.Burst})
+	options = append(options, tcOption{Interpretation: vtBytes, Type: tcaTbfParms, Data: data})
+
+	if info.Burst != nil {
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaTbfBurst, Data: uint32Value(info.Burst)})
 	}
-	if info.Pburst != 0 {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaTbfPburst, Data: info.Pburst})
+	if info.Pburst != nil {
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaTbfPburst, Data: uint32Value(info.Pburst)})
 	}
+
 	return marshalAttributes(options)
 }
 
