@@ -23,12 +23,12 @@ const (
 type ActBpf struct {
 	Tm     *Tcft
 	Parms  *ActBpfParms
-	Ops    []byte
-	OpsLen uint16
-	FD     uint32
-	Name   string
-	Tag    []byte
-	ID     uint32
+	Ops    *[]byte
+	OpsLen *uint16
+	FD     *uint32
+	Name   *string
+	Tag    *[]byte
+	ID     *uint32
 }
 
 // unmarshalActBpf parses the ActBpf-encoded data and stores the result in the value pointed to by info.
@@ -53,15 +53,15 @@ func unmarshalActBpf(data []byte, info *ActBpf) error {
 			}
 			info.Parms = parms
 		case tcaActBpfOpsLen:
-			info.OpsLen = ad.Uint16()
+			info.OpsLen = uint16Ptr(ad.Uint16())
 		case tcaActBpfOps:
-			info.Ops = ad.Bytes()
+			info.Ops = bytesPtr(ad.Bytes())
 		case tcaActBpfFD:
-			info.FD = ad.Uint32()
+			info.FD = uint32Ptr(ad.Uint32())
 		case tcaActBpfName:
-			info.Name = ad.String()
+			info.Name = stringPtr(ad.String())
 		case tcaActBpfTag:
-			info.Tag = ad.Bytes()
+			info.Tag = bytesPtr(ad.Bytes())
 		case tcaActBpfPad:
 			// padding does not contain data, we just skip it
 		default:
@@ -82,21 +82,23 @@ func marshalActBpf(info *ActBpf) ([]byte, error) {
 	if info.Tm != nil {
 		return []byte{}, ErrNoArgAlter
 	}
-	if info.Name != "" {
-		options = append(options, tcOption{Interpretation: vtString, Type: tcaActBpfName, Data: info.Name})
+	if info.Name != nil {
+		options = append(options, tcOption{Interpretation: vtString, Type: tcaActBpfName, Data: stringValue(info.Name)})
 	}
-	if len(info.Tag) > 0 {
-		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaActBpfTag, Data: info.Tag})
+	if info.Tag != nil {
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaActBpfTag, Data: bytesValue(info.Tag)})
 	}
-	if info.FD != 0 {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaActBpfFD, Data: info.FD})
+	if info.FD != nil {
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaActBpfFD, Data: uint32Value(info.FD)})
 	}
-	if info.ID != 0 {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaActBpfID, Data: info.ID})
+	if info.ID != nil {
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaActBpfID, Data: uint32Value(info.ID)})
 	}
-	if len(info.Ops) > 0 {
-		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaActBpfOps, Data: info.Ops})
-		options = append(options, tcOption{Interpretation: vtUint16, Type: tcaActBpfOpsLen, Data: info.OpsLen})
+	if info.Ops != nil {
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaActBpfOps, Data: bytesValue(info.Ops)})
+	}
+	if info.OpsLen != nil {
+		options = append(options, tcOption{Interpretation: vtUint16, Type: tcaActBpfOpsLen, Data: uint16Value(info.OpsLen)})
 	}
 	if info.Parms != nil {
 		data, err := marshalStruct(info.Parms)

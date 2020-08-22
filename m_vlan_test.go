@@ -8,8 +8,6 @@ import (
 )
 
 func TestVLan(t *testing.T) {
-	var one uint16 = 1
-	var two uint32 = 2
 	tests := map[string]struct {
 		val  VLan
 		err1 error
@@ -17,7 +15,7 @@ func TestVLan(t *testing.T) {
 	}{
 		"simple":          {val: VLan{Parms: &VLanParms{Index: 42, Action: 1}}},
 		"invalidArgument": {val: VLan{Tm: &Tcft{Install: 1}}, err1: ErrNoArgAlter},
-		"pushs":           {val: VLan{PushID: &one, PushProtocol: &one, PushPriority: &two}},
+		"pushs":           {val: VLan{PushID: uint16Ptr(1), PushProtocol: uint16Ptr(2), PushPriority: uint32Ptr(3)}},
 	}
 	for name, testcase := range tests {
 		t.Run(name, func(t *testing.T) {

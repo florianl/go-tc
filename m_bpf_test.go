@@ -14,10 +14,10 @@ func TestActBpft(t *testing.T) {
 		err1   error
 		err2   error
 	}{
-		"simple":          {val: ActBpf{FD: 12, Name: "simpleTest"}},
-		"invalidArgument": {val: ActBpf{FD: 12, Name: "simpleTest", Tm: &Tcft{Install: 1}}, err1: ErrNoArgAlter},
-		"extended":        {val: ActBpf{FD: 12, Name: "simpleTest", Parms: &ActBpfParms{Action: 2, Index: 4}}},
-		"Tm Attribute": {val: ActBpf{FD: 12, Name: "simpleTest", Parms: &ActBpfParms{Action: 2, Index: 4}},
+		"simple":          {val: ActBpf{FD: uint32Ptr(12), Name: stringPtr("simpleTest")}},
+		"invalidArgument": {val: ActBpf{FD: uint32Ptr(12), Name: stringPtr("simpleTest"), Tm: &Tcft{Install: 1}}, err1: ErrNoArgAlter},
+		"extended":        {val: ActBpf{FD: uint32Ptr(12), Name: stringPtr("simpleTest"), Parms: &ActBpfParms{Action: 2, Index: 4}}},
+		"Tm Attribute": {val: ActBpf{FD: uint32Ptr(12), Name: stringPtr("simpleTest"), Parms: &ActBpfParms{Action: 2, Index: 4}},
 			enrich: &Tcft{Install: 1, LastUse: 2, Expires: 3, FirstUse: 4}},
 	}
 

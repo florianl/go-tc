@@ -19,9 +19,9 @@ const (
 
 // Ipt contains attribute of the ipt discipline
 type Ipt struct {
-	Table string
-	Hook  uint32
-	Index uint32
+	Table *string
+	Hook  *uint32
+	Index *uint32
 	Cnt   *IptCnt
 	Tm    *Tcft
 }
@@ -48,11 +48,11 @@ func unmarshalIpt(data []byte, info *Ipt) error {
 			}
 			info.Tm = tcft
 		case tcaIptTable:
-			info.Table = ad.String()
+			info.Table = stringPtr(ad.String())
 		case tcaIptHook:
-			info.Hook = ad.Uint32()
+			info.Hook = uint32Ptr(ad.Uint32())
 		case tcaIptIndex:
-			info.Index = ad.Uint32()
+			info.Index = uint32Ptr(ad.Uint32())
 		case tcaIptCnt:
 			tmp := &IptCnt{}
 			if err := unmarshalStruct(ad.Bytes(), tmp); err != nil {
@@ -79,12 +79,15 @@ func marshalIpt(info *Ipt) ([]byte, error) {
 	if info.Tm != nil {
 		return []byte{}, ErrNoArgAlter
 	}
-	if len(info.Table) > 0 {
-		options = append(options, tcOption{Interpretation: vtString, Type: tcaIptTable, Data: info.Table})
+	if info.Table != nil {
+		options = append(options, tcOption{Interpretation: vtString, Type: tcaIptTable, Data: stringValue(info.Table)})
 	}
-	options = append(options, tcOption{Interpretation: vtUint32, Type: tcaIptHook, Data: info.Hook})
-	options = append(options, tcOption{Interpretation: vtUint32, Type: tcaIptIndex, Data: info.Index})
-	options = append(options, tcOption{Interpretation: vtString, Type: tcaIptTable, Data: info.Table})
+	if info.Hook != nil {
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaIptHook, Data: uint32Value(info.Hook)})
+	}
+	if info.Index != nil {
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaIptIndex, Data: uint32Value(info.Index)})
+	}
 	if info.Cnt != nil {
 		data, err := marshalStruct(info.Cnt)
 		if err != nil {

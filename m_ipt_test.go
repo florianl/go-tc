@@ -13,9 +13,9 @@ func TestIpt(t *testing.T) {
 		err1 error
 		err2 error
 	}{
-		"simple":          {val: Ipt{Table: "testTable", Hook: 42, Index: 1984}},
+		"simple":          {val: Ipt{Table: stringPtr("testTable"), Hook: uint32Ptr(42), Index: uint32Ptr(1984)}},
 		"invalidArgument": {val: Ipt{Tm: &Tcft{Install: 1}}, err1: ErrNoArgAlter},
-		"simple+Cnt":      {val: Ipt{Table: "testTable", Hook: 42, Index: 1984, Cnt: &IptCnt{RefCnt: 7, BindCnt: 42}}},
+		"simple+Cnt":      {val: Ipt{Table: stringPtr("testTable"), Hook: uint32Ptr(42), Index: uint32Ptr(1984), Cnt: &IptCnt{RefCnt: 7, BindCnt: 42}}},
 	}
 	for name, testcase := range tests {
 		t.Run(name, func(t *testing.T) {
