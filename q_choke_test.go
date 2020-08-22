@@ -13,7 +13,8 @@ func TestChoke(t *testing.T) {
 		err1 error
 		err2 error
 	}{
-		"simple": {val: Choke{MaxP: 42}},
+		"simple":   {val: Choke{MaxP: uint32Ptr(42)}},
+		"extended": {val: Choke{MaxP: uint32Ptr(43), Parms: &RedQOpt{Limit: 1337}}},
 	}
 
 	for name, testcase := range tests {
@@ -35,7 +36,7 @@ func TestChoke(t *testing.T) {
 
 			}
 			if diff := cmp.Diff(val, testcase.val); diff != "" {
-				t.Fatalf("Choke missmatch (want +got):\n%s", diff)
+				t.Fatalf("Choke missmatch (-want +got):\n%s", diff)
 			}
 		})
 	}

@@ -13,7 +13,7 @@ func TestAtm(t *testing.T) {
 		err1 error
 		err2 error
 	}{
-		"simple": {val: Atm{FD: 12, Addr: &AtmPvc{Itf: byte(2)}}},
+		"simple": {val: Atm{FD: uint32Ptr(12), Addr: &AtmPvc{Itf: byte(2)}}},
 	}
 
 	for name, testcase := range tests {

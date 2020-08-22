@@ -13,7 +13,7 @@ func TestFq(t *testing.T) {
 		err1 error
 		err2 error
 	}{
-		"simple": {val: Fq{PLimit: 1, FlowPLimit: 2, Quantum: 3, InitQuantum: 4, RateEnable: 5, FlowDefaultRate: 6, FlowMaxRate: 7, BucketsLog: 8, FlowRefillDelay: 9, OrphanMask: 10, LowRateThreshold: 11, CEThreshold: 12}},
+		"simple": {val: Fq{PLimit: uint32Ptr(1), FlowPLimit: uint32Ptr(2), Quantum: uint32Ptr(3), InitQuantum: uint32Ptr(4), RateEnable: uint32Ptr(5), FlowDefaultRate: uint32Ptr(6), FlowMaxRate: uint32Ptr(7), BucketsLog: uint32Ptr(8), FlowRefillDelay: uint32Ptr(9), OrphanMask: uint32Ptr(10), LowRateThreshold: uint32Ptr(11), CEThreshold: uint32Ptr(12)}},
 	}
 
 	for name, testcase := range tests {

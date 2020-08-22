@@ -13,8 +13,8 @@ func TestDsmark(t *testing.T) {
 		err1 error
 		err2 error
 	}{
-		"simple":         {val: Dsmark{Indices: 12, DefaultIndex: 34, Mask: 56, Value: 78}},
-		"simpleWithFlag": {val: Dsmark{Indices: 12, DefaultIndex: 34, SetTCIndex: true}},
+		"simple":         {val: Dsmark{Indices: uint16Ptr(12), DefaultIndex: uint16Ptr(34), Mask: uint8Ptr(56), Value: uint8Ptr(78)}},
+		"simpleWithFlag": {val: Dsmark{Indices: uint16Ptr(12), DefaultIndex: uint16Ptr(34), SetTCIndex: boolPtr(true)}},
 	}
 
 	for name, testcase := range tests {

@@ -16,7 +16,7 @@ const (
 // Choke contains attributes of the choke discipline
 type Choke struct {
 	Parms *RedQOpt
-	MaxP  uint32
+	MaxP  *uint32
 }
 
 // unmarshalChoke parses the Choke-encoded data and stores the result in the value pointed to by info.
@@ -35,7 +35,7 @@ func unmarshalChoke(data []byte, info *Choke) error {
 			}
 			info.Parms = opt
 		case tcaChokeMaxP:
-			info.MaxP = ad.Uint32()
+			info.MaxP = uint32Ptr(ad.Uint32())
 		default:
 			return fmt.Errorf("unmarshalChoke()\t%d\n\t%v", ad.Type(), ad.Bytes())
 		}
@@ -51,9 +51,16 @@ func marshalChoke(info *Choke) ([]byte, error) {
 		return []byte{}, fmt.Errorf("Choke: %w", ErrNoArg)
 	}
 	// TODO: improve logic and check combinations
+	if info.Parms != nil {
+		data, err := marshalStruct(info.Parms)
+		if err != nil {
+			return []byte{}, err
+		}
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaChokeParms, Data: data})
+	}
 
-	if info.MaxP != 0 {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaChokeMaxP, Data: info.MaxP})
+	if info.MaxP != nil {
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaChokeMaxP, Data: uint32Value(info.MaxP)})
 
 	}
 

@@ -17,11 +17,11 @@ const (
 
 // Dsmark contains attributes of the dsmark discipline
 type Dsmark struct {
-	Indices      uint16
-	DefaultIndex uint16
-	SetTCIndex   bool
-	Mask         uint8
-	Value        uint8
+	Indices      *uint16
+	DefaultIndex *uint16
+	SetTCIndex   *bool
+	Mask         *uint8
+	Value        *uint8
 }
 
 // unmarshalDsmark parses the Dsmark-encoded data and stores the result in the value pointed to by info.
@@ -34,15 +34,15 @@ func unmarshalDsmark(data []byte, info *Dsmark) error {
 	for ad.Next() {
 		switch ad.Type() {
 		case tcaDsmarkIndices:
-			info.Indices = ad.Uint16()
+			info.Indices = uint16Ptr(ad.Uint16())
 		case tcaDsmarkDefaultIndex:
-			info.DefaultIndex = ad.Uint16()
+			info.DefaultIndex = uint16Ptr(ad.Uint16())
 		case tcaDsmarkSetTCIndex:
-			info.SetTCIndex = ad.Flag()
+			info.SetTCIndex = boolPtr(ad.Flag())
 		case tcaDsmarkMask:
-			info.Mask = ad.Uint8()
+			info.Mask = uint8Ptr(ad.Uint8())
 		case tcaDsmarkValue:
-			info.Value = ad.Uint8()
+			info.Value = uint8Ptr(ad.Uint8())
 		default:
 			return fmt.Errorf("UnmarshalDsmark()\t%d\n\t%v", ad.Type(), ad.Bytes())
 		}
@@ -59,20 +59,20 @@ func marshalDsmark(info *Dsmark) ([]byte, error) {
 	}
 
 	// TODO: improve logic and check combinations
-	if info.Indices != 0 {
-		options = append(options, tcOption{Interpretation: vtUint16, Type: tcaDsmarkIndices, Data: info.Indices})
+	if info.Indices != nil {
+		options = append(options, tcOption{Interpretation: vtUint16, Type: tcaDsmarkIndices, Data: uint16Value(info.Indices)})
 	}
-	if info.DefaultIndex != 0 {
-		options = append(options, tcOption{Interpretation: vtUint16, Type: tcaDsmarkDefaultIndex, Data: info.DefaultIndex})
+	if info.DefaultIndex != nil {
+		options = append(options, tcOption{Interpretation: vtUint16, Type: tcaDsmarkDefaultIndex, Data: uint16Value(info.DefaultIndex)})
 	}
-	if info.Mask != 0 {
-		options = append(options, tcOption{Interpretation: vtUint8, Type: tcaDsmarkMask, Data: info.Mask})
+	if info.Mask != nil {
+		options = append(options, tcOption{Interpretation: vtUint8, Type: tcaDsmarkMask, Data: uint8Value(info.Mask)})
 	}
-	if info.Value != 0 {
-		options = append(options, tcOption{Interpretation: vtUint8, Type: tcaDsmarkValue, Data: info.Value})
+	if info.Value != nil {
+		options = append(options, tcOption{Interpretation: vtUint8, Type: tcaDsmarkValue, Data: uint8Value(info.Value)})
 	}
-	if info.SetTCIndex {
-		options = append(options, tcOption{Interpretation: vtFlag, Type: tcaDsmarkSetTCIndex})
+	if info.SetTCIndex != nil {
+		options = append(options, tcOption{Interpretation: vtFlag, Type: tcaDsmarkSetTCIndex, Data: boolValue(info.SetTCIndex)})
 	}
 	return marshalAttributes(options)
 }

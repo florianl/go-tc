@@ -8,31 +8,29 @@ import (
 )
 
 func TestCake(t *testing.T) {
-	var baseRate uint64 = 123
-	var diffServMode, atm, flowMode, overhead, rtt, target uint32 = 23, 34, 45, 56, 67, 78
-	var autorate, memory, nat, raw, wash, mpu, ingress, ackFilter, splitGso, fwMark uint32 = 89, 90, 11, 22, 33, 44, 55, 66, 77, 88
 	tests := map[string]struct {
 		val  Cake
 		err1 error
 		err2 error
 	}{
-		"simple": {val: Cake{BaseRate: &baseRate,
-			DiffServMode: &diffServMode,
-			Atm:          &atm,
-			FlowMode:     &flowMode,
-			Overhead:     &overhead,
-			Rtt:          &rtt,
-			Target:       &target,
-			Autorate:     &autorate,
-			Memory:       &memory,
-			Nat:          &nat,
-			Raw:          &raw,
-			Wash:         &wash,
-			Mpu:          &mpu,
-			Ingress:      &ingress,
-			AckFilter:    &ackFilter,
-			SplitGso:     &splitGso,
-			FwMark:       &fwMark}},
+		"simple": {val: Cake{BaseRate: uint64Ptr(123),
+			DiffServMode: uint32Ptr(23),
+			Atm:          uint32Ptr(34),
+			FlowMode:     uint32Ptr(45),
+			Overhead:     uint32Ptr(56),
+			Rtt:          uint32Ptr(67),
+			Target:       uint32Ptr(78),
+			Autorate:     uint32Ptr(89),
+			Memory:       uint32Ptr(90),
+			Nat:          uint32Ptr(11),
+			Raw:          uint32Ptr(22),
+			Wash:         uint32Ptr(33),
+			Mpu:          uint32Ptr(44),
+			Ingress:      uint32Ptr(55),
+			AckFilter:    uint32Ptr(66),
+			SplitGso:     uint32Ptr(77),
+			FwMark:       uint32Ptr(88),
+		}},
 	}
 
 	for name, testcase := range tests {

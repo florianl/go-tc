@@ -13,7 +13,7 @@ func TestCode(t *testing.T) {
 		err1 error
 		err2 error
 	}{
-		"simple": {val: Codel{Target: 1, Limit: 2, Interval: 3, ECN: 4, CEThreshold: 5}},
+		"simple": {val: Codel{Target: uint32Ptr(1), Limit: uint32Ptr(2), Interval: uint32Ptr(3), ECN: uint32Ptr(4), CEThreshold: uint32Ptr(5)}},
 	}
 
 	for name, testcase := range tests {

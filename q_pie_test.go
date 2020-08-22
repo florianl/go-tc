@@ -13,7 +13,7 @@ func TestPie(t *testing.T) {
 		err1 error
 		err2 error
 	}{
-		"simple": {val: Pie{Target: 1, Limit: 2, TUpdate: 3, Alpha: 4, Beta: 5, ECN: 6, Bytemode: 7}},
+		"simple": {val: Pie{Target: uint32Ptr(1), Limit: uint32Ptr(2), TUpdate: uint32Ptr(3), Alpha: uint32Ptr(4), Beta: uint32Ptr(5), ECN: uint32Ptr(6), Bytemode: uint32Ptr(7)}},
 	}
 
 	for name, testcase := range tests {

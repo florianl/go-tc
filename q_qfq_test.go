@@ -13,7 +13,7 @@ func TestQfq(t *testing.T) {
 		err1 error
 		err2 error
 	}{
-		"simple": {val: Qfq{Weight: 2, Lmax: 4}},
+		"simple": {val: Qfq{Weight: uint32Ptr(2), Lmax: uint32Ptr(4)}},
 	}
 
 	for name, testcase := range tests {

@@ -18,10 +18,10 @@ const (
 
 // Atm contains attributes of the atm discipline
 type Atm struct {
-	FD     uint32
-	Excess uint32
+	FD     *uint32
+	Excess *uint32
 	Addr   *AtmPvc
-	State  uint32
+	State  *uint32
 }
 
 // unmarshalAtm parses the Atm-encoded data and stores the result in the value pointed to by info.
@@ -34,9 +34,9 @@ func unmarshalAtm(data []byte, info *Atm) error {
 	for ad.Next() {
 		switch ad.Type() {
 		case tcaAtmFD:
-			info.FD = ad.Uint32()
+			info.FD = uint32Ptr(ad.Uint32())
 		case tcaAtmExcess:
-			info.Excess = ad.Uint32()
+			info.Excess = uint32Ptr(ad.Uint32())
 		case tcaAtmAddr:
 			arg := &AtmPvc{}
 			if err := unmarshalStruct(ad.Bytes(), arg); err != nil {
@@ -44,7 +44,7 @@ func unmarshalAtm(data []byte, info *Atm) error {
 			}
 			info.Addr = arg
 		case tcaAtmState:
-			info.State = ad.Uint32()
+			info.State = uint32Ptr(ad.Uint32())
 		default:
 			return fmt.Errorf("unmarshalAtm()\t%d\n\t%v", ad.Type(), ad.Bytes())
 
@@ -69,14 +69,14 @@ func marshalAtm(info *Atm) ([]byte, error) {
 		}
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaAtmAddr, Data: data})
 	}
-	if info.FD != 0 {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaAtmFD, Data: info.FD})
+	if info.FD != nil {
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaAtmFD, Data: uint32Value(info.FD)})
 	}
-	if info.Excess != 0 {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaAtmExcess, Data: info.Excess})
+	if info.Excess != nil {
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaAtmExcess, Data: uint32Value(info.Excess)})
 	}
-	if info.State != 0 {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaAtmState, Data: info.State})
+	if info.State != nil {
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaAtmState, Data: uint32Value(info.State)})
 	}
 
 	return marshalAttributes(options)

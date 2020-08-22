@@ -19,13 +19,13 @@ const (
 
 // Hhf contains attributes of the hhf discipline
 type Hhf struct {
-	BacklogLimit uint32
-	Quantum      uint32
-	HHFlowsLimit uint32
-	ResetTimeout uint32
-	AdmitBytes   uint32
-	EVICTTimeout uint32
-	NonHHWeight  uint32
+	BacklogLimit *uint32
+	Quantum      *uint32
+	HHFlowsLimit *uint32
+	ResetTimeout *uint32
+	AdmitBytes   *uint32
+	EVICTTimeout *uint32
+	NonHHWeight  *uint32
 }
 
 // unmarshalHhf parses the Hhf-encoded data and stores the result in the value pointed to by info.
@@ -38,19 +38,19 @@ func unmarshalHhf(data []byte, info *Hhf) error {
 	for ad.Next() {
 		switch ad.Type() {
 		case tcaHhfBacklogLimit:
-			info.BacklogLimit = ad.Uint32()
+			info.BacklogLimit = uint32Ptr(ad.Uint32())
 		case tcaHhfQuantum:
-			info.Quantum = ad.Uint32()
+			info.Quantum = uint32Ptr(ad.Uint32())
 		case tcaHhfHHFlowsLimit:
-			info.HHFlowsLimit = ad.Uint32()
+			info.HHFlowsLimit = uint32Ptr(ad.Uint32())
 		case tcaHhfResetTimeout:
-			info.ResetTimeout = ad.Uint32()
+			info.ResetTimeout = uint32Ptr(ad.Uint32())
 		case tcaHhfAdmitBytes:
-			info.AdmitBytes = ad.Uint32()
+			info.AdmitBytes = uint32Ptr(ad.Uint32())
 		case tcaHhfEVICTTimeout:
-			info.EVICTTimeout = ad.Uint32()
+			info.EVICTTimeout = uint32Ptr(ad.Uint32())
 		case tcaHhfNonHHWeight:
-			info.NonHHWeight = ad.Uint32()
+			info.NonHHWeight = uint32Ptr(ad.Uint32())
 		default:
 			return fmt.Errorf("unmarshalHhf()\t%d\n\t%v", ad.Type(), ad.Bytes())
 		}
@@ -66,26 +66,26 @@ func marshalHhf(info *Hhf) ([]byte, error) {
 		return []byte{}, fmt.Errorf("Hhf: %w", ErrNoArg)
 	}
 	// TODO: improve logic and check combinations
-	if info.BacklogLimit != 0 {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaHhfBacklogLimit, Data: info.BacklogLimit})
+	if info.BacklogLimit != nil {
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaHhfBacklogLimit, Data: uint32Value(info.BacklogLimit)})
 	}
-	if info.Quantum != 0 {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaHhfQuantum, Data: info.Quantum})
+	if info.Quantum != nil {
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaHhfQuantum, Data: uint32Value(info.Quantum)})
 	}
-	if info.HHFlowsLimit != 0 {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaHhfHHFlowsLimit, Data: info.HHFlowsLimit})
+	if info.HHFlowsLimit != nil {
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaHhfHHFlowsLimit, Data: uint32Value(info.HHFlowsLimit)})
 	}
-	if info.ResetTimeout != 0 {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaHhfResetTimeout, Data: info.ResetTimeout})
+	if info.ResetTimeout != nil {
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaHhfResetTimeout, Data: uint32Value(info.ResetTimeout)})
 	}
-	if info.AdmitBytes != 0 {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaHhfAdmitBytes, Data: info.AdmitBytes})
+	if info.AdmitBytes != nil {
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaHhfAdmitBytes, Data: uint32Value(info.AdmitBytes)})
 	}
-	if info.EVICTTimeout != 0 {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaHhfEVICTTimeout, Data: info.EVICTTimeout})
+	if info.EVICTTimeout != nil {
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaHhfEVICTTimeout, Data: uint32Value(info.EVICTTimeout)})
 	}
-	if info.NonHHWeight != 0 {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaHhfNonHHWeight, Data: info.NonHHWeight})
+	if info.NonHHWeight != nil {
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaHhfNonHHWeight, Data: uint32Value(info.NonHHWeight)})
 	}
 
 	return marshalAttributes(options)

@@ -14,8 +14,8 @@ const (
 
 // Qfq contains attributes of the qfq discipline
 type Qfq struct {
-	Weight uint32
-	Lmax   uint32
+	Weight *uint32
+	Lmax   *uint32
 }
 
 // unmarshalQfq parses the Qfq-encoded data and stores the result in the value pointed to by info.
@@ -28,9 +28,9 @@ func unmarshalQfq(data []byte, info *Qfq) error {
 	for ad.Next() {
 		switch ad.Type() {
 		case tcaQfqWeight:
-			info.Weight = ad.Uint32()
+			info.Weight = uint32Ptr(ad.Uint32())
 		case tcaQfqLmax:
-			info.Lmax = ad.Uint32()
+			info.Lmax = uint32Ptr(ad.Uint32())
 		default:
 			return fmt.Errorf("UnmarshalQfq()\t%d\n\t%v", ad.Type(), ad.Bytes())
 		}
@@ -47,11 +47,11 @@ func marshalQfq(info *Qfq) ([]byte, error) {
 	}
 
 	// TODO: improve logic and check combinations
-	if info.Weight != 0 {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaQfqWeight, Data: info.Weight})
+	if info.Weight != nil {
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaQfqWeight, Data: uint32Value(info.Weight)})
 	}
-	if info.Lmax != 0 {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaQfqLmax, Data: info.Lmax})
+	if info.Lmax != nil {
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaQfqLmax, Data: uint32Value(info.Lmax)})
 	}
 	return marshalAttributes(options)
 }

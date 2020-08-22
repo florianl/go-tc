@@ -13,7 +13,7 @@ func TestMqPrio(t *testing.T) {
 		err1 error
 		err2 error
 	}{
-		"simple": {val: MqPrio{Mode: 1, Shaper: 2, MinRate64: 3, MaxRate64: 4}},
+		"simple": {val: MqPrio{Mode: uint16Ptr(1), Shaper: uint16Ptr(2), MinRate64: uint64Ptr(3), MaxRate64: uint64Ptr(4)}},
 	}
 
 	for name, testcase := range tests {

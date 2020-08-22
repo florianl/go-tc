@@ -13,7 +13,7 @@ func TestDrr(t *testing.T) {
 		err1 error
 		err2 error
 	}{
-		"simple": {val: Drr{Quantum: 234}},
+		"simple": {val: Drr{Quantum: uint32Ptr(234)}},
 	}
 
 	for name, testcase := range tests {

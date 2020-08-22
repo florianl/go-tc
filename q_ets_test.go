@@ -8,8 +8,6 @@ import (
 )
 
 func TestEts(t *testing.T) {
-	var nBands uint8 = 6
-	var nStrict uint8 = 3
 	quanta := []uint32{4500, 3000, 2500}
 	prioMap := []uint8{0, 1, 1, 1, 2, 3, 4, 5}
 	tests := map[string]struct {
@@ -18,7 +16,7 @@ func TestEts(t *testing.T) {
 		err2 error
 	}{
 		// tc qdisc add dev tcDev root handle 1: ets strict 3 quanta 4500 3000 2500 priomap 0 1 1 1 2 3 4 5
-		"simple": {val: Ets{NBands: &nBands, NStrict: &nStrict, Quanta: &quanta, PrioMap: &prioMap}},
+		"simple": {val: Ets{NBands: uint8Ptr(6), NStrict: uint8Ptr(3), Quanta: &quanta, PrioMap: &prioMap}},
 	}
 
 	for name, testcase := range tests {

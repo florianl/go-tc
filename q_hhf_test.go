@@ -13,7 +13,7 @@ func TestHhf(t *testing.T) {
 		err1 error
 		err2 error
 	}{
-		"simple": {val: Hhf{BacklogLimit: 1, Quantum: 2, HHFlowsLimit: 3, ResetTimeout: 4, AdmitBytes: 5, EVICTTimeout: 6, NonHHWeight: 7}},
+		"simple": {val: Hhf{BacklogLimit: uint32Ptr(1), Quantum: uint32Ptr(2), HHFlowsLimit: uint32Ptr(3), ResetTimeout: uint32Ptr(4), AdmitBytes: uint32Ptr(5), EVICTTimeout: uint32Ptr(6), NonHHWeight: uint32Ptr(7)}},
 	}
 
 	for name, testcase := range tests {

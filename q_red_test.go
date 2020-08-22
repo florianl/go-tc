@@ -13,7 +13,7 @@ func TestRed(t *testing.T) {
 		err1 error
 		err2 error
 	}{
-		"simple": {val: Red{MaxP: 2, Parms: &RedQOpt{QthMin: 2, QthMax: 4}}},
+		"simple": {val: Red{MaxP: uint32Ptr(2), Parms: &RedQOpt{QthMin: 2, QthMax: 4}}},
 	}
 
 	for name, testcase := range tests {

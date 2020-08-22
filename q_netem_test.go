@@ -8,18 +8,13 @@ import (
 )
 
 func TestNetem(t *testing.T) {
-	var ecn uint32 = 123
-	var lat int64 = -4242
-	var jitter int64 = -1337
-	var rate uint64 = 1337
-
 	tests := map[string]struct {
 		val  Netem
 		err1 error
 		err2 error
 	}{
-		"simple": {val: Netem{Ecn: &ecn, Latency64: &lat, Jitter64: &jitter}},
-		"qopt":   {val: Netem{Qopt: NetemQopt{Latency: 42}, Rate64: &rate}},
+		"simple": {val: Netem{Ecn: uint32Ptr(123), Latency64: int64Ptr(-4242), Jitter64: int64Ptr(-1337)}},
+		"qopt":   {val: Netem{Qopt: NetemQopt{Latency: 42}, Rate64: uint64Ptr(1337)}},
 		"random": {val: Netem{Corr: &NetemCorr{Delay: 2}, Reorder: &NetemReorder{Correlation: 13}, Corrupt: &NetemCorrupt{Correlation: 11}, Rate: &NetemRate{PacketOverhead: 1337}, Slot: &NetemSlot{MinDelay: 2, MaxDelay: 4}}},
 	}
 

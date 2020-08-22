@@ -16,7 +16,7 @@ const (
 // Red contains attributes of the red discipline
 type Red struct {
 	Parms *RedQOpt
-	MaxP  uint32
+	MaxP  *uint32
 }
 
 // unmarshalRed parses the Red-encoded data and stores the result in the value pointed to by info.
@@ -35,7 +35,7 @@ func unmarshalRed(data []byte, info *Red) error {
 			}
 			info.Parms = opt
 		case tcaRedMaxP:
-			info.MaxP = ad.Uint32()
+			info.MaxP = uint32Ptr(ad.Uint32())
 		default:
 			return fmt.Errorf("unmarshalRed()\t%d\n\t%v", ad.Type(), ad.Bytes())
 		}
@@ -59,8 +59,8 @@ func marshalRed(info *Red) ([]byte, error) {
 		}
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaRedParms, Data: data})
 	}
-	if info.MaxP != 0 {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaRedMaxP, Data: info.MaxP})
+	if info.MaxP != nil {
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaRedMaxP, Data: uint32Value(info.MaxP)})
 	}
 	return marshalAttributes(options)
 }
