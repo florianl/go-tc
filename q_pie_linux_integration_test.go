@@ -71,6 +71,11 @@ func TestLinuxTcQueuePie(t *testing.T) {
 		}
 	}()
 
+	target := uint32(0x4e20)
+	limit := uint32(0x64)
+	tUpdate := uint32(0x7530)
+	ecn := uint32(1)
+
 	qdisc := Object{
 		Msg{
 			Family:  unix.AF_UNSPEC,
@@ -84,10 +89,10 @@ func TestLinuxTcQueuePie(t *testing.T) {
 		Attribute{
 			Kind: "pie",
 			Pie: &Pie{
-				Target:  0x4e20,
-				Limit:   0x64,
-				TUpdate: 0x7530,
-				ECN:     0x1,
+				Target:  &target,
+				Limit:   &limit,
+				TUpdate: &tUpdate,
+				ECN:     &ecn,
 			},
 		},
 	}
