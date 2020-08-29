@@ -33,10 +33,19 @@ jobs:
         export PATH=$PATH:$(go env GOPATH)/bin
         go test -c -race -tags integration .
         sudo ./go-tc.test -test.v
+    - name: coveralls.io
+      if: matrix.platform == 'ubuntu-latest'
+      env:
+        COVERALLS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # https://github.com/actions/setup-go/issues/14
+      run: |
+        export PATH=$PATH:$(go env GOPATH)/bin
+        go get -u github.com/mattn/goveralls
+        goveralls -coverprofile=profile.cov -service=github
   code-check:
     strategy:
       matrix:
-        go-version: [1.13.x, 1.14.x]
+        go-version: [1.14.x, 1.15.x]
     runs-on: ubuntu-latest
     steps:
     - name: Install Go
@@ -66,12 +75,3 @@ jobs:
         staticcheck -checks all core/*
         # ignore should not use ALL_CAPS in Go names in internal/
         staticcheck -checks all,-ST1003 ./internal/...
-    - name: coveralls.io
-      if: matrix.platform == 'ubuntu-latest'
-      env:
-        COVERALLS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      # https://github.com/actions/setup-go/issues/14
-      run: |
-        export PATH=$PATH:$(go env GOPATH)/bin
-        go get -u github.com/mattn/goveralls
-        goveralls -coverprofile=profile.cov -service=github
