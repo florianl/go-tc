@@ -17,7 +17,15 @@ func TestBpf(t *testing.T) {
 			OpsLen:  uint16Ptr(0x1),
 			ClassID: uint32Ptr(0x10001),
 			Flags:   uint32Ptr(0x1)}},
-		"da obj /tmp/bpf.o sec foo": {val: Bpf{FD: uint32Ptr(8), Name: stringPtr("bpf.o:[foo]"), Flags: uint32Ptr(0x1), FlagsGen: uint32Ptr(0x0)}},
+		"da obj /tmp/bpf.o sec foo": {val: Bpf{FD: uint32Ptr(8), Name: stringPtr("bpf.o:[foo]"),
+			Flags: uint32Ptr(0x1), FlagsGen: uint32Ptr(0x2)}},
+		"all options": {val: Bpf{Ops: bytesPtr([]byte{0x6, 0x0, 0x0, 0x0, 0xff, 0xff, 0xff, 0xff}),
+			OpsLen:  uint16Ptr(0x1),
+			ClassID: uint32Ptr(0x10001),
+			FD:      uint32Ptr(42),
+			Name:    stringPtr("testing"),
+			Tag:     bytesPtr([]byte{0xAA, 0x55}),
+			ID:      uint32Ptr(42)}},
 	}
 
 	for name, testcase := range tests {
@@ -38,8 +46,8 @@ func TestBpf(t *testing.T) {
 				t.Fatalf("Unexpected error: %v", err2)
 
 			}
-			if diff := cmp.Diff(val, testcase.val); diff != "" {
-				t.Fatalf("Bpf missmatch (want +got):\n%s", diff)
+			if diff := cmp.Diff(testcase.val, val); diff != "" {
+				t.Fatalf("Bpf missmatch (-want +got):\n%s", diff)
 			}
 		})
 	}

@@ -10,7 +10,7 @@ const (
 	tcaBpfUnspec = iota
 	tcaBpfAct
 	tcaBpfPolice
-	tcaBpfClassid
+	tcaBpfClassID
 	tcaBpfOpsLen
 	tcaBpfOps
 	tcaBpfFd
@@ -51,7 +51,7 @@ func unmarshalBpf(data []byte, info *Bpf) error {
 				return err
 			}
 			info.Police = pol
-		case tcaBpfClassid:
+		case tcaBpfClassID:
 			info.ClassID = uint32Ptr(ad.Uint32())
 		case tcaBpfOpsLen:
 			info.OpsLen = uint16Ptr(ad.Uint16())
@@ -91,17 +91,17 @@ func marshalBpf(info *Bpf) ([]byte, error) {
 	if info.OpsLen != nil {
 		options = append(options, tcOption{Interpretation: vtUint16, Type: tcaBpfOpsLen, Data: uint16Value(info.OpsLen)})
 	}
-	if info.Name != nil {
-		options = append(options, tcOption{Interpretation: vtString, Type: tcaBpfName, Data: stringValue(info.Name)})
-	}
 	if info.FD != nil {
 		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaBpfFd, Data: uint32Value(info.FD)})
+	}
+	if info.Name != nil {
+		options = append(options, tcOption{Interpretation: vtString, Type: tcaBpfName, Data: stringValue(info.Name)})
 	}
 	if info.ID != nil {
 		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaBpfID, Data: uint32Value(info.ID)})
 	}
 	if info.ClassID != nil {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaBpfClassid, Data: uint32Value(info.ClassID)})
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaBpfClassID, Data: uint32Value(info.ClassID)})
 	}
 	if info.Tag != nil {
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaBpfTag, Data: bytesValue(info.Tag)})
