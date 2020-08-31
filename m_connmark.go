@@ -70,7 +70,7 @@ func marshalConnmark(info *Connmark) ([]byte, error) {
 		return []byte{}, ErrNoArgAlter
 	}
 	if info.Parms != nil {
-		data, err := marshalStruct(info.Parms)
+		data, err := marshalAndAlignStruct(info.Parms)
 		if err != nil {
 			return []byte{}, err
 		}

@@ -32,3 +32,31 @@ func TestExtractFqCodelXStats(t *testing.T) {
 		})
 	}
 }
+
+func TestMarshalAndAlignStruct(t *testing.T) {
+	// The ConnmarkParam struct holds 22 bytes and therefore is not
+	// aligned to rtaAlignTo.
+	unaligned := ConnmarkParam{
+		Index:   1,
+		Capab:   2,
+		Action:  3,
+		RefCnt:  4,
+		BindCnt: 5,
+		Zone:    6,
+	}
+	returned := ConnmarkParam{}
+
+	bytes, err := marshalAndAlignStruct(&unaligned)
+	if err != nil {
+		t.Fatalf("Failed to marshal and align struct: %v", err)
+	}
+	if len(bytes)%rtaAlignTo != 0 {
+		t.Fatalf("Alignment of struct failed")
+	}
+	if err := unmarshalStruct(bytes, &returned); err != nil {
+		t.Fatalf("Failed to unmarshal struct: %v", err)
+	}
+	if diff := cmp.Diff(unaligned, returned); diff != "" {
+		t.Fatalf("Struct alignment missmatch (-want +got):\n%s", diff)
+	}
+}

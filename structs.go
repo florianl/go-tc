@@ -11,6 +11,26 @@ func unmarshalStruct(data []byte, s interface{}) error {
 	return binary.Read(b, nativeEndian, s)
 }
 
+const (
+	rtaAlignTo = 4
+)
+
+func marshalAndAlignStruct(s interface{}) ([]byte, error) {
+	var buf bytes.Buffer
+	err := binary.Write(&buf, nativeEndian, s)
+	if err != nil {
+		return []byte{}, err
+	}
+	bufLen := buf.Len()
+	alignedLen := (bufLen + (rtaAlignTo - 1)) & ^(rtaAlignTo - 1)
+	if bufLen != alignedLen && bufLen < alignedLen {
+		for i := 0; i < (alignedLen - bufLen); i++ {
+			buf.WriteByte(0x0)
+		}
+	}
+	return buf.Bytes(), nil
+}
+
 func marshalStruct(s interface{}) ([]byte, error) {
 	var buf bytes.Buffer
 	err := binary.Write(&buf, nativeEndian, s)
