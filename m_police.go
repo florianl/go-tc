@@ -22,8 +22,9 @@ const (
 // PolicyAction defines the action that is applied by Policy.
 type PolicyAction uint32
 
+// Default Policy actions.
+// PolicyUnspec - skipped as it is -1
 const (
-	/* PolicyUnspec - skipped as it is -1 */
 	PolicyOk PolicyAction = iota
 	PolicyReclassify
 	PolicyShot
