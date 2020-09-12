@@ -175,7 +175,7 @@ func TestFilterAttribute(t *testing.T) {
 			Addend: uint32Ptr(90), Mask: uint32Ptr(21), XOR: uint32Ptr(43), Divisor: uint32Ptr(65), PerTurb: uint32Ptr(87)}}},
 		"fw":     {val: &Attribute{Kind: "fw", Fw: &Fw{ClassID: uint32Ptr(12), InDev: stringPtr("lo"), Mask: uint32Ptr(0xFFFF)}}},
 		"route4": {val: &Attribute{Kind: "route4", Route4: &Route4{ClassID: uint32Ptr(0xFFFF), To: uint32Ptr(2), From: uint32Ptr(3), IIf: uint32Ptr(4)}}},
-		"rsvp":   {val: &Attribute{Kind: "rsvp", Rsvp: &Rsvp{ClassID: uint32Ptr(42), Police: &Police{AvRate: 1337, Result: 12}}}},
+		"rsvp":   {val: &Attribute{Kind: "rsvp", Rsvp: &Rsvp{ClassID: uint32Ptr(42), Police: &Police{AvRate: uint32Ptr(1337), Result: uint32Ptr(12)}}}},
 		"u32":    {val: &Attribute{Kind: "u32", U32: &U32{ClassID: uint32Ptr(0xFFFF), Mark: &U32Mark{Val: 0x55, Mask: 0xAA, Success: 0x1}}}},
 	}
 

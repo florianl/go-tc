@@ -13,7 +13,7 @@ func TestRsvp(t *testing.T) {
 		err1 error
 		err2 error
 	}{
-		"simple":   {val: Rsvp{ClassID: uint32Ptr(43), Src: bytesPtr([]byte{0xAA}), Dst: bytesPtr([]byte{0x55}), Police: &Police{AvRate: 1337, Result: 12}}},
+		"simple":   {val: Rsvp{ClassID: uint32Ptr(43), Src: bytesPtr([]byte{0xAA}), Dst: bytesPtr([]byte{0x55}), Police: &Police{AvRate: uint32Ptr(1337), Result: uint32Ptr(12)}}},
 		"extended": {val: Rsvp{ClassID: uint32Ptr(13), Src: bytesPtr([]byte{0xAA}), Dst: bytesPtr([]byte{0x55}), PInfo: &RsvpPInfo{Dpi: RsvpGpi{Mask: 1234, Key: 4321, Offset: 1}, Protocol: 42}}},
 	}
 

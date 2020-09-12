@@ -36,11 +36,11 @@ type Police struct {
 	Tbf        *Policy
 	Rate       *RateSpec
 	PeakRate   *RateSpec
-	AvRate     uint32
-	Result     uint32
+	AvRate     *uint32
+	Result     *uint32
 	Tm         *Tcft
-	Rate64     uint64
-	PeakRate64 uint64
+	Rate64     *uint64
+	PeakRate64 *uint64
 }
 
 // unmarshalPolice parses the Police-encoded data and stores the result in the value pointed to by info.
@@ -71,9 +71,9 @@ func unmarshalPolice(data []byte, info *Police) error {
 			}
 			info.PeakRate = rate
 		case tcaPoliceAvRate:
-			info.AvRate = ad.Uint32()
+			info.AvRate = uint32Ptr(ad.Uint32())
 		case tcaPoliceResult:
-			info.Result = ad.Uint32()
+			info.Result = uint32Ptr(ad.Uint32())
 		case tcaPoliceTm:
 			tm := &Tcft{}
 			if err := unmarshalStruct(ad.Bytes(), tm); err != nil {
@@ -83,10 +83,10 @@ func unmarshalPolice(data []byte, info *Police) error {
 		case tcaPolicePad:
 			// padding does not contain data, we just skip it
 		case tcaPoliceRate64:
-			info.Rate64 = ad.Uint64()
+			info.Rate64 = uint64Ptr(ad.Uint64())
 			return ErrNotImplemented
 		case tcaPolicePeakRate64:
-			info.PeakRate64 = ad.Uint64()
+			info.PeakRate64 = uint64Ptr(ad.Uint64())
 			return ErrNotImplemented
 		default:
 			return fmt.Errorf("UnmarshalPolice()\t%d\n\t%v", ad.Type(), ad.Bytes())
@@ -125,17 +125,17 @@ func marshalPolice(info *Police) ([]byte, error) {
 		}
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaPoliceTbf, Data: data})
 	}
-	if info.AvRate != 0 {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaPoliceAvRate, Data: info.AvRate})
+	if info.AvRate != nil {
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaPoliceAvRate, Data: uint32Value(info.AvRate)})
 	}
-	if info.Result != 0 {
-		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaPoliceResult, Data: info.Result})
+	if info.Result != nil {
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaPoliceResult, Data: uint32Value(info.Result)})
 	}
-	if info.Rate64 != 0 {
-		options = append(options, tcOption{Interpretation: vtUint64, Type: tcaPoliceRate64, Data: info.Rate64})
+	if info.Rate64 != nil {
+		return []byte{}, fmt.Errorf("police: rate64: %w", ErrNotImplemented)
 	}
-	if info.PeakRate64 != 0 {
-		options = append(options, tcOption{Interpretation: vtUint64, Type: tcaPolicePeakRate64, Data: info.PeakRate64})
+	if info.PeakRate64 != nil {
+		return []byte{}, fmt.Errorf("police: peakrate64: %w", ErrNotImplemented)
 	}
 	if info.Tm != nil {
 		return []byte{}, ErrNoArgAlter

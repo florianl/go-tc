@@ -26,7 +26,7 @@ func TestAction(t *testing.T) {
 		"mirred":              {val: Action{Kind: "mirred", Mirred: &Mirred{Parms: &MirredParam{Index: 42, Action: 1}}}},
 		"mirred+stats":        {val: Action{Kind: "mirred", Mirred: &Mirred{Parms: &MirredParam{Index: 42, Action: 1}}, Stats: &GenStats{Basic: &GenBasic{Bytes: 8, Packets: 1}, RateEst: &GenRateEst{BytePerSecond: 42, PacketPerSecond: 3}, Queue: &GenQueue{QueueLen: 5, Backlog: 6, Drops: 1, Requeues: 3, Overlimits: 1}, RateEst64: &GenRateEst64{BytePerSecond: 12, PacketPerSecond: 1}, BasicHw: &GenBasic{Bytes: 42, Packets: 3}}}},
 		"nat":                 {val: Action{Kind: "nat", Nat: &Nat{Parms: &NatParms{Index: 42, Action: 1}}}},
-		"police":              {val: Action{Kind: "police", Police: &Police{AvRate: 1337, Result: 42}}},
+		"police":              {val: Action{Kind: "police", Police: &Police{AvRate: uint32Ptr(1337), Result: uint32Ptr(42)}}},
 		"sample":              {val: Action{Kind: "sample", Sample: &Sample{Parms: &SampleParms{Index: 42, Action: 1}}}},
 		"vlan":                {val: Action{Kind: "vlan", VLan: &VLan{Parms: &VLanParms{Index: 42, Action: 1}}}},
 	}
