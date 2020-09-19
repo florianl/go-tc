@@ -14,6 +14,10 @@ func TestTbf(t *testing.T) {
 		err2 error
 	}{
 		"no TbfQopt": {val: Tbf{Burst: uint32Ptr(1)}, err1: ErrNoArg},
+		"simple": {val: Tbf{Parms: &TbfQopt{Mtu: 9216, Rate: RateSpec{
+			Rate:      125,
+			Linklayer: 1,
+		}}}},
 	}
 
 	for name, testcase := range tests {
@@ -26,7 +30,12 @@ func TestTbf(t *testing.T) {
 				t.Fatalf("Unexpected error: %v", err1)
 			}
 			val := Tbf{}
-			err2 := unmarshalTbf(data, &val)
+			var altered []byte
+			var err error
+			if altered, err = stripRateTable(t, data, []uint16{tcaTbfRtab, tcaTbfPtab}); err != nil {
+				t.Fatalf("Failed to strip rate table: %v", err)
+			}
+			err2 := unmarshalTbf(altered, &val)
 			if err2 != nil {
 				if testcase.err2 != nil && errors.Is(err2, testcase.err2) {
 					return
