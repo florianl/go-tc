@@ -2,7 +2,11 @@
 
 package tc
 
-import "bytes"
+import (
+	"fmt"
+
+	"github.com/google/go-cmp/cmp"
+)
 
 func Fuzz(data []byte) int {
 	return fuzzFu32(data)
@@ -20,8 +24,8 @@ func fuzzFu32(data []byte) int {
 		panic(err)
 	}
 
-	if bytes.Compare(data, data2) != 0 {
-		panic(err)
+	if diff := cmp.Diff(data2, data); diff != "" {
+		panic(fmt.Sprintf("Missmatch (-want +got):\n%s", diff))
 	}
 
 	return 1
