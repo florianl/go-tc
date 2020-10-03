@@ -39,3 +39,10 @@ func main() {
 ## Requirements
 
 * A version of Go that is [supported by upstream](https://golang.org/doc/devel/release.html#policy)
+
+## Privileges
+
+This package processes information directly from the kernel and therefore it requires special privileges. You can provide this privileges by adjusting the `CAP_NET_ADMIN` capabilities.
+```
+	setcap 'cap_net_admin=+ep' /your/executable
+```
