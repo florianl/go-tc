@@ -109,8 +109,8 @@ func validateFilterObject(action int, info *Object) ([]tcOption, error) {
 	}
 	options = append(options, tcOption{Interpretation: vtString, Type: tcaKind, Data: info.Kind})
 
-	if (info.Stats != nil || info.XStats != nil || info.Stats2 != nil) && action != unix.RTM_DELTFILTER {
-		return options, ErrNotImplemented
+	if info.Stats != nil || info.XStats != nil || info.Stats2 != nil {
+		return options, ErrInvalidArg
 	}
 
 	if info.EgressBlock != nil {
