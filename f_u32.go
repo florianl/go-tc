@@ -179,7 +179,7 @@ type U32Sel struct {
 
 func validateU32SelOptions(info *U32Sel) ([]byte, error) {
 	if int(info.NKeys) != len(info.Keys) {
-		return []byte{}, fmt.Errorf("Nkeys != len(Keys)")
+		return []byte{}, fmt.Errorf("number of expected keys matches not number of provided keys: %w", ErrInvalidArg)
 	}
 
 	buf := new(bytes.Buffer)
