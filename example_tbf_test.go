@@ -14,12 +14,10 @@ import (
 )
 
 func ExampleTbf() {
-	var rtnl *rtnetlink.Conn
-	var err error
-
 	tcIface := "tcExampleTbf"
 
-	if rtnl, err = setupDummyInterface(tcIface); err != nil {
+	rtnl, err := setupDummyInterface(tcIface)
+	if err != nil {
 		fmt.Fprintf(os.Stderr, "could not setup dummy interface: %v\n", err)
 		return
 	}

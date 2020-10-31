@@ -9,6 +9,7 @@ import (
 
 	"github.com/florianl/go-tc"
 	"github.com/florianl/go-tc/core"
+	"github.com/jsimonetti/rtnetlink"
 	"golang.org/x/sys/unix"
 )
 
@@ -43,8 +44,28 @@ func ExampleQdisc_Get() {
 
 // This example demonstraces how to add a qdisc to an interface and delete it again
 func ExampleQdisc() {
+	tcIface := "ExampleQdisc"
+
+	rtnl, err := setupDummyInterface(tcIface)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "could not setup dummy interface: %v\n", err)
+		return
+	}
+	defer rtnl.Close()
+
+	devID, err := net.InterfaceByName(tcIface)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "could not get interface ID: %v\n", err)
+		return
+	}
+	defer func(devID uint32, rtnl *rtnetlink.Conn) {
+		if err := rtnl.Link.Delete(devID); err != nil {
+			fmt.Fprintf(os.Stderr, "could not delete interface: %v\n", err)
+		}
+	}(uint32(devID.Index), rtnl)
+
 	// open a rtnetlink socket
-	rtnl, err := tc.Open(&tc.Config{})
+	tcnl, err := tc.Open(&tc.Config{})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "could not open rtnetlink socket: %v\n", err)
 		return
@@ -54,12 +75,6 @@ func ExampleQdisc() {
 			fmt.Fprintf(os.Stderr, "could not close rtnetlink socket: %v\n", err)
 		}
 	}()
-
-	devID, err := net.InterfaceByName("lo")
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "could not get interface ID: %v\n", err)
-		return
-	}
 
 	qdisc := tc.Object{
 		tc.Msg{
@@ -74,11 +89,11 @@ func ExampleQdisc() {
 		},
 	}
 
-	if err := rtnl.Qdisc().Add(&qdisc); err != nil {
+	if err := tcnl.Qdisc().Add(&qdisc); err != nil {
 		fmt.Fprintf(os.Stderr, "could not assign clsact to lo: %v\n", err)
 		return
 	}
-	if err := rtnl.Qdisc().Delete(&qdisc); err != nil {
+	if err := tcnl.Qdisc().Delete(&qdisc); err != nil {
 		fmt.Fprintf(os.Stderr, "could not delete clsact qdisc from lo: %v\n", err)
 		return
 	}
@@ -86,23 +101,36 @@ func ExampleQdisc() {
 
 // This example demonstrate the use with classic BPF
 func Example_cBPF() {
-	// open a rtnetlink socket
-	rtnl, err := tc.Open(&tc.Config{})
+	tcIface := "ExampleClassicBPF"
+
+	rtnl, err := setupDummyInterface(tcIface)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "could not setup dummy interface: %v\n", err)
+		return
+	}
+	defer rtnl.Close()
+
+	devID, err := net.InterfaceByName(tcIface)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "could not get interface ID: %v\n", err)
+		return
+	}
+	defer func(devID uint32, rtnl *rtnetlink.Conn) {
+		if err := rtnl.Link.Delete(devID); err != nil {
+			fmt.Fprintf(os.Stderr, "could not delete interface: %v\n", err)
+		}
+	}(uint32(devID.Index), rtnl)
+
+	tcnl, err := tc.Open(&tc.Config{})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "could not open rtnetlink socket: %v\n", err)
 		return
 	}
 	defer func() {
-		if err := rtnl.Close(); err != nil {
+		if err := tcnl.Close(); err != nil {
 			fmt.Fprintf(os.Stderr, "could not close rtnetlink socket: %v\n", err)
 		}
 	}()
-
-	devID, err := net.InterfaceByName("lo")
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "could not get interface ID: %v\n", err)
-		return
-	}
 
 	qdisc := tc.Object{
 		tc.Msg{
@@ -117,12 +145,12 @@ func Example_cBPF() {
 		},
 	}
 
-	if err := rtnl.Qdisc().Add(&qdisc); err != nil {
+	if err := tcnl.Qdisc().Add(&qdisc); err != nil {
 		fmt.Fprintf(os.Stderr, "could not assign clsact to lo: %v\n", err)
 		return
 	}
 	// when deleting the qdisc, the applied filter will also be gone
-	defer rtnl.Qdisc().Delete(&qdisc)
+	defer tcnl.Qdisc().Delete(&qdisc)
 
 	ops := []byte{0x6, 0x0, 0x0, 0x0, 0xff, 0xff, 0xff, 0xff}
 	opsLen := uint16(1)
@@ -147,7 +175,7 @@ func Example_cBPF() {
 			},
 		},
 	}
-	if err := rtnl.Filter().Add(&filter); err != nil {
+	if err := tcnl.Filter().Add(&filter); err != nil {
 		fmt.Fprintf(os.Stderr, "could not assign cBPF: %v\n", err)
 		return
 	}
@@ -155,22 +183,36 @@ func Example_cBPF() {
 
 func ExampleU32() {
 	// example from http://man7.org/linux/man-pages/man8/tc-police.8.html
-	rtnl, err := tc.Open(&tc.Config{})
+	tcIface := "ExampleU32"
+
+	rtnl, err := setupDummyInterface(tcIface)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "could not setup dummy interface: %v\n", err)
+		return
+	}
+	defer rtnl.Close()
+
+	devID, err := net.InterfaceByName(tcIface)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "could not get interface ID: %v\n", err)
+		return
+	}
+	defer func(devID uint32, rtnl *rtnetlink.Conn) {
+		if err := rtnl.Link.Delete(devID); err != nil {
+			fmt.Fprintf(os.Stderr, "could not delete interface: %v\n", err)
+		}
+	}(uint32(devID.Index), rtnl)
+
+	tcnl, err := tc.Open(&tc.Config{})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "could not open rtnetlink socket: %v\n", err)
 		return
 	}
 	defer func() {
-		if err := rtnl.Close(); err != nil {
+		if err := tcnl.Close(); err != nil {
 			fmt.Fprintf(os.Stderr, "could not close rtnetlink socket: %v\n", err)
 		}
 	}()
-
-	devID, err := net.InterfaceByName("lo")
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "could not get interface ID: %v\n", err)
-		return
-	}
 
 	qdisc := tc.Object{
 		tc.Msg{
@@ -209,12 +251,12 @@ func ExampleU32() {
 		},
 	}
 
-	if err := rtnl.Qdisc().Add(&qdisc); err != nil {
+	if err := tcnl.Qdisc().Add(&qdisc); err != nil {
 		fmt.Fprintf(os.Stderr, "could not assign clsact to lo: %v\n", err)
 		return
 	}
 	// when deleting the qdisc, the applied filter will also be gone
-	defer rtnl.Qdisc().Delete(&qdisc)
+	defer tcnl.Qdisc().Delete(&qdisc)
 
 	ops := []byte{0x6, 0x0, 0x0, 0x0, 0xff, 0xff, 0xff, 0xff}
 	opsLen := uint16(1)
@@ -239,7 +281,7 @@ func ExampleU32() {
 			},
 		},
 	}
-	if err := rtnl.Filter().Add(&filter); err != nil {
+	if err := tcnl.Filter().Add(&filter); err != nil {
 		fmt.Fprintf(os.Stderr, "could not assign cBPF: %v\n", err)
 		return
 	}

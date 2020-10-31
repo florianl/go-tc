@@ -9,26 +9,41 @@ import (
 
 	"github.com/florianl/go-tc"
 	"github.com/florianl/go-tc/core"
+	"github.com/jsimonetti/rtnetlink"
 	"golang.org/x/sys/unix"
 )
 
 func ExampleNetem() {
-	rtnl, err := tc.Open(&tc.Config{})
+	tcIface := "ExampleNetem"
+
+	rtnl, err := setupDummyInterface(tcIface)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "could not setup dummy interface: %v\n", err)
+		return
+	}
+	defer rtnl.Close()
+
+	devID, err := net.InterfaceByName(tcIface)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "could not get interface ID: %v\n", err)
+		return
+	}
+	defer func(devID uint32, rtnl *rtnetlink.Conn) {
+		if err := rtnl.Link.Delete(devID); err != nil {
+			fmt.Fprintf(os.Stderr, "could not delete interface: %v\n", err)
+		}
+	}(uint32(devID.Index), rtnl)
+
+	tcnl, err := tc.Open(&tc.Config{})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "could not open rtnetlink socket: %v\n", err)
 		return
 	}
 	defer func() {
-		if err := rtnl.Close(); err != nil {
+		if err := tcnl.Close(); err != nil {
 			fmt.Fprintf(os.Stderr, "could not close rtnetlink socket: %v\n", err)
 		}
 	}()
-
-	devID, err := net.InterfaceByName("lo")
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "could not get interface ID: %v\n", err)
-		return
-	}
 
 	var ecn uint32 = 1
 	qdisc := tc.Object{
@@ -51,17 +66,17 @@ func ExampleNetem() {
 		},
 	}
 
-	if err := rtnl.Qdisc().Replace(&qdisc); err != nil {
+	if err := tcnl.Qdisc().Replace(&qdisc); err != nil {
 		fmt.Fprintf(os.Stderr, "could not assign qdisc netem to lo: %v\n", err)
 		return
 	}
 	defer func() {
-		if err := rtnl.Qdisc().Delete(&qdisc); err != nil {
+		if err := tcnl.Qdisc().Delete(&qdisc); err != nil {
 			fmt.Fprintf(os.Stderr, "could not delete netem qdisc of lo: %v\n", err)
 			return
 		}
 	}()
-	qdiscs, err := rtnl.Qdisc().Get()
+	qdiscs, err := tcnl.Qdisc().Get()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "could not get all qdiscs: %v\n", err)
 	}
