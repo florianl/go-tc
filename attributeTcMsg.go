@@ -299,7 +299,7 @@ func extractTCAOptions(data []byte, tc *Attribute, kind string) error {
 		}
 		tc.Cake = info
 	default:
-		return fmt.Errorf("extractTCAOptions(): unsupported kind: %s", kind)
+		return fmt.Errorf("extractTCAOptions(): unsupported kind %s: %w", kind, ErrUnknownKind)
 	}
 
 	return nil
@@ -376,7 +376,7 @@ func extractXStats(data []byte, tc *XStats, kind string) error {
 func extractClsact(data []byte) error {
 	// Clsact is parameterless - so we expect to options
 	if len(data) != 0 {
-		return fmt.Errorf("extractClsact()\t%v", data)
+		return fmt.Errorf("clsact is parameterless: %w", ErrInvalidArg)
 	}
 	return nil
 }

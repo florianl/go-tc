@@ -2,7 +2,6 @@ package tc
 
 import (
 	"errors"
-	"strings"
 	"testing"
 
 	"github.com/florianl/go-tc/internal/unix"
@@ -135,18 +134,19 @@ func TestExtractTCAOptions(t *testing.T) {
 		kind     string
 		data     []byte
 		expected *Attribute
-		err      string
+		err      error
 	}{
 		"clsact":         {kind: "clsact", expected: &Attribute{}},
-		"clsactWithData": {kind: "clsact", data: []byte{0xde, 0xad, 0xc0, 0xde}, expected: &Attribute{}, err: "extractClsact()"},
+		"clsactWithData": {kind: "clsact", data: []byte{0xde, 0xad, 0xc0, 0xde}, err: ErrInvalidArg},
 		"ingress":        {kind: "ingress", expected: &Attribute{}},
+		"unknown":        {kind: "unknown", err: ErrUnknownKind},
 	}
 
 	for name, testcase := range tests {
 		t.Run(name, func(t *testing.T) {
 			value := &Attribute{}
 			if err := extractTCAOptions(testcase.data, value, testcase.kind); err != nil {
-				if len(testcase.err) > 0 && strings.Contains(err.Error(), testcase.err) {
+				if errors.Is(err, testcase.err) {
 					// we received the expected error. everything is fine
 					return
 				}
