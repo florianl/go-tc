@@ -7,12 +7,20 @@ import (
 
 // Various errors
 var (
+	ErrNoArgAlter = errors.New("argument cannot be altered")
+	ErrInvalidDev = errors.New("invalid device ID")
+
+	// ErrNotImplemented is returned for not yet implemented parts.
 	ErrNotImplemented = errors.New("functionality not yet implemented")
-	ErrNoArg          = errors.New("missing argument")
-	ErrNoArgAlter     = errors.New("argument cannot be altered")
-	ErrInvalidDev     = errors.New("invalid device ID")
-	ErrInvalidArg     = errors.New("invalid argument")
-	ErrUnknownKind    = errors.New("unknown kind")
+
+	// ErrNoArg is returned for missing arguments.
+	ErrNoArg = errors.New("missing argument")
+
+	// ErrInvalidArg is returned on invalid given arguments.
+	ErrInvalidArg = errors.New("invalid argument")
+
+	// ErrUnknownKind is returned for unknown qdisc, filter or class types.
+	ErrUnknownKind = errors.New("unknown kind")
 )
 
 // Config contains options for RTNETLINK
