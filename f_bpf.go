@@ -36,6 +36,11 @@ type Bpf struct {
 	ID       *uint32
 }
 
+// Flags defined by the kernel for the BPF filter
+const (
+	BpfActDirect =  1
+)
+
 // unmarshalBpf parses the Bpf-encoded data and stores the result in the value pointed to by info.
 func unmarshalBpf(data []byte, info *Bpf) error {
 	ad, err := netlink.NewAttributeDecoder(data)
