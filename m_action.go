@@ -16,6 +16,27 @@ const (
 	tcaActCookie
 )
 
+const (
+	ActBind = 1
+	ActNoBind = 0
+	ActUnbind = 1
+	ActNoUnbind = 0
+	ActReplace = 1
+	ActNoReplace = 0
+)
+
+const (
+	ActOk = 0
+	ActReclassify = 1
+	ActShot = 2
+	ActPipe = 3
+	ActStolen = 4
+	ActQueued = 5
+	ActRepeat = 6
+	ActRedirect = 7
+	ActTrap = 8
+)
+
 // Action represents action attributes of various filters and classes
 type Action struct {
 	Kind     string
