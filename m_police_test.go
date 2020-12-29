@@ -34,8 +34,9 @@ func TestPolice(t *testing.T) {
 				}
 				t.Fatalf("Unexpected error: %v", err1)
 			}
+			newData, tm := injectTcft(t, data, tcaPoliceTm)
 			val := Police{}
-			err2 := unmarshalPolice(data, &val)
+			err2 := unmarshalPolice(newData, &val)
 			if err2 != nil {
 				if testcase.err2 != nil && errors.Is(err2, testcase.err2) {
 					return
@@ -43,6 +44,7 @@ func TestPolice(t *testing.T) {
 				t.Fatalf("Unexpected error: %v", err2)
 
 			}
+			testcase.val.Tm = tm
 			if diff := cmp.Diff(val, testcase.val); diff != "" {
 				t.Fatalf("Police missmatch (want +got):\n%s", diff)
 			}

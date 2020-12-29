@@ -25,9 +25,9 @@ func TestMirred(t *testing.T) {
 				}
 				t.Fatalf("Unexpected error: %v", err1)
 			}
-
+			newData, tm := injectTcft(t, data, tcaMirredTm)
 			val := Mirred{}
-			err2 := unmarshalMirred(data, &val)
+			err2 := unmarshalMirred(newData, &val)
 			if err2 != nil {
 				if testcase.err2 != nil && testcase.err2.Error() == err2.Error() {
 					return
@@ -35,6 +35,7 @@ func TestMirred(t *testing.T) {
 				t.Fatalf("Unexpected error: %v", err2)
 
 			}
+			testcase.val.Tm = tm
 			if diff := cmp.Diff(val, testcase.val); diff != "" {
 				t.Fatalf("Mirred missmatch (want +got):\n%s", diff)
 			}

@@ -40,8 +40,9 @@ func TestActBpft(t *testing.T) {
 				data = append(data, tmp...)
 				testcase.val.Tm = testcase.enrich
 			}
+			newData, tm := injectTcft(t, data, tcaActBpfTm)
 			val := ActBpf{}
-			err2 := unmarshalActBpf(data, &val)
+			err2 := unmarshalActBpf(newData, &val)
 			if err2 != nil {
 				if testcase.err2 != nil && testcase.err2.Error() == err2.Error() {
 					return
@@ -49,6 +50,7 @@ func TestActBpft(t *testing.T) {
 				t.Fatalf("Unexpected error: %v", err2)
 
 			}
+			testcase.val.Tm = tm
 			if diff := cmp.Diff(val, testcase.val); diff != "" {
 				t.Fatalf("ActBpft missmatch (want +got):\n%s", diff)
 			}

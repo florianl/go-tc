@@ -26,8 +26,9 @@ func TestCsum(t *testing.T) {
 				}
 				t.Fatalf("Unexpected error: %v", err1)
 			}
+			newData, tm := injectTcft(t, data, tcaCsumTm)
 			val := Csum{}
-			err2 := unmarshalCsum(data, &val)
+			err2 := unmarshalCsum(newData, &val)
 			if err2 != nil {
 				if testcase.err2 != nil && testcase.err2.Error() == err2.Error() {
 					return
@@ -35,6 +36,7 @@ func TestCsum(t *testing.T) {
 				t.Fatalf("Unexpected error: %v", err2)
 
 			}
+			testcase.val.Tm = tm
 			if diff := cmp.Diff(val, testcase.val); diff != "" {
 				t.Fatalf("Csum missmatch (want +got):\n%s", diff)
 			}

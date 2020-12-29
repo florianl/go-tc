@@ -27,9 +27,9 @@ func TestDefact(t *testing.T) {
 				}
 				t.Fatalf("Unexpected error: %v", err1)
 			}
-
+			newData, tm := injectTcft(t, data, tcaDefTm)
 			val := Defact{}
-			err2 := unmarshalDefact(data, &val)
+			err2 := unmarshalDefact(newData, &val)
 			if err2 != nil {
 				if testcase.err2 != nil && testcase.err2.Error() == err2.Error() {
 					return
@@ -37,6 +37,7 @@ func TestDefact(t *testing.T) {
 				t.Fatalf("Unexpected error: %v", err2)
 
 			}
+			testcase.val.Tm = tm
 			if diff := cmp.Diff(val, testcase.val); diff != "" {
 				t.Fatalf("Defact missmatch (want +got):\n%s", diff)
 			}
