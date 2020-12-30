@@ -96,20 +96,73 @@ func generateClsactStab(t *testing.T) []byte {
 	return data
 }
 
+func generateMatchall(t *testing.T) []byte {
+	t.Helper()
+	options := []tcOption{}
+	options = append(options, tcOption{Interpretation: vtString, Type: tcaKind, Data: "matchall"})
+	tmp, _ := marshalMatchall(&Matchall{
+		ClassID: uint32Ptr(22),
+		Flags:   uint32Ptr(33),
+	})
+	options = append(options, tcOption{Interpretation: vtBytes, Type: tcaOptions, Data: tmp})
+
+	data, err := marshalAttributes(options)
+	if err != nil {
+		t.Fatalf("could not generate test data: %v", err)
+	}
+	return data
+}
+
+func generateNetem(t *testing.T) []byte {
+	t.Helper()
+	options := []tcOption{}
+	options = append(options, tcOption{Interpretation: vtString, Type: tcaKind, Data: "netem"})
+	tmp, _ := marshalNetem(&Netem{Ecn: uint32Ptr(42)})
+	options = append(options, tcOption{Interpretation: vtBytes, Type: tcaOptions, Data: tmp})
+
+	data, err := marshalAttributes(options)
+	if err != nil {
+		t.Fatalf("could not generate test data: %v", err)
+	}
+	return data
+}
+
+func generateCake(t *testing.T) []byte {
+	t.Helper()
+	options := []tcOption{}
+	options = append(options, tcOption{Interpretation: vtString, Type: tcaKind, Data: "cake"})
+	tmp, _ := marshalCake(&Cake{BaseRate: uint64Ptr(424242)})
+	options = append(options, tcOption{Interpretation: vtBytes, Type: tcaOptions, Data: tmp})
+
+	data, err := marshalAttributes(options)
+	if err != nil {
+		t.Fatalf("could not generate test data: %v", err)
+	}
+	return data
+}
+
 func TestExtractTcmsgAttributes(t *testing.T) {
 	tests := map[string]struct {
 		input    []byte
 		expected *Attribute
 		err      error
 	}{
-		"empty":  {input: []byte{}, expected: &Attribute{}},
-		"clsact": {input: generateClsact(t), expected: &Attribute{Kind: "clsact", HwOffload: uint8Ptr(0x60), EgressBlock: uint32Ptr(0x1337), IngressBlock: uint32Ptr(0xcafe), Chain: uint32Ptr(42)}},
+		"empty": {input: []byte{}, expected: &Attribute{}},
+		"clsact": {input: generateClsact(t), expected: &Attribute{Kind: "clsact", HwOffload: uint8Ptr(0x60),
+			EgressBlock: uint32Ptr(0x1337), IngressBlock: uint32Ptr(0xcafe), Chain: uint32Ptr(42)}},
 		"htb": {input: generateHtb(t), expected: &Attribute{Kind: "htb",
 			XStats: &XStats{Htb: &HtbXStats{Lends: 0x02, Borrows: 0x03, Giants: 0x04, Tokens: 0x05, CTokens: 0x06}},
 			Htb:    &Htb{DirectQlen: uint32Ptr(0x7b), Rate64: uint64Ptr(0xea), Ceil64: uint64Ptr(0x0159)}}},
 		"pfifo": {input: generatePfifo(t), expected: &Attribute{Kind: "pfifo",
 			Pfifo: &FifoOpt{Limit: 123}, Stats: &Stats{Bytes: 123, Packets: 321, Drops: 0, Overlimits: 42}}},
-		"clsact+stab": {input: generateClsactStab(t), expected: &Attribute{Kind: "clsact", Stab: &Stab{Base: &SizeSpec{CellLog: 0x2a, LinkLayer: 0x01, MTU: 0x05d4}}}},
+		"clsact+stab": {input: generateClsactStab(t), expected: &Attribute{Kind: "clsact",
+			Stab: &Stab{Base: &SizeSpec{CellLog: 0x2a, LinkLayer: 0x01, MTU: 0x05d4}}}},
+		"matchall": {input: generateMatchall(t), expected: &Attribute{Kind: "matchall",
+			Matchall: &Matchall{ClassID: uint32Ptr(22), Flags: uint32Ptr(33)}}},
+		"netem": {input: generateNetem(t), expected: &Attribute{Kind: "netem",
+			Netem: &Netem{Ecn: uint32Ptr(42)}}},
+		"cake": {input: generateCake(t), expected: &Attribute{Kind: "cake",
+			Cake: &Cake{BaseRate: uint64Ptr(424242)}}},
 	}
 
 	for name, testcase := range tests {
