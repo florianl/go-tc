@@ -223,7 +223,7 @@ type FqCodelXStats struct {
 	Cl   *FqCodelClStats
 }
 
-func extractFqCodelXStats(data []byte, info *FqCodelXStats) error {
+func unmarshalFqCodelXStats(data []byte, info *FqCodelXStats) error {
 	info.Type = nativeEndian.Uint32(data[:4])
 	switch info.Type {
 	case tcaFqCodelXStatsQdisc:
@@ -246,6 +246,10 @@ func extractFqCodelXStats(data []byte, info *FqCodelXStats) error {
 	return nil
 }
 func marshalFqCodelXStats(v *FqCodelXStats) ([]byte, error) {
+	if v == nil {
+		return []byte{}, fmt.Errorf("FqCodelXStats: %w", ErrNoArg)
+	}
+
 	var buf bytes.Buffer
 	err := binary.Write(&buf, nativeEndian, v.Type)
 	if err != nil {

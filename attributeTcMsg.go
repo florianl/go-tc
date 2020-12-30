@@ -357,7 +357,7 @@ func extractXStats(data []byte, tc *XStats, kind string) error {
 		tc.Pie = info
 	case "fq_codel":
 		info := &FqCodelXStats{}
-		if err := extractFqCodelXStats(data, info); err != nil {
+		if err := unmarshalFqCodelXStats(data, info); err != nil {
 			return err
 		}
 		tc.FqCodel = info

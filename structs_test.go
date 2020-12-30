@@ -1,39 +1,52 @@
 package tc
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/mdlayher/netlink"
 )
 
-func TestExtractFqCodelXStats(t *testing.T) {
+func TestFqCodelXStats(t *testing.T) {
 	tests := map[string]struct {
-		data     []byte
-		expected *FqCodelXStats
-		err      error
+		val  FqCodelXStats
+		err1 error
+		err2 error
 	}{
-		"Qdisc": {data: []byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
-			expected: &FqCodelXStats{Type: 0, Qd: &FqCodelQdStats{}}},
+		"Qdisc": {val: FqCodelXStats{Type: 0, Qd: &FqCodelQdStats{MaxPacket: 123}}},
+		"Class": {val: FqCodelXStats{Type: 1, Cl: &FqCodelClStats{Deficit: -1}}},
 	}
 
 	for name, testcase := range tests {
 		t.Run(name, func(t *testing.T) {
-			stats := &FqCodelXStats{}
-			if err := extractFqCodelXStats(testcase.data, stats); err != nil {
-				if testcase.err != nil && testcase.err.Error() == err.Error() {
-					// we received the expected error. everything is fine
+			data, err1 := marshalFqCodelXStats(&testcase.val)
+			if err1 != nil {
+				if testcase.err1 != nil && testcase.err1.Error() == err1.Error() {
 					return
 				}
-				t.Fatalf("received error '%v', but expected '%v'", err, testcase.err)
+				t.Fatalf("Unexpected error: %v", err1)
 			}
-			if diff := cmp.Diff(stats, testcase.expected); diff != "" {
-				t.Fatalf("TestExtractFqCodelXStats missmatch (-want +got):\n%s", diff)
+			val := FqCodelXStats{}
+			err2 := unmarshalFqCodelXStats(data, &val)
+			if err2 != nil {
+				if testcase.err2 != nil && testcase.err2.Error() == err2.Error() {
+					return
+				}
+				t.Fatalf("Unexpected error: %v", err2)
+
+			}
+			if diff := cmp.Diff(val, testcase.val); diff != "" {
+				t.Fatalf("FqCodelXStats missmatch (want +got):\n%s", diff)
 			}
 		})
 	}
+	t.Run("nil", func(t *testing.T) {
+		_, err := marshalFqCodelXStats(nil)
+		if !errors.Is(err, ErrNoArg) {
+			t.Fatalf("unexpected error: %v", err)
+		}
+	})
 }
 
 func TestMarshalAndAlignStruct(t *testing.T) {

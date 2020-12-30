@@ -14,6 +14,8 @@ func TestAtm(t *testing.T) {
 		err2 error
 	}{
 		"simple": {val: Atm{FD: uint32Ptr(12), Addr: &AtmPvc{Itf: byte(2)}}},
+		"extended": {val: Atm{FD: uint32Ptr(12), Addr: &AtmPvc{Itf: byte(2)},
+			Excess: uint32Ptr(34), State: uint32Ptr(45)}},
 	}
 
 	for name, testcase := range tests {
