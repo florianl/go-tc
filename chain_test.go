@@ -1,6 +1,7 @@
 package tc
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/florianl/go-tc/core"
@@ -72,4 +73,19 @@ func TestChain(t *testing.T) {
 		})
 	}
 
+	t.Run("delete nil", func(t *testing.T) {
+		if err := tcSocket.Chain().Delete(nil); !errors.Is(err, ErrNoArg) {
+			t.Fatalf("unexpected error: %v", err)
+		}
+	})
+	t.Run("add nil", func(t *testing.T) {
+		if err := tcSocket.Chain().Add(nil); !errors.Is(err, ErrNoArg) {
+			t.Fatalf("unexpected error: %v", err)
+		}
+	})
+	t.Run("get nil", func(t *testing.T) {
+		if _, err := tcSocket.Chain().Get(nil); !errors.Is(err, ErrNoArg) {
+			t.Fatalf("unexpected error: %v", err)
+		}
+	})
 }

@@ -1,6 +1,7 @@
 package tc
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/florianl/go-tc/core"
@@ -46,9 +47,13 @@ func TestClass(t *testing.T) {
 
 	tests := map[string]struct {
 		kind string
+		err  error
 		hfsc *Hfsc
+		htb  *Htb
 	}{
-		"hfsc": {kind: "hfsc", hfsc: &Hfsc{Rsc: &ServiceCurve{M1: 12, D: 34, M2: 56}}},
+		"hfsc":    {kind: "hfsc", hfsc: &Hfsc{Rsc: &ServiceCurve{M1: 12, D: 34, M2: 56}}},
+		"htb":     {kind: "htb", htb: &Htb{DirectQlen: uint32Ptr(4455)}},
+		"unknown": {kind: "unknown", err: ErrNotImplemented},
 	}
 
 	for name, testcase := range tests {
@@ -58,10 +63,15 @@ func TestClass(t *testing.T) {
 				Attribute{
 					Kind: testcase.kind,
 					Hfsc: testcase.hfsc,
+					Htb:  testcase.htb,
 				},
 			}
 
 			if err := tcSocket.Class().Add(&testClass); err != nil {
+				if testcase.err != nil && errors.Is(err, testcase.err) {
+					t.Log("received expected error")
+					return
+				}
 				t.Fatalf("could not add new class: %v", err)
 			}
 

@@ -17,10 +17,14 @@ func TestU32(t *testing.T) {
 		err1 error
 		err2 error
 	}{
-		"empty":    {},
-		"simple":   {val: U32{ClassID: uint32Ptr(0xFFFF), Mark: &U32Mark{Val: 0x55, Mask: 0xAA, Success: 0x1}}},
-		"divisor":  {val: U32{Divisor: uint32Ptr(1), Link: uint32Ptr(42)}},
-		"extended": {val: U32{ClassID: uint32Ptr(0xFFFF), Mark: &U32Mark{Val: 0x55, Mask: 0xAA, Success: 0x1}, Police: &Police{AvRate: uint32Ptr(1337), Result: uint32Ptr(12)}}},
+		"empty": {},
+		"simple": {val: U32{ClassID: uint32Ptr(0xFFFF),
+			Mark: &U32Mark{Val: 0x55, Mask: 0xAA, Success: 0x1},
+			Hash: uint32Ptr(1234), Pcnt: uint64Ptr(4321), InDev: stringPtr("foobar")}},
+		"divisor": {val: U32{Divisor: uint32Ptr(1), Link: uint32Ptr(42)}},
+		"extended": {val: U32{ClassID: uint32Ptr(0xFFFF),
+			Mark:   &U32Mark{Val: 0x55, Mask: 0xAA, Success: 0x1},
+			Police: &Police{AvRate: uint32Ptr(1337), Result: uint32Ptr(12)}}},
 		"policy": {val: U32{
 			Sel: &U32Sel{
 				Flags: 0x1,
