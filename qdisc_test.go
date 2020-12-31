@@ -45,17 +45,26 @@ func TestQdisc(t *testing.T) {
 		hhf     *Hhf
 		pie     *Pie
 		choke   *Choke
+		netem   *Netem
+		cake    *Cake
 	}{
 		"clsact":   {kind: "clsact"},
 		"emptyHtb": {kind: "htb", err: ErrNoArg},
-		"fq_codel": {kind: "fq_codel", fqCodel: &FqCodel{Target: uint32Ptr(42), Limit: uint32Ptr(0xCAFE)}},
-		"red":      {kind: "red", red: &Red{MaxP: uint32Ptr(42)}},
-		"sfb":      {kind: "sfb", sfb: &Sfb{Parms: &SfbQopt{Max: 0xFF}}},
-		"cbq":      {kind: "cbq", cbq: &Cbq{LssOpt: &CbqLssOpt{OffTime: 10}, WrrOpt: &CbqWrrOpt{Weight: 42}, FOpt: &CbqFOpt{Split: 2}, OVLStrategy: &CbqOvl{Penalty: 2}}},
-		"codel":    {kind: "codel", codel: &Codel{Target: uint32Ptr(1), Limit: uint32Ptr(2), Interval: uint32Ptr(3), ECN: uint32Ptr(4), CEThreshold: uint32Ptr(5)}},
-		"hhf":      {kind: "hhf", hhf: &Hhf{BacklogLimit: uint32Ptr(1), Quantum: uint32Ptr(2), HHFlowsLimit: uint32Ptr(3), ResetTimeout: uint32Ptr(4), AdmitBytes: uint32Ptr(5), EVICTTimeout: uint32Ptr(6), NonHHWeight: uint32Ptr(7)}},
-		"pie":      {kind: "pie", pie: &Pie{Target: uint32Ptr(1), Limit: uint32Ptr(2), TUpdate: uint32Ptr(3), Alpha: uint32Ptr(4), Beta: uint32Ptr(5), ECN: uint32Ptr(6), Bytemode: uint32Ptr(7)}},
-		"choke":    {kind: "choke", choke: &Choke{MaxP: uint32Ptr(42)}},
+		"fq_codel": {kind: "fq_codel",
+			fqCodel: &FqCodel{Target: uint32Ptr(42), Limit: uint32Ptr(0xCAFE)}},
+		"red": {kind: "red", red: &Red{MaxP: uint32Ptr(42)}},
+		"sfb": {kind: "sfb", sfb: &Sfb{Parms: &SfbQopt{Max: 0xFF}}},
+		"cbq": {kind: "cbq", cbq: &Cbq{LssOpt: &CbqLssOpt{OffTime: 10}, WrrOpt: &CbqWrrOpt{Weight: 42},
+			FOpt: &CbqFOpt{Split: 2}, OVLStrategy: &CbqOvl{Penalty: 2}}},
+		"codel": {kind: "codel", codel: &Codel{Target: uint32Ptr(1), Limit: uint32Ptr(2), Interval: uint32Ptr(3),
+			ECN: uint32Ptr(4), CEThreshold: uint32Ptr(5)}},
+		"hhf": {kind: "hhf", hhf: &Hhf{BacklogLimit: uint32Ptr(1), Quantum: uint32Ptr(2), HHFlowsLimit: uint32Ptr(3),
+			ResetTimeout: uint32Ptr(4), AdmitBytes: uint32Ptr(5), EVICTTimeout: uint32Ptr(6), NonHHWeight: uint32Ptr(7)}},
+		"pie": {kind: "pie", pie: &Pie{Target: uint32Ptr(1), Limit: uint32Ptr(2), TUpdate: uint32Ptr(3),
+			Alpha: uint32Ptr(4), Beta: uint32Ptr(5), ECN: uint32Ptr(6), Bytemode: uint32Ptr(7)}},
+		"choke": {kind: "choke", choke: &Choke{MaxP: uint32Ptr(42)}},
+		"netem": {kind: "netem", netem: &Netem{Ecn: uint32Ptr(64)}},
+		"cake":  {kind: "cake", cake: &Cake{BaseRate: uint64Ptr(128)}},
 	}
 
 	tcMsg := Msg{
@@ -80,6 +89,8 @@ func TestQdisc(t *testing.T) {
 					Hhf:     testcase.hhf,
 					Pie:     testcase.pie,
 					Choke:   testcase.choke,
+					Netem:   testcase.netem,
+					Cake:    testcase.cake,
 				},
 			}
 
@@ -99,6 +110,18 @@ func TestQdisc(t *testing.T) {
 				t.Logf("%#v\n", qdisc)
 			}
 
+			t.Run("Change", func(t *testing.T) {
+				if err := tcSocket.Qdisc().Change(&testQdisc); err != nil {
+					t.Fatalf("could not change qdisc: %v", err)
+				}
+			})
+
+			t.Run("Link", func(t *testing.T) {
+				if err := tcSocket.Qdisc().Link(&testQdisc); err != nil {
+					t.Fatalf("could not change qdisc: %v", err)
+				}
+			})
+
 			if err := tcSocket.Qdisc().Delete(&testQdisc); err != nil {
 				t.Fatalf("could not delete qdisc: %v", err)
 			}
@@ -106,6 +129,31 @@ func TestQdisc(t *testing.T) {
 		})
 	}
 
+	t.Run("delete nil", func(t *testing.T) {
+		if err := tcSocket.Qdisc().Delete(nil); !errors.Is(err, ErrNoArg) {
+			t.Fatalf("unexpected error: %v", err)
+		}
+	})
+	t.Run("add nil", func(t *testing.T) {
+		if err := tcSocket.Qdisc().Add(nil); !errors.Is(err, ErrNoArg) {
+			t.Fatalf("unexpected error: %v", err)
+		}
+	})
+	t.Run("link nil", func(t *testing.T) {
+		if err := tcSocket.Qdisc().Link(nil); !errors.Is(err, ErrNoArg) {
+			t.Fatalf("unexpected error: %v", err)
+		}
+	})
+	t.Run("replace nil", func(t *testing.T) {
+		if err := tcSocket.Qdisc().Replace(nil); !errors.Is(err, ErrNoArg) {
+			t.Fatalf("unexpected error: %v", err)
+		}
+	})
+	t.Run("change nil", func(t *testing.T) {
+		if err := tcSocket.Qdisc().Change(nil); !errors.Is(err, ErrNoArg) {
+			t.Fatalf("unexpected error: %v", err)
+		}
+	})
 }
 
 func qdiscAlterResponses(t *testing.T, cache *[]netlink.Message) []byte {

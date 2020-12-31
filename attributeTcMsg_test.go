@@ -141,6 +141,20 @@ func generateCake(t *testing.T) []byte {
 	return data
 }
 
+func generateQfq(t *testing.T) []byte {
+	t.Helper()
+	options := []tcOption{}
+	options = append(options, tcOption{Interpretation: vtString, Type: tcaKind, Data: "qfq"})
+	tmp, _ := marshalQfq(&Qfq{Weight: uint32Ptr(1), Lmax: uint32Ptr(2)})
+	options = append(options, tcOption{Interpretation: vtBytes, Type: tcaOptions, Data: tmp})
+
+	data, err := marshalAttributes(options)
+	if err != nil {
+		t.Fatalf("could not generate test data: %v", err)
+	}
+	return data
+}
+
 func TestExtractTcmsgAttributes(t *testing.T) {
 	tests := map[string]struct {
 		input    []byte
@@ -163,6 +177,8 @@ func TestExtractTcmsgAttributes(t *testing.T) {
 			Netem: &Netem{Ecn: uint32Ptr(42)}}},
 		"cake": {input: generateCake(t), expected: &Attribute{Kind: "cake",
 			Cake: &Cake{BaseRate: uint64Ptr(424242)}}},
+		"qfq": {input: generateQfq(t), expected: &Attribute{Kind: "qfq",
+			Qfq: &Qfq{Weight: uint32Ptr(1), Lmax: uint32Ptr(2)}}},
 	}
 
 	for name, testcase := range tests {
