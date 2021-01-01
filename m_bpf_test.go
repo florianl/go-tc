@@ -41,6 +41,7 @@ func TestActBpft(t *testing.T) {
 				testcase.val.Tm = testcase.enrich
 			}
 			newData, tm := injectTcft(t, data, tcaActBpfTm)
+			newData = injectAttribute(t, newData, []byte{}, tcaActBpfPad)
 			val := ActBpf{}
 			err2 := unmarshalActBpf(newData, &val)
 			if err2 != nil {

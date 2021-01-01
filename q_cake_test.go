@@ -42,8 +42,9 @@ func TestCake(t *testing.T) {
 				}
 				t.Fatalf("Unexpected error: %v", err1)
 			}
+			newData := injectAttribute(t, data, []byte{}, tcaCakePad)
 			val := Cake{}
-			err2 := unmarshalCake(data, &val)
+			err2 := unmarshalCake(newData, &val)
 			if err2 != nil {
 				if testcase.err2 != nil && testcase.err2.Error() == err2.Error() {
 					return

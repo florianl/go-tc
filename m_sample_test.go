@@ -29,6 +29,7 @@ func TestSample(t *testing.T) {
 				t.Fatalf("Unexpected error: %v", err1)
 			}
 			newData, tm := injectTcft(t, data, tcaSampleTm)
+			newData = injectAttribute(t, newData, []byte{}, tcaSamplePad)
 			val := Sample{}
 			err2 := unmarshalSample(newData, &val)
 			if err2 != nil {

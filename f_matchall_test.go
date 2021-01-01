@@ -30,8 +30,9 @@ func TestMatchall(t *testing.T) {
 				}
 				t.Fatalf("Unexpected error: %v", err1)
 			}
+			newData := injectAttribute(t, data, []byte{}, tcaMatchallPad)
 			val := Matchall{}
-			err2 := unmarshalMatchall(data, &val)
+			err2 := unmarshalMatchall(newData, &val)
 			if err2 != nil {
 				if testcase.err2 != nil && testcase.err2.Error() == err2.Error() {
 					return

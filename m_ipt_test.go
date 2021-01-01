@@ -27,6 +27,7 @@ func TestIpt(t *testing.T) {
 				t.Fatalf("Unexpected error: %v", err1)
 			}
 			newData, tm := injectTcft(t, data, tcaIptTm)
+			newData = injectAttribute(t, newData, []byte{}, tcaIptPad)
 			val := Ipt{}
 			err2 := unmarshalIpt(newData, &val)
 			if err2 != nil {

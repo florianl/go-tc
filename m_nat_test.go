@@ -27,6 +27,7 @@ func TestNat(t *testing.T) {
 			}
 
 			newData, tm := injectTcft(t, data, tcaNatTm)
+			newData = injectAttribute(t, newData, []byte{}, tcaNatPad)
 			val := Nat{}
 			err2 := unmarshalNat(newData, &val)
 			if err2 != nil {

@@ -30,6 +30,7 @@ func TestIfe(t *testing.T) {
 				t.Fatalf("Unexpected error: %v", err1)
 			}
 			newData, tm := injectTcft(t, data, tcaIfeTm)
+			newData = injectAttribute(t, newData, []byte{}, tcaIfePad)
 			val := Ife{}
 			err2 := unmarshalIfe(newData, &val)
 			if err2 != nil {

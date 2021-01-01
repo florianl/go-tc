@@ -55,8 +55,9 @@ func TestAction(t *testing.T) {
 				}
 				t.Fatalf("Unexpected error: %v", err1)
 			}
+			newData := injectAttribute(t, data, []byte{0x0}, tcaActPad)
 			val := []*Action{}
-			err2 := unmarshalActions(data, &val)
+			err2 := unmarshalActions(newData, &val)
 			if err2 != nil {
 				if !errors.Is(testcase.err2, err2) {
 					return

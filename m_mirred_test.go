@@ -26,6 +26,7 @@ func TestMirred(t *testing.T) {
 				t.Fatalf("Unexpected error: %v", err1)
 			}
 			newData, tm := injectTcft(t, data, tcaMirredTm)
+			newData = injectAttribute(t, newData, []byte{}, tcaMirredPad)
 			val := Mirred{}
 			err2 := unmarshalMirred(newData, &val)
 			if err2 != nil {

@@ -65,8 +65,9 @@ func TestU32(t *testing.T) {
 				}
 				t.Fatalf("Unexpected error: %v", err1)
 			}
+			newData := injectAttribute(t, data, []byte{}, tcaU32Pad)
 			val := U32{}
-			err2 := unmarshalU32(data, &val)
+			err2 := unmarshalU32(newData, &val)
 			if err2 != nil {
 				if testcase.err2 != nil && errors.Is(err2, testcase.err2) {
 					return

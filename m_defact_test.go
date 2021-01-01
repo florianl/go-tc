@@ -28,6 +28,7 @@ func TestDefact(t *testing.T) {
 				t.Fatalf("Unexpected error: %v", err1)
 			}
 			newData, tm := injectTcft(t, data, tcaDefTm)
+			newData = injectAttribute(t, newData, []byte{}, tcaDefPad)
 			val := Defact{}
 			err2 := unmarshalDefact(newData, &val)
 			if err2 != nil {

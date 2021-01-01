@@ -148,6 +148,8 @@ func unmarshalNetem(data []byte, info *Netem) error {
 				return err
 			}
 			info.Slot = tmp
+		case tcaNetemPad:
+			// padding does not contain data, we just skip it
 		default:
 			return fmt.Errorf("unmarshalNetem()\t%d\n\t%v", ad.Type(), ad.Bytes())
 		}

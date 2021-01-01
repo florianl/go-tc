@@ -27,6 +27,7 @@ func TestCsum(t *testing.T) {
 				t.Fatalf("Unexpected error: %v", err1)
 			}
 			newData, tm := injectTcft(t, data, tcaCsumTm)
+			newData = injectAttribute(t, newData, []byte{}, tcaCsumPad)
 			val := Csum{}
 			err2 := unmarshalCsum(newData, &val)
 			if err2 != nil {

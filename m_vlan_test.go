@@ -27,6 +27,7 @@ func TestVLan(t *testing.T) {
 				t.Fatalf("Unexpected error: %v", err1)
 			}
 			newData, tm := injectTcft(t, data, tcaVLanTm)
+			newData = injectAttribute(t, newData, []byte{}, tcaVLanPad)
 			val := VLan{}
 			err2 := unmarshalVLan(newData, &val)
 			if err2 != nil {

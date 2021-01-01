@@ -26,8 +26,9 @@ func TestHtb(t *testing.T) {
 				}
 				t.Fatalf("Unexpected error: %v", err1)
 			}
+			newData := injectAttribute(t, data, []byte{}, tcaHtbPad)
 			val := Htb{}
-			err2 := unmarshalHtb(data, &val)
+			err2 := unmarshalHtb(newData, &val)
 			if err2 != nil {
 				if testcase.err2 != nil && testcase.err2.Error() == err2.Error() {
 					return

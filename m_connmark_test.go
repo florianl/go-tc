@@ -26,6 +26,7 @@ func TestConnmark(t *testing.T) {
 				t.Fatalf("Unexpected error: %v", err1)
 			}
 			newData, tm := injectTcft(t, data, tcaConnmarkTm)
+			newData = injectAttribute(t, newData, []byte{}, tcaConnmarkPad)
 			val := Connmark{}
 			err2 := unmarshalConnmark(newData, &val)
 			if err2 != nil {

@@ -110,6 +110,8 @@ func unmarshalCake(data []byte, info *Cake) error {
 		case tcaCakeFwMark:
 			tmp := ad.Uint32()
 			info.FwMark = &tmp
+		case tcaCakePad:
+			// padding does not contain data, we just skip it
 		default:
 			return fmt.Errorf("unmarshalCake()\t%d\n\t%v", ad.Type(), ad.Bytes())
 		}

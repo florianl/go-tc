@@ -17,24 +17,24 @@ const (
 )
 
 const (
-	ActBind = 1
-	ActNoBind = 0
-	ActUnbind = 1
-	ActNoUnbind = 0
-	ActReplace = 1
+	ActBind      = 1
+	ActNoBind    = 0
+	ActUnbind    = 1
+	ActNoUnbind  = 0
+	ActReplace   = 1
 	ActNoReplace = 0
 )
 
 const (
-	ActOk = 0
+	ActOk         = 0
 	ActReclassify = 1
-	ActShot = 2
-	ActPipe = 3
-	ActStolen = 4
-	ActQueued = 5
-	ActRepeat = 6
-	ActRedirect = 7
-	ActTrap = 8
+	ActShot       = 2
+	ActPipe       = 3
+	ActStolen     = 4
+	ActQueued     = 5
+	ActRepeat     = 6
+	ActRedirect   = 7
+	ActTrap       = 8
 )
 
 // Action represents action attributes of various filters and classes
@@ -100,6 +100,8 @@ func unmarshalAction(data []byte, info *Action) error {
 				return err
 			}
 			info.Stats = stats
+		case tcaActPad:
+			// padding does not contain data, we just skip it
 		default:
 			return fmt.Errorf("unmarshalAction()\t%d\n\t%v", ad.Type(), ad.Bytes())
 		}
