@@ -3,8 +3,8 @@ module github.com/florianl/go-tc
 go 1.12
 
 require (
-	github.com/google/go-cmp v0.5.2
-	github.com/jsimonetti/rtnetlink v0.0.0-20200726165900-d699427278d3
-	github.com/mdlayher/netlink v1.1.0
-	golang.org/x/sys v0.0.0-20200923182605-d9f96fdee20d
+	github.com/google/go-cmp v0.5.4
+	github.com/jsimonetti/rtnetlink v0.0.0-20201220180245-69540ac93943
+	github.com/mdlayher/netlink v1.2.0
+	golang.org/x/sys v0.0.0-20210108172913-0df2131ae363
 )
