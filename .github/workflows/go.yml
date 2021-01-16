@@ -41,7 +41,7 @@ jobs:
       run: |
         export PATH=$PATH:$(go env GOPATH)/bin
         go get -u github.com/mattn/goveralls
-        goveralls -coverprofile=profile.cov -service=github
+        goveralls -tags integration -coverprofile=profile.cov -service=github
   code-check:
     strategy:
       matrix:
