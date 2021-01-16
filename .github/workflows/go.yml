@@ -25,35 +25,23 @@ jobs:
       run: go test -count=1 ./...
     - name: Test with -race
       if: matrix.platform == 'ubuntu-latest'
-      run: go test -race -count=1 -covermode atomic -coverprofile=profile.cov ./...
+      run: go test -race -count=3 ./...
     - name: Integrationtest for linux
       if: matrix.platform == 'ubuntu-latest'
       # https://github.com/actions/setup-go/issues/14
       run: |
         export PATH=$PATH:$(go env GOPATH)/bin
-        go test -c -race -tags integration .
-        sudo ./go-tc.test -test.v
-  test-coverage:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Install Go
-      uses: actions/setup-go@v1
-      with:
-        go-version: 1.15.x
-    - name: Checkout code
-      uses: actions/checkout@v1
-    - name: Download Go dependencies
-      env:
-        GOPROXY: "https://proxy.golang.org"
-      run: go mod download
+        go test -c -race -tags integration -covermode atomic .
+        sudo ./go-tc.test -test.v -test.coverprofile=profile.cov
     - name: coveralls.io
+      if: matrix.platform == 'ubuntu-latest'
       env:
         COVERALLS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       # https://github.com/actions/setup-go/issues/14
       run: |
         export PATH=$PATH:$(go env GOPATH)/bin
         go get -u github.com/mattn/goveralls
-        goveralls -v -coverprofile=profile.cov -service=github
+        goveralls -tags integration -coverprofile=profile.cov -service=github
   code-check:
     strategy:
       matrix:
