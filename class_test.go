@@ -17,6 +17,16 @@ func TestClass(t *testing.T) {
 		t.Fatalf("expected ErrNoArg, received: %v", err)
 	}
 
+	err = tcSocket.Class().Replace(nil)
+	if err != ErrNoArg {
+		t.Fatalf("expected ErrNoArg, received: %v", err)
+	}
+
+	err = tcSocket.Class().Delete(nil)
+	if err != ErrNoArg {
+		t.Fatalf("expected ErrNoArg, received: %v", err)
+	}
+
 	tcMsg := Msg{
 		Family:  unix.AF_UNSPEC,
 		Ifindex: 1337,
