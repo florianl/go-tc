@@ -2,13 +2,12 @@ package tc
 
 import (
 	"context"
-	"encoding/binary"
 	"fmt"
 	"log"
 	"time"
-	"unsafe"
 
 	"github.com/florianl/go-tc/internal/unix"
+	"github.com/josharian/native"
 	"github.com/mdlayher/netlink"
 )
 
@@ -19,22 +18,7 @@ type Tc struct {
 	logger *log.Logger
 }
 
-// for detailes see https://github.com/tensorflow/tensorflow/blob/master/tensorflow/go/tensor.go#L488-L505
-var nativeEndian binary.ByteOrder
-
-func init() {
-	buf := [2]byte{}
-	*(*uint16)(unsafe.Pointer(&buf[0])) = uint16(0xABCD)
-
-	switch buf {
-	case [2]byte{0xCD, 0xAB}:
-		nativeEndian = binary.LittleEndian
-	case [2]byte{0xAB, 0xCD}:
-		nativeEndian = binary.BigEndian
-	default:
-		panic("Could not determine native endianness.")
-	}
-}
+var nativeEndian = native.Endian
 
 // devNull satisfies io.Writer, in case *log.Logger is not provided
 type devNull struct{}
