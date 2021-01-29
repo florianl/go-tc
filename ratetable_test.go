@@ -5,7 +5,7 @@ package tc
 import (
 	"testing"
 
-	"github.com/florianl/go-tc/internal/unix"
+	"github.com/dennisafa/go-tc/internal/unix"
 )
 
 var (

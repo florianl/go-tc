@@ -6,8 +6,8 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/florianl/go-tc/core"
-	"github.com/florianl/go-tc/internal/unix"
+	"github.com/dennisafa/go-tc/core"
+	"github.com/dennisafa/go-tc/internal/unix"
 
 	"github.com/mdlayher/netlink"
 )

@@ -3,7 +3,7 @@ package tc
 import (
 	"fmt"
 
-	"github.com/florianl/go-tc/internal/unix"
+	"github.com/dennisafa/go-tc/internal/unix"
 	"github.com/mdlayher/netlink"
 )
 
