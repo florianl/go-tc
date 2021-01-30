@@ -1,6 +1,8 @@
 package tc
 
 import (
+	"bytes"
+	"encoding/binary"
 	"errors"
 	"testing"
 
@@ -123,6 +125,60 @@ func injectAttribute(t *testing.T, orig, new []byte, tcaAttribute uint16) []byte
 	})
 
 	newData, err := netlink.MarshalAttributes(attrs)
+	if err != nil {
+		t.Fatalf("Failed to marshal attributes: %v", err)
+	}
+
+	return newData
+}
+
+// changeEndianess modifies the endianes for given attributes.
+// The kernel expects some arguments to be in a specific endian format but
+// returns them in host endian.
+func changeEndianess(t *testing.T, orig []byte, attrs map[uint16]valueType) []byte {
+	t.Helper()
+
+	var newAttrs []netlink.Attribute
+
+	ad, err := netlink.NewAttributeDecoder(orig)
+	if err != nil {
+		t.Fatalf("Failed to decode attributes: %v", err)
+	}
+	ad.ByteOrder = nativeEndian
+	for ad.Next() {
+		vT, ok := attrs[ad.Type()]
+		if !ok {
+			newAttrs = append(newAttrs, netlink.Attribute{
+				Type: ad.Type(),
+				Data: ad.Bytes(),
+			})
+			continue
+		}
+		switch vT {
+		case vtUint16Be:
+			data := bytes.NewBuffer(make([]byte, 0, 2))
+			if err := binary.Write(data, binary.BigEndian, ad.Uint16()); err != nil {
+				t.Fatalf("changeEndianess for %d: %v", ad.Type(), err)
+			}
+			newAttrs = append(newAttrs, netlink.Attribute{
+				Type: ad.Type(),
+				Data: data.Bytes(),
+			})
+		case vtUint32Be:
+			data := bytes.NewBuffer(make([]byte, 0, 4))
+			if err := binary.Write(data, binary.BigEndian, ad.Uint32()); err != nil {
+				t.Fatalf("changeEndianess for %d: %v", ad.Type(), err)
+			}
+			newAttrs = append(newAttrs, netlink.Attribute{
+				Type: ad.Type(),
+				Data: data.Bytes(),
+			})
+		default:
+			t.Fatalf("Unexpected valueType %d", vT)
+		}
+	}
+
+	newData, err := netlink.MarshalAttributes(newAttrs)
 	if err != nil {
 		t.Fatalf("Failed to marshal attributes: %v", err)
 	}
