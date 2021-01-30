@@ -47,6 +47,7 @@ func TestQdisc(t *testing.T) {
 		choke   *Choke
 		netem   *Netem
 		cake    *Cake
+		htb     *Htb
 	}{
 		"clsact":   {kind: "clsact"},
 		"emptyHtb": {kind: "htb", err: ErrNoArg},
@@ -65,6 +66,7 @@ func TestQdisc(t *testing.T) {
 		"choke": {kind: "choke", choke: &Choke{MaxP: uint32Ptr(42)}},
 		"netem": {kind: "netem", netem: &Netem{Ecn: uint32Ptr(64)}},
 		"cake":  {kind: "cake", cake: &Cake{BaseRate: uint64Ptr(128)}},
+		"htb":   {kind: "htb", htb: &Htb{Rate64: uint64Ptr(96)}},
 	}
 
 	tcMsg := Msg{
@@ -91,6 +93,7 @@ func TestQdisc(t *testing.T) {
 					Choke:   testcase.choke,
 					Netem:   testcase.netem,
 					Cake:    testcase.cake,
+					Htb:     testcase.htb,
 				},
 			}
 
