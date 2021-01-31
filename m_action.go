@@ -54,7 +54,7 @@ type Action struct {
 	Sample   *Sample
 	VLan     *VLan
 	Police   *Police
-	Tunnel   *Tunnel
+	Tunnel   *TunnelKey
 }
 
 func unmarshalActions(data []byte, actions *[]*Action) error {
@@ -211,7 +211,7 @@ func marshalAction(info *Action) ([]byte, error) {
 		}
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaActOptions, Data: data})
 	case "tunnel_key":
-		data, err := marshalTunnel(info.Tunnel)
+		data, err := marshalTunnelKey(info.Tunnel)
 		if err != nil {
 			return []byte{}, err
 		}
@@ -309,8 +309,8 @@ func extractActOptions(data []byte, act *Action, kind string) error {
 		}
 		act.Police = info
 	case "tunnel_key":
-		info := &Tunnel{}
-		if err := unmarshalTunnel(data, info); err != nil {
+		info := &TunnelKey{}
+		if err := unmarshalTunnelKey(data, info); err != nil {
 			return err
 		}
 		act.Tunnel = info

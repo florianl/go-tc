@@ -25,7 +25,7 @@ const (
 )
 
 // Tunnel contains attribute of the Tunnel discipline
-type Tunnel struct {
+type TunnelKey struct {
 	Parms           *TunnelParms
 	KeyEncIPv4Src   *net.IP
 	KeyEncIPv4Dst   *net.IP
@@ -39,11 +39,11 @@ type TunnelParms struct {
 	Action       uint32
 	RefCnt       uint32
 	BindCnt      uint32
-	TunnelAction uint32
+	TunnelKeyAction uint32
 }
 
 // marshalVLan returns the binary encoding of Vlan
-func marshalTunnel(info *Tunnel) ([]byte, error) {
+func marshalTunnelKey(info *TunnelKey) ([]byte, error) {
 	options := []tcOption{}
 
 	if info == nil {
@@ -63,14 +63,14 @@ func marshalTunnel(info *Tunnel) ([]byte, error) {
 		if err != nil {
 			return []byte{}, fmt.Errorf("Tunnel - KeyEncIPv4Src: %w", err)
 		}
-		options = append(options, tcOption{Interpretation: vtUint32Be, Type: tcaTunnelKeyEncIPv4Src, Data: tmp})
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaTunnelKeyEncIPv4Src, Data: tmp})
 	}
 	if info.KeyEncIPv4Dst != nil {
 		tmp, err := ipToUint32(*info.KeyEncIPv4Dst)
 		if err != nil {
 			return []byte{}, fmt.Errorf("Tunnel - KeyEncIPv4Dst: %w", err)
 		}
-		options = append(options, tcOption{Interpretation: vtUint32Be, Type: tcaTunnelKeyEncIPv4Dst, Data: tmp})
+		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaTunnelKeyEncIPv4Dst, Data: tmp})
 	}
 	if info.KeyEncKeyID != nil {
 		options = append(options, tcOption{Interpretation: vtUint64Be, Type: tcaTunnelKeyEncKeyID, Data: *info.KeyEncKeyID})
@@ -78,8 +78,8 @@ func marshalTunnel(info *Tunnel) ([]byte, error) {
 	return marshalAttributes(options)
 }
 
-// unmarshalTunnel parses the Tunnel-encoded data and stores the result in the value pointed to by info.
-func unmarshalTunnel(data []byte, info *Tunnel) error {
+// unmarshalTunnelKey parses the Tunnel-encoded data and stores the result in the value pointed to by info.
+func unmarshalTunnelKey(data []byte, info *TunnelKey) error {
 	ad, err := netlink.NewAttributeDecoder(data)
 	if err != nil {
 		return err
