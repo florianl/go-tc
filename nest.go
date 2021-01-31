@@ -89,7 +89,7 @@ func marshalAttributes(options []tcOption) ([]byte, error) {
 			}
 			ad.Bytes(option.Type, data.Bytes())
 		case vtUint64Be:
-			data := bytes.NewBuffer(make([]byte, 0, 4))
+			data := bytes.NewBuffer(make([]byte, 0, 8))
 			if err := binary.Write(data, binary.BigEndian, (option.Data).(uint64)); err != nil {
 				return []byte{}, err
 			}

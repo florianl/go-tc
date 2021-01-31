@@ -210,7 +210,7 @@ func marshalAction(info *Action) ([]byte, error) {
 			return []byte{}, err
 		}
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaActOptions, Data: data})
-	case "tunnel":
+	case "tunnel_key":
 		data, err := marshalTunnel(info.Tunnel)
 		if err != nil {
 			return []byte{}, err
@@ -308,7 +308,7 @@ func extractActOptions(data []byte, act *Action, kind string) error {
 			return err
 		}
 		act.Police = info
-	case "tunnel":
+	case "tunnel_key":
 		info := &Tunnel{}
 		if err := unmarshalTunnel(data, info); err != nil {
 			return err
