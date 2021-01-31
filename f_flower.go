@@ -101,6 +101,7 @@ const (
 type Flower struct {
 	ClassID              *uint32
 	Indev                *string
+	Actions              *[]*Action
 	KeyEthType           *uint16
 	KeyIPProto           *uint8
 	KeyIPv4Src           *net.IP
@@ -177,6 +178,12 @@ func unmarshalFlower(data []byte, info *Flower) error {
 		case tcaFlowerIndev:
 			tmp := ad.String()
 			info.Indev = &tmp
+		case tcaFlowerAct:
+			actions := &[]*Action{}
+			if err := unmarshalActions(ad.Bytes(), actions); err != nil {
+				return err
+			}
+			info.Actions = actions
 		case tcaFlowerKeyEthType:
 			tmp := ad.Uint16()
 			info.KeyEthType = &tmp
@@ -375,6 +382,13 @@ func marshalFlower(info *Flower) ([]byte, error) {
 	}
 	if info.Indev != nil {
 		options = append(options, tcOption{Interpretation: vtString, Type: tcaFlowerIndev, Data: *info.Indev})
+	}
+	if info.Actions != nil {
+		data, err := marshalActions(*info.Actions)
+		if err != nil {
+			return []byte{}, err
+		}
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaMatchallAct, Data: data})
 	}
 	if info.KeyEthType != nil {
 		options = append(options, tcOption{Interpretation: vtUint16Be, Type: tcaFlowerKeyEthType, Data: *info.KeyEthType})
