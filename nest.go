@@ -24,6 +24,7 @@ const (
 	vtInt64
 	vtUint16Be
 	vtUint32Be
+	vtUint64Be
 )
 
 type tcOption struct {
@@ -84,6 +85,12 @@ func marshalAttributes(options []tcOption) ([]byte, error) {
 		case vtUint32Be:
 			data := bytes.NewBuffer(make([]byte, 0, 4))
 			if err := binary.Write(data, binary.BigEndian, (option.Data).(uint32)); err != nil {
+				return []byte{}, err
+			}
+			ad.Bytes(option.Type, data.Bytes())
+		case vtUint64Be:
+			data := bytes.NewBuffer(make([]byte, 0, 4))
+			if err := binary.Write(data, binary.BigEndian, (option.Data).(uint64)); err != nil {
 				return []byte{}, err
 			}
 			ad.Bytes(option.Type, data.Bytes())

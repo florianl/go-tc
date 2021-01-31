@@ -54,6 +54,7 @@ type Action struct {
 	Sample   *Sample
 	VLan     *VLan
 	Police   *Police
+	Tunnel   *Tunnel
 }
 
 func unmarshalActions(data []byte, actions *[]*Action) error {
@@ -209,6 +210,12 @@ func marshalAction(info *Action) ([]byte, error) {
 			return []byte{}, err
 		}
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaActOptions, Data: data})
+	case "tunnel":
+		data, err := marshalTunnel(info.Tunnel)
+		if err != nil {
+			return []byte{}, err
+		}
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaActOptions, Data: data})
 	default:
 		return []byte{}, fmt.Errorf("unknown kind '%s'", info.Kind)
 	}
@@ -301,6 +308,12 @@ func extractActOptions(data []byte, act *Action, kind string) error {
 			return err
 		}
 		act.Police = info
+	case "tunnel":
+		info := &Tunnel{}
+		if err := unmarshalTunnel(data, info); err != nil {
+			return err
+		}
+		act.Tunnel = info
 	default:
 		return fmt.Errorf("extractActOptions(): unsupported kind: %s", kind)
 
