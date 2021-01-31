@@ -388,7 +388,6 @@ func marshalFlower(info *Flower) ([]byte, error) {
 		if err != nil {
 			return []byte{}, err
 		}
-		fmt.Printf("Creating actions")
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaFlowerAct, Data: data})
 	}
 	if info.KeyEthType != nil {
