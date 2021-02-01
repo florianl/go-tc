@@ -32,10 +32,6 @@ func TestFilter(t *testing.T) {
 		},
 	}
 
-	u32ExactMatch := &U32{
-		ClassID: uint32Ptr(13),
-	}
-
 	if err := tcSocket.Qdisc().Add(&testQdisc); err != nil {
 		t.Fatalf("could not add new qdisc: %v", err)
 	}
@@ -43,12 +39,16 @@ func TestFilter(t *testing.T) {
 	tests := map[string]struct {
 		kind       string
 		u32        *U32
+		flower     *Flower
+		matchall   *Matchall
 		errAdd     error
 		errReplace error
 	}{
 		"unknown":         {kind: "unknown", errAdd: ErrNotImplemented},
 		"missingArgument": {kind: "bpf", errAdd: ErrNoArg},
-		"u32-exactMatch":  {kind: "u32", u32: u32ExactMatch},
+		"u32-exactMatch":  {kind: "u32", u32: &U32{ClassID: uint32Ptr(13)}},
+		"flower":          {kind: "flower", flower: &Flower{ClassID: uint32Ptr(13)}},
+		"matchall":        {kind: "matchall", matchall: &Matchall{ClassID: uint32Ptr(13)}},
 	}
 
 	for name, testcase := range tests {
@@ -57,8 +57,10 @@ func TestFilter(t *testing.T) {
 			testFilter := Object{
 				tcMsg,
 				Attribute{
-					Kind: testcase.kind,
-					U32:  testcase.u32,
+					Kind:     testcase.kind,
+					U32:      testcase.u32,
+					Flower:   testcase.flower,
+					Matchall: testcase.matchall,
 				},
 			}
 

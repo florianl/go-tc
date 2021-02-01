@@ -9,15 +9,20 @@ import (
 )
 
 func TestFlower(t *testing.T) {
+	actions := []*Action{
+		{Kind: "mirred", Mirred: &Mirred{Parms: &MirredParam{Index: 0x1, Capab: 0x0, Action: 0x4, RefCnt: 0x1, BindCnt: 0x1, Eaction: 0x1, IfIndex: 0x2}}},
+	}
+
 	tests := map[string]struct {
 		val  Flower
 		err1 error
 		err2 error
 	}{
 		"simple": {val: Flower{ClassID: uint32Ptr(42)}},
-		"allAguments": {val: Flower{
+		"allArguments": {val: Flower{
 			ClassID:              uint32Ptr(1),
 			Indev:                stringPtr("foo"),
+			Actions:              &actions,            
 			KeyEthType:           uint16Ptr(2),
 			KeyIPProto:           uint8Ptr(3),
 			KeyIPv4Src:           netIPPtr(net.ParseIP("1.2.3.4")),
