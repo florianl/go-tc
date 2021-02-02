@@ -7,7 +7,7 @@ import (
 	"net"
 	"testing"
 
-	"github.com/florianl/go-tc/internal/unix"
+	"github.com/dennisafa/go-tc/internal/unix"
 )
 
 // Get requests don't need special priviledges

@@ -1,4 +1,4 @@
-module github.com/florianl/go-tc
+module github.com/dennisafa/go-tc
 
 go 1.12
 

@@ -6,7 +6,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/florianl/go-tc/internal/unix"
+	"github.com/dennisafa/go-tc/internal/unix"
 	"github.com/josharian/native"
 	"github.com/mdlayher/netlink"
 )

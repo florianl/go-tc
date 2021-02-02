@@ -286,6 +286,12 @@ func extractTCAOptions(data []byte, tc *Attribute, kind string) error {
 			return err
 		}
 		tc.Flow = info
+	case "flower":
+		info := &Flower{}
+		if err := unmarshalFlower(data, info); err != nil {
+			return err
+		}
+		tc.Flower = info
 	case "matchall":
 		info := &Matchall{}
 		if err := unmarshalMatchall(data, info); err != nil {

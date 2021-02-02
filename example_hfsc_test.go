@@ -7,8 +7,8 @@ import (
 	"net"
 	"os"
 
-	"github.com/florianl/go-tc"
-	"github.com/florianl/go-tc/core"
+	"github.com/dennisafa/go-tc"
+	"github.com/dennisafa/go-tc/core"
 	"github.com/jsimonetti/rtnetlink"
 	"golang.org/x/sys/unix"
 )
