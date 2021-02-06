@@ -2,30 +2,43 @@ package tc
 
 import (
 	"errors"
-	"testing"
 	"net"
+	"testing"
 
 	"github.com/google/go-cmp/cmp"
 )
 
 func TestTunnelKey(t *testing.T) {
-	var testIP = "127.0.0.1"
-	testSrcIP := net.ParseIP(testIP)
-	testDstIP := net.ParseIP(testIP)
+	IPv4 := net.ParseIP("127.0.0.1")
+	IPv6 := net.ParseIP("fe80::42")
 	tests := map[string]struct {
 		val  TunnelKey
 		err1 error
 		err2 error
 	}{
-		"simple":          {val: TunnelKey{Parms: &TunnelParms{Index: 0x3,
+		"simple": {val: TunnelKey{Parms: &TunnelParms{Index: 0x3,
 			Capab:   0x0,
 			Action:  ActPipe,
 			RefCnt:  0x1,
 			BindCnt: 0x1, TunnelKeyAction: 0x0},
-			KeyEncSrc: &testSrcIP,
-			KeyEncDst: &testDstIP}},
-		"invalidArgument": {val: TunnelKey{Tm: &Tcft{Install: 1}}, err1: ErrNoArgAlter},
+			KeyEncSrc: &IPv4,
+			KeyEncDst: &IPv4}},
+		"IPv6": {val: TunnelKey{Parms: &TunnelParms{Index: 42},
+			KeyEncSrc: &IPv6, KeyEncDst: &IPv6,
+			KeyEncKeyID:   uint32Ptr(0xAA55),
+			KeyEncDstPort: uint16Ptr(22),
+			KeyNoCSUM:     uint8Ptr(1),
+			KeyEncTOS:     uint8Ptr(2),
+			KeyEncTTL:     uint8Ptr(42),
+		}},
+		"invalidArgument": {val: TunnelKey{Tm: &Tcft{Install: 1}},
+			err1: ErrNoArgAlter},
 	}
+
+	endianessMix := make(map[uint16]valueType)
+	endianessMix[tcaTunnelKeyEncKeyID] = vtUint32Be
+	endianessMix[tcaTunnelKeyEncDstPort] = vtUint16Be
+
 	for name, testcase := range tests {
 		t.Run(name, func(t *testing.T) {
 			data, err1 := marshalTunnelKey(&testcase.val)
@@ -37,6 +50,7 @@ func TestTunnelKey(t *testing.T) {
 			}
 			newData, tm := injectTcft(t, data, tcaTunnelKeyTm)
 			newData = injectAttribute(t, newData, []byte{}, tcaTunnelKeyPad)
+			newData = changeEndianess(t, newData, endianessMix)
 			val := TunnelKey{}
 			err2 := unmarshalTunnelKey(newData, &val)
 			if err2 != nil {
