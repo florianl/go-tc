@@ -31,6 +31,9 @@ func TestAction(t *testing.T) {
 			Ipt: &Ipt{Table: stringPtr("testTable"), Hook: uint32Ptr(42), Index: uint32Ptr(1984)}}},
 		"mirred": {val: Action{Kind: "mirred",
 			Mirred: &Mirred{Parms: &MirredParam{Index: 42, Action: 1}}}},
+		"mirred+cookie+index": {val: Action{Kind: "mirred",
+			Cookie: bytesPtr([]byte{0xAA, 0x55}), Index: uint32(42),
+			Mirred: &Mirred{Parms: &MirredParam{Index: 42, Action: 1}}}},
 		"mirred+stats": {val: Action{Kind: "mirred",
 			Mirred: &Mirred{Parms: &MirredParam{Index: 42, Action: 1}},
 			Stats: &GenStats{Basic: &GenBasic{Bytes: 8, Packets: 1}, RateEst: &GenRateEst{BytePerSecond: 42, PacketPerSecond: 3},
@@ -44,6 +47,8 @@ func TestAction(t *testing.T) {
 			Sample: &Sample{Parms: &SampleParms{Index: 42, Action: 1}}}},
 		"vlan": {val: Action{Kind: "vlan",
 			VLan: &VLan{Parms: &VLanParms{Index: 42, Action: 1}}}},
+		"tunnel key": {val: Action{Kind: "tunnel_key",
+			TunnelKey: &TunnelKey{KeyEncKeyID: uint32Ptr(123)}}},
 	}
 
 	for name, testcase := range tests {
