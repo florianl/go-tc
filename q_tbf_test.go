@@ -14,7 +14,11 @@ func TestTbf(t *testing.T) {
 		err2 error
 	}{
 		"no TbfQopt": {val: Tbf{Burst: uint32Ptr(1)}, err1: ErrNoArg},
-		"simple": {val: Tbf{Parms: &TbfQopt{Mtu: 9216, Rate: RateSpec{
+		"simple rate": {val: Tbf{Parms: &TbfQopt{Mtu: 9216, Rate: RateSpec{
+			Rate:      125,
+			Linklayer: 1,
+		}}}},
+		"simple peak rate": {val: Tbf{Parms: &TbfQopt{Mtu: 9216, PeakRate: RateSpec{
 			Rate:      125,
 			Linklayer: 1,
 		}}}},
