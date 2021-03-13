@@ -20,13 +20,6 @@ type Tc struct {
 
 var nativeEndian = native.Endian
 
-// devNull satisfies io.Writer, in case *log.Logger is not provided
-type devNull struct{}
-
-func (devNull) Write(p []byte) (int, error) {
-	return 0, nil
-}
-
 // Open establishes a RTNETLINK socket for traffic control
 func Open(config *Config) (*Tc, error) {
 	var tc Tc
@@ -42,7 +35,7 @@ func Open(config *Config) (*Tc, error) {
 	tc.con = con
 
 	if config.Logger == nil {
-		tc.logger = log.New(new(devNull), "", 0)
+		tc.logger = setDummyLogger()
 	} else {
 		tc.logger = config.Logger
 	}
