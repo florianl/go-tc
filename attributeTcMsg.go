@@ -250,6 +250,12 @@ func extractTCAOptions(data []byte, tc *Attribute, kind string) error {
 			return err
 		}
 		tc.BPF = info
+	case "cgroup":
+		info := &Cgroup{}
+		if err := unmarshalCgroup(data, info); err != nil {
+			return err
+		}
+		tc.Cgroup = info
 	case "u32":
 		info := &U32{}
 		if err := unmarshalU32(data, info); err != nil {

@@ -166,6 +166,7 @@ type Attribute struct {
 	// Filters
 	Basic    *Basic
 	BPF      *Bpf
+	Cgroup   *Cgroup
 	U32      *U32
 	Rsvp     *Rsvp
 	Route4   *Route4

@@ -41,6 +41,7 @@ func TestFilter(t *testing.T) {
 		u32        *U32
 		flower     *Flower
 		matchall   *Matchall
+		cgroup     *Cgroup
 		errAdd     error
 		errReplace error
 	}{
@@ -49,6 +50,8 @@ func TestFilter(t *testing.T) {
 		"u32-exactMatch":  {kind: "u32", u32: &U32{ClassID: uint32Ptr(13)}},
 		"flower":          {kind: "flower", flower: &Flower{ClassID: uint32Ptr(13)}},
 		"matchall":        {kind: "matchall", matchall: &Matchall{ClassID: uint32Ptr(13)}},
+		"cgroup": {kind: "cgroup", cgroup: &Cgroup{Action: &Action{Kind: "vlan",
+			VLan: &VLan{PushID: uint16Ptr(12)}}}},
 	}
 
 	for name, testcase := range tests {
@@ -61,6 +64,7 @@ func TestFilter(t *testing.T) {
 					U32:      testcase.u32,
 					Flower:   testcase.flower,
 					Matchall: testcase.matchall,
+					Cgroup:   testcase.cgroup,
 				},
 			}
 

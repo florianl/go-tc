@@ -75,6 +75,8 @@ func validateFilterObject(action int, info *Object) ([]tcOption, error) {
 		data, err = marshalBpf(info.BPF)
 	case "basic":
 		data, err = marshalBasic(info.Basic)
+	case "cgroup":
+		data, err = marshalCgroup(info.Cgroup)
 	case "flow":
 		data, err = marshalFlow(info.Flow)
 	case "flower":
