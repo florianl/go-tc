@@ -437,7 +437,7 @@ func marshalFlower(info *Flower) ([]byte, error) {
 		options = append(options, tcOption{Interpretation: vtUint16Be, Type: tcaFlowerKeyUDPDst, Data: *info.KeyUDPDst})
 	}
 	if info.KeyVlanID != nil {
-		options = append(options, tcOption{Interpretation: vtUint16Be, Type: tcaFlowerKeyVlanID, Data: *info.KeyVlanID})
+		options = append(options, tcOption{Interpretation: vtUint16, Type: tcaFlowerKeyVlanID, Data: *info.KeyVlanID})
 	}
 	if info.KeyVlanPrio != nil {
 		options = append(options, tcOption{Interpretation: vtUint8, Type: tcaFlowerKeyVlanPrio, Data: *info.KeyVlanPrio})
@@ -579,7 +579,7 @@ func marshalFlower(info *Flower) ([]byte, error) {
 		options = append(options, tcOption{Interpretation: vtUint8, Type: tcaFlowerKeyIPTTLMask, Data: *info.KeyIPTTLMask})
 	}
 	if info.KeyCVlanID != nil {
-		options = append(options, tcOption{Interpretation: vtUint16Be, Type: tcaFlowerKeyCVlanID, Data: *info.KeyCVlanID})
+		options = append(options, tcOption{Interpretation: vtUint16, Type: tcaFlowerKeyCVlanID, Data: *info.KeyCVlanID})
 	}
 	if info.KeyCVlanPrio != nil {
 		options = append(options, tcOption{Interpretation: vtUint8, Type: tcaFlowerKeyCVlanPrio, Data: *info.KeyCVlanPrio})

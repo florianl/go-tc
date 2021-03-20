@@ -95,7 +95,6 @@ func TestFlower(t *testing.T) {
 	endianessMix[tcaFlowerKeyTCPDst] = vtUint16Be
 	endianessMix[tcaFlowerKeyUDPSrc] = vtUint16Be
 	endianessMix[tcaFlowerKeyUDPDst] = vtUint16Be
-	endianessMix[tcaFlowerKeyVlanID] = vtUint16Be
 	endianessMix[tcaFlowerKeyVlanEthType] = vtUint16Be
 	endianessMix[tcaFlowerKeyEncKeyID] = vtUint32Be
 	endianessMix[tcaFlowerKeyEncIPv4Src] = vtUint32Be
@@ -122,7 +121,6 @@ func TestFlower(t *testing.T) {
 	endianessMix[tcaFlowerKeyArpTIPMask] = vtUint32Be
 	endianessMix[tcaFlowerKeyTCPFlags] = vtUint16Be
 	endianessMix[tcaFlowerKeyTCPFlagsMask] = vtUint16Be
-	endianessMix[tcaFlowerKeyCVlanID] = vtUint16Be
 	endianessMix[tcaFlowerKeyCVlanEthType] = vtUint16Be
 
 	for name, testcase := range tests {
