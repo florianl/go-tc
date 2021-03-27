@@ -4,6 +4,7 @@ package tc
 
 import (
 	"fmt"
+	"log"
 	"net"
 	"testing"
 
@@ -144,6 +145,17 @@ func TestLinuxTcClassGet(t *testing.T) {
 func TestSocket(t *testing.T) {
 	t.Run("empty Config", func(t *testing.T) {
 		tc, err := Open(nil)
+		if err != nil {
+			t.Fatalf("failed to open netlink socket: %v", err)
+		}
+		if err = tc.Close(); err != nil {
+			t.Fatalf("failed to close test socket: %v", err)
+		}
+	})
+	t.Run("with logger", func(t *testing.T) {
+		tc, err := Open(&Config{
+			Logger: log.Default(),
+		})
 		if err != nil {
 			t.Fatalf("failed to open netlink socket: %v", err)
 		}
