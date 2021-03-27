@@ -1,4 +1,4 @@
-//+build integration,linux
+//+build integration,linux,go1.16
 
 package tc
 
