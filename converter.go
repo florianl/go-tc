@@ -2,6 +2,17 @@ package tc
 
 import "net"
 
+func netIPMaskPtr(v net.IPMask) *net.IPMask {
+	return &v
+}
+
+func netIPMaskValue(v *net.IPMask) net.IPMask {
+	if v != nil {
+		return *v
+	}
+	return net.IPMask{}
+}
+
 func netIPPtr(v net.IP) *net.IP {
 	return &v
 }

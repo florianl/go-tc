@@ -21,6 +21,21 @@ func uint32ToIP(ip uint32) net.IP {
 	return netIP
 }
 
+// ipMaskToUint32 converts a legacy IPMask object to its uint32 representative.
+// For IPv6 masks it returns ErrInvalidArg.
+func ipMaskToUint32(ipv4 net.IPMask) (uint32, error) {
+	ones, bits := ipv4.Size()
+	if bits != 32 {
+		return 0, ErrInvalidArg
+	}
+	return uint32(ones), nil
+}
+
+// uint32ToIPMask converts a legacy ip mask to a net.IPMask object.
+func uint32ToIPMask(bits uint32) net.IPMask {
+	return net.CIDRMask(int(bits), 32)
+}
+
 // bytesToIP converts a slice of bytes into a net.IP object.
 func bytesToIP(ip []byte) (net.IP, error) {
 	if len(ip) != net.IPv4len && len(ip) != net.IPv6len {
