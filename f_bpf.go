@@ -38,7 +38,7 @@ type Bpf struct {
 
 // Flags defined by the kernel for the BPF filter
 const (
-	BpfActDirect =  1
+	BpfActDirect = 1
 )
 
 // unmarshalBpf parses the Bpf-encoded data and stores the result in the value pointed to by info.

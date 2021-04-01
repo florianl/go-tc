@@ -17,6 +17,7 @@ const (
 	tcaTcIndexAct
 )
 
+// TcIndex contains attributes of the tcIndex discipline
 type TcIndex struct {
 	Hash        *uint32
 	Mask        *uint16
