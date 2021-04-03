@@ -62,6 +62,8 @@ func unmarshalActBpf(data []byte, info *ActBpf) error {
 			info.Name = stringPtr(ad.String())
 		case tcaActBpfTag:
 			info.Tag = bytesPtr(ad.Bytes())
+		case tcaActBpfID:
+			info.ID = uint32Ptr(ad.Uint32())
 		case tcaActBpfPad:
 			// padding does not contain data, we just skip it
 		default:

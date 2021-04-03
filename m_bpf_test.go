@@ -19,6 +19,8 @@ func TestActBpft(t *testing.T) {
 		"extended":        {val: ActBpf{FD: uint32Ptr(12), Name: stringPtr("simpleTest"), Parms: &ActBpfParms{Action: 2, Index: 4}}},
 		"Tm Attribute": {val: ActBpf{FD: uint32Ptr(12), Name: stringPtr("simpleTest"), Parms: &ActBpfParms{Action: 2, Index: 4}},
 			enrich: &Tcft{Install: 1, LastUse: 2, Expires: 3, FirstUse: 4}},
+		"legacy BPF": {val: ActBpf{Ops: bytesPtr([]byte{0x6, 0x0, 0x0, 0x0, 0xff, 0xff, 0xff, 0xff}), OpsLen: uint16Ptr(1),
+			ID: uint32Ptr(42), Tag: bytesPtr([]byte("foo"))}},
 	}
 
 	for name, testcase := range tests {
