@@ -21,6 +21,13 @@ func TestCgroup(t *testing.T) {
 				SampleGroup: uint32Ptr(3),
 			},
 		}}},
+		"with ematch": {val: Cgroup{
+			Ematch: &Ematch{
+				Hdr: &EmatchTreeHdr{NMatches: 1},
+				Matches: &[]EmatchMatch{
+					{Hdr: EmatchHdr{MatchID: 0x0, Kind: 0x1, Flags: 0x0, Pad: 0x0},
+						Data: []byte{0x14, 0x0, 0x0, 0x0, 0x0, 0xff, 0x0, 0x0, 0x3, 0x0, 0x2, 0x12}}},
+			}}},
 	}
 
 	for name, testcase := range tests {
@@ -46,10 +53,16 @@ func TestCgroup(t *testing.T) {
 			}
 		})
 	}
-	t.Run("nil", func(t *testing.T) {
+	t.Run("marshal(nil)", func(t *testing.T) {
 		_, err := marshalCgroup(nil)
 		if !errors.Is(err, ErrNoArg) {
 			t.Fatalf("unexpected error: %v", err)
+		}
+	})
+	t.Run("unmarshal(0x0)", func(t *testing.T) {
+		val := Cgroup{}
+		if err := unmarshalCgroup([]byte{0x00}, &val); err == nil {
+			t.Fatalf("expected error but got nil")
 		}
 	})
 }

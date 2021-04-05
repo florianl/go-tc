@@ -14,6 +14,13 @@ func TestBasic(t *testing.T) {
 		err2 error
 	}{
 		"simple": {val: Basic{ClassID: uint32Ptr(2)}},
+		"with ematch": {val: Basic{ClassID: uint32Ptr(3),
+			Ematch: &Ematch{
+				Hdr: &EmatchTreeHdr{NMatches: 1},
+				Matches: &[]EmatchMatch{
+					{Hdr: EmatchHdr{MatchID: 0x0, Kind: 0x1, Flags: 0x0, Pad: 0x0},
+						Data: []byte{0x14, 0x0, 0x0, 0x0, 0x0, 0xff, 0x0, 0x0, 0x3, 0x0, 0x2, 0x12}}},
+			}}},
 	}
 
 	for name, testcase := range tests {
@@ -39,10 +46,16 @@ func TestBasic(t *testing.T) {
 			}
 		})
 	}
-	t.Run("nil", func(t *testing.T) {
+	t.Run("marshal(nil)", func(t *testing.T) {
 		_, err := marshalBasic(nil)
 		if !errors.Is(err, ErrNoArg) {
 			t.Fatalf("unexpected error: %v", err)
+		}
+	})
+	t.Run("unmarshal(0x0)", func(t *testing.T) {
+		val := Basic{}
+		if err := unmarshalBasic([]byte{0x00}, &val); err == nil {
+			t.Fatalf("expected error but got nil")
 		}
 	})
 }

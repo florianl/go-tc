@@ -18,6 +18,7 @@ const (
 type Basic struct {
 	ClassID *uint32
 	Police  *Police
+	Ematch  *Ematch
 }
 
 // unmarshalBasic parses the Basic-encoded data and stores the result in the value pointed to by info.
@@ -37,6 +38,12 @@ func unmarshalBasic(data []byte, info *Basic) error {
 			info.Police = pol
 		case tcaBasicClassID:
 			info.ClassID = uint32Ptr(ad.Uint32())
+		case tcaBasicEmatches:
+			ematch := &Ematch{}
+			if err := unmarshalEmatch(ad.Bytes(), ematch); err != nil {
+				return err
+			}
+			info.Ematch = ematch
 		default:
 			return fmt.Errorf("unmarshalBasic()\t%d\n\t%v", ad.Type(), ad.Bytes())
 		}
@@ -55,6 +62,13 @@ func marshalBasic(info *Basic) ([]byte, error) {
 	// TODO: improve logic and check combinations
 	if info.ClassID != nil {
 		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaBasicClassID, Data: uint32Value(info.ClassID)})
+	}
+	if info.Ematch != nil {
+		data, err := marshalEmatch(info.Ematch)
+		if err != nil {
+			return []byte{}, err
+		}
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaBasicEmatches, Data: data})
 	}
 	return marshalAttributes(options)
 }

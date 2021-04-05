@@ -33,6 +33,7 @@ type Flow struct {
 	XOR       *uint32
 	Divisor   *uint32
 	PerTurb   *uint32
+	Ematch    *Ematch
 }
 
 // unmarshalFlow parses the Flow-encoded data and stores the result in the value pointed to by info.
@@ -62,11 +63,17 @@ func unmarshalFlow(data []byte, info *Flow) error {
 			info.Divisor = uint32Ptr(ad.Uint32())
 		case tcaFlowPerTurb:
 			info.PerTurb = uint32Ptr(ad.Uint32())
+		case tcaFlowEMatches:
+			ematch := &Ematch{}
+			if err := unmarshalEmatch(ad.Bytes(), ematch); err != nil {
+				return err
+			}
+			info.Ematch = ematch
 		default:
 			return fmt.Errorf("unmarshalFlow()\t%d\n\t%v", ad.Type(), ad.Bytes())
 		}
 	}
-	return nil
+	return ad.Err()
 }
 
 // marshalFlow returns the binary encoding of Flow
@@ -104,6 +111,13 @@ func marshalFlow(info *Flow) ([]byte, error) {
 	}
 	if info.PerTurb != nil {
 		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFlowPerTurb, Data: uint32Value(info.PerTurb)})
+	}
+	if info.Ematch != nil {
+		data, err := marshalEmatch(info.Ematch)
+		if err != nil {
+			return []byte{}, err
+		}
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaFlowEMatches, Data: data})
 	}
 	return marshalAttributes(options)
 }

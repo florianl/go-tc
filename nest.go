@@ -32,6 +32,9 @@ type tcOption struct {
 	Data           interface{}
 }
 
+// NLA_F_NESTED from include/uapi/linux/netlink.h
+const nlaFNnested = (1 << 15)
+
 func marshalAttributes(options []tcOption) ([]byte, error) {
 	ad := netlink.NewAttributeEncoder()
 

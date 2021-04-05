@@ -16,6 +16,7 @@ const (
 // Cgroup contains attributes of the cgroup discipline
 type Cgroup struct {
 	Action *Action
+	Ematch *Ematch
 }
 
 // marshalCgroup returns the binary encoding of Cgroup
@@ -35,6 +36,13 @@ func marshalCgroup(info *Cgroup) ([]byte, error) {
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaCgroupAct, Data: data})
 
 	}
+	if info.Ematch != nil {
+		data, err := marshalEmatch(info.Ematch)
+		if err != nil {
+			return []byte{}, err
+		}
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaCgroupEmatches, Data: data})
+	}
 	return marshalAttributes(options)
 }
 
@@ -53,9 +61,15 @@ func unmarshalCgroup(data []byte, info *Cgroup) error {
 				return err
 			}
 			info.Action = act
+		case tcaCgroupEmatches:
+			ematch := &Ematch{}
+			if err := unmarshalEmatch(ad.Bytes(), ematch); err != nil {
+				return err
+			}
+			info.Ematch = ematch
 		default:
 			return fmt.Errorf("unmarshalCgroup()\t%d\n\t%v", ad.Type(), ad.Bytes())
 		}
 	}
-	return nil
+	return ad.Err()
 }
