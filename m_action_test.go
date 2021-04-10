@@ -49,6 +49,8 @@ func TestAction(t *testing.T) {
 			VLan: &VLan{Parms: &VLanParms{Index: 42, Action: 1}}}},
 		"tunnel key": {val: Action{Kind: "tunnel_key",
 			TunnelKey: &TunnelKey{KeyEncKeyID: uint32Ptr(123)}}},
+		"gate": {val: Action{Kind: "gate",
+			Gate: &Gate{Parms: &GateParms{Index: 42}, Priority: int32Ptr(21)}}},
 	}
 
 	for name, testcase := range tests {
