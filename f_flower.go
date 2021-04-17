@@ -102,6 +102,10 @@ type Flower struct {
 	ClassID              *uint32
 	Indev                *string
 	Actions              *[]*Action
+	KeyEthDst            *net.HardwareAddr
+	KeyEthDstMask        *net.HardwareAddr
+	KeyEthSrc            *net.HardwareAddr
+	KeyEthSrcMask        *net.HardwareAddr
 	KeyEthType           *uint16
 	KeyIPProto           *uint8
 	KeyIPv4Src           *net.IP
@@ -186,6 +190,18 @@ func unmarshalFlower(data []byte, info *Flower) error {
 				return err
 			}
 			info.Actions = actions
+		case tcaFlowerKeyEthDst:
+			tmp := bytesToHardwareAddr(ad.Bytes())
+			info.KeyEthDst = &tmp
+		case tcaFlowerKeyEthDstMask:
+			tmp := bytesToHardwareAddr(ad.Bytes())
+			info.KeyEthDstMask = &tmp
+		case tcaFlowerKeyEthSrc:
+			tmp := bytesToHardwareAddr(ad.Bytes())
+			info.KeyEthSrc = &tmp
+		case tcaFlowerKeyEthSrcMask:
+			tmp := bytesToHardwareAddr(ad.Bytes())
+			info.KeyEthSrcMask = &tmp
 		case tcaFlowerKeyEthType:
 			tmp := ad.Uint16()
 			info.KeyEthType = &tmp
@@ -397,6 +413,22 @@ func marshalFlower(info *Flower) ([]byte, error) {
 			return []byte{}, err
 		}
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaFlowerAct, Data: data})
+	}
+	if info.KeyEthDst != nil {
+		tmp := hardwareAddrToBytes(*info.KeyEthDst)
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaFlowerKeyEthDst, Data: tmp})
+	}
+	if info.KeyEthDstMask != nil {
+		tmp := hardwareAddrToBytes(*info.KeyEthDstMask)
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaFlowerKeyEthDstMask, Data: tmp})
+	}
+	if info.KeyEthSrc != nil {
+		tmp := hardwareAddrToBytes(*info.KeyEthSrc)
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaFlowerKeyEthSrc, Data: tmp})
+	}
+	if info.KeyEthSrcMask != nil {
+		tmp := hardwareAddrToBytes(*info.KeyEthSrcMask)
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaFlowerKeyEthSrcMask, Data: tmp})
 	}
 	if info.KeyEthType != nil {
 		options = append(options, tcOption{Interpretation: vtUint16Be, Type: tcaFlowerKeyEthType, Data: *info.KeyEthType})

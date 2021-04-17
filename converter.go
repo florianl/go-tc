@@ -24,6 +24,17 @@ func netIPValue(v *net.IP) net.IP {
 	return net.IP{}
 }
 
+func netHardwareAddrPtr(v net.HardwareAddr) *net.HardwareAddr {
+	return &v
+}
+
+func netHardwareAddrValue(v *net.HardwareAddr) net.HardwareAddr {
+	if v != nil {
+		return *v
+	}
+	return net.HardwareAddr{}
+}
+
 func bytesPtr(v []byte) *[]byte {
 	return &v
 }

@@ -48,3 +48,13 @@ func bytesToIP(ip []byte) (net.IP, error) {
 func ipToBytes(ip net.IP) []byte {
 	return []byte(ip)
 }
+
+// bytesToHardwareAddr converts a slice of bytes into a net.HardwareAddr object.
+func bytesToHardwareAddr(mac []byte) net.HardwareAddr {
+	return net.HardwareAddr(mac[:])
+}
+
+// hardwareAddrToBytes casts a net.HardwareAddr object into its byte slice representative.
+func hardwareAddrToBytes(mac net.HardwareAddr) []byte {
+	return []byte(mac)
+}

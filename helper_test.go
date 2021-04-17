@@ -93,3 +93,30 @@ func TestRealIPHelper(t *testing.T) {
 		}
 	})
 }
+
+func TestMacHelper(t *testing.T) {
+	for _, macStr := range []string{
+		"00:00:5e:00:53:01",
+		"02:00:5e:10:00:00:00:01",
+		"00:00:00:00:fe:80:00:00:00:00:00:00:02:00:5e:10:00:00:00:01",
+		"00-00-5e-00-53-01",
+		"02-00-5e-10-00-00-00-01",
+		"00-00-00-00-fe-80-00-00-00-00-00-00-02-00-5e-10-00-00-00-01",
+		"0000.5e00.5301",
+		"0200.5e10.0000.0001",
+		"0000.0000.fe80.0000.0000.0000.0200.5e10.0000.0001",
+	} {
+		macStr := macStr
+		t.Run(macStr, func(t *testing.T) {
+			mac, err := net.ParseMAC(macStr)
+			if err != nil {
+				t.Fatalf("failed to parse mac string: %v", err)
+			}
+			tmp := hardwareAddrToBytes(mac)
+			mac2 := bytesToHardwareAddr(tmp)
+			if diff := cmp.Diff(mac, mac2); diff != "" {
+				t.Fatalf("HardwareAddr missmatch (-want +got):\n%s", diff)
+			}
+		})
+	}
+}
