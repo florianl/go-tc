@@ -18,9 +18,19 @@ func TestBasic(t *testing.T) {
 			Ematch: &Ematch{
 				Hdr: &EmatchTreeHdr{NMatches: 1},
 				Matches: &[]EmatchMatch{
-					{Hdr: EmatchHdr{MatchID: 0x0, Kind: 0x1, Flags: 0x0, Pad: 0x0},
-						Data: []byte{0x14, 0x0, 0x0, 0x0, 0x0, 0xff, 0x0, 0x0, 0x3, 0x0, 0x2, 0x12}}},
-			}}},
+					{Hdr: EmatchHdr{MatchID: 0x0, Kind: EmatchU32, Flags: 0x0, Pad: 0x0},
+						// match 'u32(u16 0x1122 0xffff at nexthdr+4)'
+						U32Match: &U32Match{
+							Mask:    0xffff,
+							Value:   0x1122,
+							Off:     0x400,
+							OffMask: 0xffff,
+						},
+					},
+				},
+			},
+		},
+		},
 	}
 
 	for name, testcase := range tests {

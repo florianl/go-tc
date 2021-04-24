@@ -6,6 +6,22 @@ import (
 	"github.com/mdlayher/netlink"
 )
 
+type EmatchLayer uint8
+
+const (
+	EmatchLayerLink      = EmatchLayer(0)
+	EmatchLayerNetwork   = EmatchLayer(1)
+	EmatchLayerTransport = EmatchLayer(2)
+)
+
+type EmatchOpnd uint8
+
+const (
+	EmatchOpndEq = EmatchOpnd(0)
+	EmatchOpndGt = EmatchOpnd(1)
+	EmatchOpndLt = EmatchOpnd(2)
+)
+
 const (
 	tcaEmatchTreeUnspec = iota
 	tcaEmatchTreeHdr
@@ -50,8 +66,9 @@ type EmatchHdr struct {
 }
 
 type EmatchMatch struct {
-	Hdr  EmatchHdr
-	Data []byte
+	Hdr      EmatchHdr
+	U32Match *U32Match
+	CmpMatch *CmpMatch
 }
 
 // unmarshalEmatch parses the Ematch-encoded data and stores the result in the value pointed to by info.
@@ -119,10 +136,25 @@ func unmarshalEmatchTreeList(data []byte, info *[]EmatchMatch) error {
 		if err := unmarshalStruct(tmp[:8], &match.Hdr); err != nil {
 			return err
 		}
-		match.Data = append(match.Data, tmp[8:]...)
+		switch match.Hdr.Kind {
+		case EmatchU32:
+			expr := &U32Match{}
+			if err := unmarshalU32Match(tmp[8:], expr); err != nil {
+				return err
+			}
+			match.U32Match = expr
+		case EmatchCmp:
+			expr := &CmpMatch{}
+			if err := unmarshalCmpMatch(tmp[8:], expr); err != nil {
+				return err
+			}
+			match.CmpMatch = expr
+		default:
+			return fmt.Errorf("unmarshalEmatchTreeList() kind %d is not yet implemented", match.Hdr.Kind)
+		}
 		*info = append(*info, match)
 	}
-	return nil
+	return ad.Err()
 }
 
 func marshalEmatchTreeList(info *[]EmatchMatch) ([]byte, error) {
@@ -133,7 +165,19 @@ func marshalEmatchTreeList(info *[]EmatchMatch) ([]byte, error) {
 		if err != nil {
 			return []byte{}, err
 		}
-		payload = append(payload, m.Data...)
+		var expr []byte
+		switch m.Hdr.Kind {
+		case EmatchU32:
+			expr, err = marshalU32Match(m.U32Match)
+		case EmatchCmp:
+			expr, err = marshalCmpMatch(m.CmpMatch)
+		default:
+			return []byte{}, fmt.Errorf("marshalEmatchTreeList() kind %d is not yet implemented", m.Hdr.Kind)
+		}
+		if err != nil {
+			return []byte{}, fmt.Errorf("marshalEmatchTreeList(): %v", err)
+		}
+		payload = append(payload, expr...)
 		options = append(options, tcOption{Interpretation: vtBytes, Type: uint16(i + 1), Data: payload})
 	}
 	return marshalAttributes(options)

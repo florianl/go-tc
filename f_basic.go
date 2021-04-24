@@ -48,7 +48,7 @@ func unmarshalBasic(data []byte, info *Basic) error {
 			return fmt.Errorf("unmarshalBasic()\t%d\n\t%v", ad.Type(), ad.Bytes())
 		}
 	}
-	return nil
+	return ad.Err()
 }
 
 // marshalBasic returns the binary encoding of Basic
