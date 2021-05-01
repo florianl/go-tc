@@ -4,7 +4,7 @@ type U32Match struct {
 	Mask    uint32 // big endian
 	Value   uint32 // big endian
 	Off     int32
-	OffMask int32
+	OffMask uint32
 }
 
 func unmarshalU32Match(data []byte, info *U32Match) error {
