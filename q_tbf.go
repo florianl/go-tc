@@ -77,7 +77,7 @@ func marshalTbf(info *Tbf) ([]byte, error) {
 	}
 	if info.Parms.PeakRate.Rate != 0 {
 		ratePolicy := Policy{}
-		ratePolicy.Burst = uint32Value(info.Burst)
+		ratePolicy.Burst = uint32Value(info.Pburst)
 		ratePolicy.Action = PolicyOk
 		ratePolicy.Limit = info.Parms.Limit
 		ratePolicy.PeakRate.Rate = info.Parms.PeakRate.Rate
