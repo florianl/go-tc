@@ -50,6 +50,19 @@ func TestEmatch(t *testing.T) {
 				},
 			},
 		},
+		"match 'ipset(interactive src,src)'": {
+			val: Ematch{
+				Hdr: &EmatchTreeHdr{NMatches: 1, ProgID: 42},
+				Matches: &[]EmatchMatch{
+					{Hdr: EmatchHdr{MatchID: 0, Kind: 0x8, Flags: 0x0, Pad: 0x0},
+						IPSetMatch: &IPSetMatch{
+							IPSetID: 19,
+							Dir:     []IPSetDir{IPSetSrc, IPSetSrc},
+						},
+					},
+				},
+			},
+		},
 	}
 
 	for name, testcase := range tests {

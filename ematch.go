@@ -66,9 +66,10 @@ type EmatchHdr struct {
 }
 
 type EmatchMatch struct {
-	Hdr      EmatchHdr
-	U32Match *U32Match
-	CmpMatch *CmpMatch
+	Hdr        EmatchHdr
+	U32Match   *U32Match
+	CmpMatch   *CmpMatch
+	IPSetMatch *IPSetMatch
 }
 
 // unmarshalEmatch parses the Ematch-encoded data and stores the result in the value pointed to by info.
@@ -149,6 +150,12 @@ func unmarshalEmatchTreeList(data []byte, info *[]EmatchMatch) error {
 				return err
 			}
 			match.CmpMatch = expr
+		case EmatchIPSet:
+			expr := &IPSetMatch{}
+			if err := unmarshalIPSetMatch(tmp[8:], expr); err != nil {
+				return err
+			}
+			match.IPSetMatch = expr
 		default:
 			return fmt.Errorf("unmarshalEmatchTreeList() kind %d is not yet implemented", match.Hdr.Kind)
 		}
@@ -171,6 +178,8 @@ func marshalEmatchTreeList(info *[]EmatchMatch) ([]byte, error) {
 			expr, err = marshalU32Match(m.U32Match)
 		case EmatchCmp:
 			expr, err = marshalCmpMatch(m.CmpMatch)
+		case EmatchIPSet:
+			expr, err = marshalIPSetMatch(m.IPSetMatch)
 		default:
 			return []byte{}, fmt.Errorf("marshalEmatchTreeList() kind %d is not yet implemented", m.Hdr.Kind)
 		}

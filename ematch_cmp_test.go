@@ -26,6 +26,6 @@ func TestCmpMatch(t *testing.T) {
 		t.Fatal(err)
 	}
 	if diff := cmp.Diff(in, out); diff != "" {
-		t.Fatalf("U32Match missmatch (-want +got):\n%s", diff)
+		t.Fatalf("CmpMatch missmatch (-want +got):\n%s", diff)
 	}
 }
