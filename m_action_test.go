@@ -83,4 +83,24 @@ func TestAction(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 	})
+
+	t.Run("unmarshalAction(unknown)", func(t *testing.T) {
+		info := &Action{}
+		if err := unmarshalAction(generateActUnknown(t), info); err == nil {
+			t.Fatal("Expected error but got none")
+		}
+	})
+}
+
+func generateActUnknown(t *testing.T) []byte {
+	t.Helper()
+	options := []tcOption{}
+	options = append(options, tcOption{Interpretation: vtString, Type: tcaActKind, Data: "unknown"})
+	options = append(options, tcOption{Interpretation: vtBytes, Type: tcaActOptions, Data: []byte{0x42}})
+
+	data, err := marshalAttributes(options)
+	if err != nil {
+		t.Fatalf("could not generate test data: %v", err)
+	}
+	return data
 }
