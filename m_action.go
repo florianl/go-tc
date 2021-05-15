@@ -47,6 +47,7 @@ type Action struct {
 	ConnMark  *Connmark
 	CSum      *Csum
 	Defact    *Defact
+	Gact      *Gact
 	Gate      *Gate
 	Ife       *Ife
 	Ipt       *Ipt
@@ -166,6 +167,12 @@ func marshalAction(info *Action) ([]byte, error) {
 			return []byte{}, err
 		}
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaActOptions, Data: data})
+	case "gact":
+		data, err := marshalGact(info.Gact)
+		if err != nil {
+			return []byte{}, err
+		}
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaActOptions, Data: data})
 	case "gate":
 		data, err := marshalGate(info.Gate)
 		if err != nil {
@@ -267,6 +274,12 @@ func extractActOptions(data []byte, act *Action, kind string) error {
 			return err
 		}
 		act.Defact = info
+	case "gact":
+		info := &Gact{}
+		if err := unmarshalGact(data, info); err != nil {
+			return err
+		}
+		act.Gact = info
 	case "gate":
 		info := &Gate{}
 		if err := unmarshalGate(data, info); err != nil {

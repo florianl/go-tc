@@ -51,6 +51,8 @@ func TestAction(t *testing.T) {
 			TunnelKey: &TunnelKey{KeyEncKeyID: uint32Ptr(123)}}},
 		"gate": {val: Action{Kind: "gate",
 			Gate: &Gate{Parms: &GateParms{Index: 42}, Priority: int32Ptr(21)}}},
+		"gact": {val: Action{Kind: "gact",
+			Gact: &Gact{Prob: &GactProb{PType: 1}, Parms: &GactParms{Index: 2}}}},
 	}
 
 	for name, testcase := range tests {
