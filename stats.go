@@ -65,33 +65,23 @@ func unmarshalGenStats(data []byte, info *GenStats) error {
 		switch ad.Type() {
 		case tcaStatsBasic:
 			stat := &GenBasic{}
-			if err := unmarshalStruct(ad.Bytes(), stat); err != nil {
-				return err
-			}
+			err = unmarshalStruct(ad.Bytes(), stat)
 			info.Basic = stat
 		case tcaStatsRateEst:
 			stat := &GenRateEst{}
-			if err := unmarshalStruct(ad.Bytes(), stat); err != nil {
-				return err
-			}
+			err = unmarshalStruct(ad.Bytes(), stat)
 			info.RateEst = stat
 		case tcaStatsQueue:
 			stat := &GenQueue{}
-			if err := unmarshalStruct(ad.Bytes(), stat); err != nil {
-				return err
-			}
+			err = unmarshalStruct(ad.Bytes(), stat)
 			info.Queue = stat
 		case tcaStatsRateEst64:
 			stat := &GenRateEst64{}
-			if err := unmarshalStruct(ad.Bytes(), stat); err != nil {
-				return err
-			}
+			err = unmarshalStruct(ad.Bytes(), stat)
 			info.RateEst64 = stat
 		case tcaStatsBasicHw:
 			stat := &GenBasic{}
-			if err := unmarshalStruct(ad.Bytes(), stat); err != nil {
-				return err
-			}
+			err = unmarshalStruct(ad.Bytes(), stat)
 			info.BasicHw = stat
 		case tcaStatsPad:
 			// padding does not contain data, we just skip it
@@ -99,7 +89,7 @@ func unmarshalGenStats(data []byte, info *GenStats) error {
 			return fmt.Errorf("unmarshalGenStats()\t%d\n\t%v", ad.Type(), ad.Bytes())
 		}
 	}
-	return nil
+	return err
 }
 
 // marshalGenStats returns the binary encoding of GenStats
