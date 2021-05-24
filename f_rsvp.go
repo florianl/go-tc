@@ -31,6 +31,7 @@ func unmarshalRsvp(data []byte, info *Rsvp) error {
 	if err != nil {
 		return err
 	}
+	var multiError error
 	ad.ByteOrder = nativeEndian
 	for ad.Next() {
 		switch ad.Type() {
@@ -42,21 +43,19 @@ func unmarshalRsvp(data []byte, info *Rsvp) error {
 			info.Src = bytesPtr(ad.Bytes())
 		case tcaRsvpPInfo:
 			arg := &RsvpPInfo{}
-			if err := unmarshalStruct(ad.Bytes(), arg); err != nil {
-				return err
-			}
+			err := unmarshalStruct(ad.Bytes(), arg)
+			concatError(multiError, err)
 			info.PInfo = arg
 		case tcaRsvpPolice:
 			pol := &Police{}
-			if err := unmarshalPolice(ad.Bytes(), pol); err != nil {
-				return err
-			}
+			err := unmarshalPolice(ad.Bytes(), pol)
+			concatError(multiError, err)
 			info.Police = pol
 		default:
 			return fmt.Errorf("unmarshalRsvp()\t%d\n\t%v", ad.Type(), ad.Bytes())
 		}
 	}
-	return nil
+	return concatError(multiError, ad.Err())
 
 }
 
@@ -67,6 +66,7 @@ func marshalRsvp(info *Rsvp) ([]byte, error) {
 	if info == nil {
 		return []byte{}, fmt.Errorf("Ipt: %w", ErrNoArg)
 	}
+	var multiError error
 
 	// TODO: improve logic and check combinations
 	if info.ClassID != nil {
@@ -74,9 +74,7 @@ func marshalRsvp(info *Rsvp) ([]byte, error) {
 	}
 	if info.PInfo != nil {
 		data, err := marshalStruct(info.PInfo)
-		if err != nil {
-			return []byte{}, err
-		}
+		concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaRsvpPInfo, Data: data})
 	}
 	if info.Src != nil {
@@ -87,11 +85,14 @@ func marshalRsvp(info *Rsvp) ([]byte, error) {
 	}
 	if info.Police != nil {
 		data, err := marshalPolice(info.Police)
-		if err != nil {
-			return []byte{}, err
-		}
+		concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaRsvpPolice, Data: data})
 	}
+
+	if multiError != nil {
+		return []byte{}, multiError
+	}
+
 	return marshalAttributes(options)
 }
 

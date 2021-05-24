@@ -26,23 +26,24 @@ func marshalCgroup(info *Cgroup) ([]byte, error) {
 	if info == nil {
 		return []byte{}, fmt.Errorf("Cgroup: %w", ErrNoArg)
 	}
-
+	var multiError error
 	// TODO: improve logic and check combinations
 	if info.Action != nil {
 		data, err := marshalAction(info.Action)
-		if err != nil {
-			return []byte{}, err
-		}
+		concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaCgroupAct, Data: data})
 
 	}
 	if info.Ematch != nil {
 		data, err := marshalEmatch(info.Ematch)
-		if err != nil {
-			return []byte{}, err
-		}
+		concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaCgroupEmatches, Data: data})
 	}
+
+	if multiError != nil {
+		return []byte{}, multiError
+	}
+
 	return marshalAttributes(options)
 }
 
@@ -52,24 +53,24 @@ func unmarshalCgroup(data []byte, info *Cgroup) error {
 	if err != nil {
 		return err
 	}
+	var multiError error
 	ad.ByteOrder = nativeEndian
 	for ad.Next() {
 		switch ad.Type() {
 		case tcaCgroupAct:
 			act := &Action{}
-			if err := unmarshalAction(ad.Bytes(), act); err != nil {
-				return err
-			}
+			err := unmarshalAction(ad.Bytes(), act)
+			concatError(multiError, err)
 			info.Action = act
 		case tcaCgroupEmatches:
 			ematch := &Ematch{}
-			if err := unmarshalEmatch(ad.Bytes(), ematch); err != nil {
-				return err
-			}
+			err := unmarshalEmatch(ad.Bytes(), ematch)
+			concatError(multiError, err)
 			info.Ematch = ematch
 		default:
 			return fmt.Errorf("unmarshalCgroup()\t%d\n\t%v", ad.Type(), ad.Bytes())
 		}
 	}
-	return ad.Err()
+	return concatError(multiError, ad.Err())
+
 }

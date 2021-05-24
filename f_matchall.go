@@ -27,6 +27,7 @@ func unmarshalMatchall(data []byte, info *Matchall) error {
 	if err != nil {
 		return err
 	}
+	var multiError error
 	ad.ByteOrder = nativeEndian
 	for ad.Next() {
 		switch ad.Type() {
@@ -34,9 +35,8 @@ func unmarshalMatchall(data []byte, info *Matchall) error {
 			info.ClassID = uint32Ptr(ad.Uint32())
 		case tcaMatchallAct:
 			actions := &[]*Action{}
-			if err := unmarshalActions(ad.Bytes(), actions); err != nil {
-				return err
-			}
+			err := unmarshalActions(ad.Bytes(), actions)
+			concatError(multiError, err)
 			info.Actions = actions
 		case tcaMatchallFlags:
 			info.Flags = uint32Ptr(ad.Uint32())
@@ -46,7 +46,7 @@ func unmarshalMatchall(data []byte, info *Matchall) error {
 			return fmt.Errorf("unmarshalMatchall()\t%d\n\t%v", ad.Type(), ad.Bytes())
 		}
 	}
-	return nil
+	return concatError(multiError, ad.Err())
 }
 
 // marshalMatchall returns the binary encoding of Matchall
@@ -58,19 +58,23 @@ func marshalMatchall(info *Matchall) ([]byte, error) {
 	}
 
 	// TODO: improve logic and check combinations
+	var multiError error
+
 	if info.ClassID != nil {
 		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaMatchallClassID, Data: uint32Value(info.ClassID)})
 	}
 	if info.Actions != nil {
 		data, err := marshalActions(*info.Actions)
-		if err != nil {
-			return []byte{}, err
-		}
+		concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaMatchallAct, Data: data})
 	}
 
 	if info.Flags != nil {
 		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaMatchallFlags, Data: uint32Value(info.Flags)})
+	}
+
+	if multiError != nil {
+		return []byte{}, multiError
 	}
 
 	return marshalAttributes(options)

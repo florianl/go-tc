@@ -29,6 +29,7 @@ func unmarshalFw(data []byte, info *Fw) error {
 	if err != nil {
 		return err
 	}
+	var multiError error
 	ad.ByteOrder = nativeEndian
 	for ad.Next() {
 		switch ad.Type() {
@@ -40,15 +41,14 @@ func unmarshalFw(data []byte, info *Fw) error {
 			info.Mask = uint32Ptr(ad.Uint32())
 		case tcaFwPolice:
 			pol := &Police{}
-			if err := unmarshalPolice(ad.Bytes(), pol); err != nil {
-				return err
-			}
+			err := unmarshalPolice(ad.Bytes(), pol)
+			concatError(multiError, err)
 			info.Police = pol
 		default:
 			return fmt.Errorf("unmarshalFw()\t%d\n\t%v", ad.Type(), ad.Bytes())
 		}
 	}
-	return nil
+	return concatError(multiError, ad.Err())
 }
 
 // marshalFw returns the binary encoding of Fw
@@ -58,6 +58,7 @@ func marshalFw(info *Fw) ([]byte, error) {
 	if info == nil {
 		return []byte{}, fmt.Errorf("Fw: %w", ErrNoArg)
 	}
+	var multiError error
 
 	// TODO: improve logic and check combinations
 	if info.ClassID != nil {
@@ -71,11 +72,11 @@ func marshalFw(info *Fw) ([]byte, error) {
 	}
 	if info.Police != nil {
 		data, err := marshalPolice(info.Police)
-		if err != nil {
-			return []byte{}, err
-		}
+		concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaFwPolice, Data: data})
 	}
-
+	if multiError != nil {
+		return []byte{}, multiError
+	}
 	return marshalAttributes(options)
 }

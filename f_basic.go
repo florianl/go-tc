@@ -27,28 +27,27 @@ func unmarshalBasic(data []byte, info *Basic) error {
 	if err != nil {
 		return err
 	}
+	var multiError error
 	ad.ByteOrder = nativeEndian
 	for ad.Next() {
 		switch ad.Type() {
 		case tcaBasicPolice:
 			pol := &Police{}
-			if err := unmarshalPolice(ad.Bytes(), pol); err != nil {
-				return err
-			}
+			err := unmarshalPolice(ad.Bytes(), pol)
+			concatError(multiError, err)
 			info.Police = pol
 		case tcaBasicClassID:
 			info.ClassID = uint32Ptr(ad.Uint32())
 		case tcaBasicEmatches:
 			ematch := &Ematch{}
-			if err := unmarshalEmatch(ad.Bytes(), ematch); err != nil {
-				return err
-			}
+			err := unmarshalEmatch(ad.Bytes(), ematch)
+			concatError(multiError, err)
 			info.Ematch = ematch
 		default:
 			return fmt.Errorf("unmarshalBasic()\t%d\n\t%v", ad.Type(), ad.Bytes())
 		}
 	}
-	return ad.Err()
+	return concatError(multiError, ad.Err())
 }
 
 // marshalBasic returns the binary encoding of Basic

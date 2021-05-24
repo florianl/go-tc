@@ -47,14 +47,14 @@ func unmarshalBpf(data []byte, info *Bpf) error {
 	if err != nil {
 		return err
 	}
+	var multiError error
 	ad.ByteOrder = nativeEndian
 	for ad.Next() {
 		switch ad.Type() {
 		case tcaBpfPolice:
 			pol := &Police{}
-			if err := unmarshalPolice(ad.Bytes(), pol); err != nil {
-				return err
-			}
+			err := unmarshalPolice(ad.Bytes(), pol)
+			concatError(multiError, err)
 			info.Police = pol
 		case tcaBpfClassID:
 			info.ClassID = uint32Ptr(ad.Uint32())
@@ -78,7 +78,7 @@ func unmarshalBpf(data []byte, info *Bpf) error {
 			return fmt.Errorf("unmarshalBpf()\t%d\n\t%v", ad.Type(), ad.Bytes())
 		}
 	}
-	return nil
+	return concatError(multiError, ad.Err())
 }
 
 // marshalBpf returns the binary encoding of Bpf

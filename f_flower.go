@@ -175,6 +175,7 @@ func unmarshalFlower(data []byte, info *Flower) error {
 	if err != nil {
 		return err
 	}
+	var multiError error
 	ad.ByteOrder = nativeEndian
 	for ad.Next() {
 		switch ad.Type() {
@@ -186,9 +187,8 @@ func unmarshalFlower(data []byte, info *Flower) error {
 			info.Indev = &tmp
 		case tcaFlowerAct:
 			actions := &[]*Action{}
-			if err := unmarshalActions(ad.Bytes(), actions); err != nil {
-				return err
-			}
+			err := unmarshalActions(ad.Bytes(), actions)
+			concatError(multiError, err)
 			info.Actions = actions
 		case tcaFlowerKeyEthDst:
 			tmp := bytesToHardwareAddr(ad.Bytes())
@@ -389,7 +389,7 @@ func unmarshalFlower(data []byte, info *Flower) error {
 			return fmt.Errorf("unmarshalFlower()\t%d\n\t%v", ad.Type(), ad.Bytes())
 		}
 	}
-	return nil
+	return concatError(multiError, ad.Err())
 }
 
 // marshalFlower returns the binary encoding of Flow
@@ -399,7 +399,7 @@ func marshalFlower(info *Flower) ([]byte, error) {
 	if info == nil {
 		return []byte{}, fmt.Errorf("Flower: %w", ErrNoArg)
 	}
-
+	var multiError error
 	// TODO: improve logic and check combinations
 	if info.ClassID != nil {
 		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFlowerClassID, Data: *info.ClassID})
@@ -409,9 +409,7 @@ func marshalFlower(info *Flower) ([]byte, error) {
 	}
 	if info.Actions != nil {
 		data, err := marshalActions(*info.Actions)
-		if err != nil {
-			return []byte{}, err
-		}
+		concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaFlowerAct, Data: data})
 	}
 	if info.KeyEthDst != nil {
@@ -438,30 +436,22 @@ func marshalFlower(info *Flower) ([]byte, error) {
 	}
 	if info.KeyIPv4Src != nil {
 		tmp, err := ipToUint32(*info.KeyIPv4Src)
-		if err != nil {
-			return []byte{}, fmt.Errorf("Flower - KeyIPv4Src: %w", err)
-		}
+		concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtUint32Be, Type: tcaFlowerKeyIPv4Src, Data: tmp})
 	}
 	if info.KeyIPv4SrcMask != nil {
 		tmp, err := ipMaskToUint32(*info.KeyIPv4SrcMask)
-		if err != nil {
-			return []byte{}, fmt.Errorf("Flower - KeyIPv4SrcMask: %w", err)
-		}
+		concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtUint32Be, Type: tcaFlowerKeyIPv4SrcMask, Data: tmp})
 	}
 	if info.KeyIPv4Dst != nil {
 		tmp, err := ipToUint32(*info.KeyIPv4Dst)
-		if err != nil {
-			return []byte{}, fmt.Errorf("Flower - KeyIPv4Dst: %w", err)
-		}
+		concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtUint32Be, Type: tcaFlowerKeyIPv4Dst, Data: tmp})
 	}
 	if info.KeyIPv4DstMask != nil {
 		tmp, err := ipMaskToUint32(*info.KeyIPv4DstMask)
-		if err != nil {
-			return []byte{}, fmt.Errorf("Flower - KeyIPv4DstMask: %w", err)
-		}
+		concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtUint32Be, Type: tcaFlowerKeyIPv4DstMask, Data: tmp})
 	}
 	if info.KeyTCPSrc != nil {
@@ -493,30 +483,22 @@ func marshalFlower(info *Flower) ([]byte, error) {
 	}
 	if info.KeyEncIPv4Src != nil {
 		tmp, err := ipToUint32(*info.KeyEncIPv4Src)
-		if err != nil {
-			return []byte{}, fmt.Errorf("Flower - KeyEncIPv4Src: %w", err)
-		}
+		concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtUint32Be, Type: tcaFlowerKeyEncIPv4Src, Data: tmp})
 	}
 	if info.KeyEncIPv4SrcMask != nil {
 		tmp, err := ipMaskToUint32(*info.KeyEncIPv4SrcMask)
-		if err != nil {
-			return []byte{}, fmt.Errorf("Flower - KeyEncIPv4SrcMask: %w", err)
-		}
+		concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtUint32Be, Type: tcaFlowerKeyEncIPv4SrcMask, Data: tmp})
 	}
 	if info.KeyEncIPv4Dst != nil {
 		tmp, err := ipToUint32(*info.KeyEncIPv4Dst)
-		if err != nil {
-			return []byte{}, fmt.Errorf("Flower - KeyEncIPv4Dst: %w", err)
-		}
+		concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtUint32Be, Type: tcaFlowerKeyEncIPv4Dst, Data: tmp})
 	}
 	if info.KeyEncIPv4DstMask != nil {
 		tmp, err := ipMaskToUint32(*info.KeyEncIPv4DstMask)
-		if err != nil {
-			return []byte{}, fmt.Errorf("Flower - KeyEncIPv4DstMask: %w", err)
-		}
+		concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtUint32Be, Type: tcaFlowerKeyEncIPv4DstMask, Data: tmp})
 	}
 	if info.KeyTCPSrcMask != nil {
@@ -644,6 +626,9 @@ func marshalFlower(info *Flower) ([]byte, error) {
 	}
 	if info.InHwCount != nil {
 		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFlowerInHwCount, Data: *info.InHwCount})
+	}
+	if multiError != nil {
+		return []byte{}, multiError
 	}
 	return marshalAttributes(options)
 }

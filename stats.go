@@ -95,7 +95,7 @@ func unmarshalGenStats(data []byte, info *GenStats) error {
 			return fmt.Errorf("unmarshalGenStats()\t%d\n\t%v", ad.Type(), ad.Bytes())
 		}
 	}
-	return multiError
+	return concatError(multiError, ad.Err())
 }
 
 // marshalGenStats returns the binary encoding of GenStats

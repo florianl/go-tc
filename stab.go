@@ -52,7 +52,7 @@ func unmarshalStab(data []byte, stab *Stab) error {
 			return fmt.Errorf("unmarshalStab()\t%d\n\t%v", ad.Type(), ad.Bytes())
 		}
 	}
-	return multiError
+	return concatError(multiError, ad.Err())
 }
 
 func marshalStab(info *Stab) ([]byte, error) {
