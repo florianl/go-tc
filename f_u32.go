@@ -48,12 +48,11 @@ func marshalU32(info *U32) ([]byte, error) {
 	}
 
 	// TODO: improve logic and check combinations
+	var multiError error
 
 	if info.Sel != nil {
 		data, err := validateU32SelOptions(info.Sel)
-		if err != nil {
-			return []byte{}, err
-		}
+		concatError(multiError, err)
 		// align returned data to 4 bytes
 		for len(data)%4 != 0 {
 			data = append(data, 0x0)
@@ -63,9 +62,7 @@ func marshalU32(info *U32) ([]byte, error) {
 
 	if info.Mark != nil {
 		data, err := marshalStruct(info.Mark)
-		if err != nil {
-			return []byte{}, err
-		}
+		concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaU32Mark, Data: data})
 	}
 
@@ -74,9 +71,7 @@ func marshalU32(info *U32) ([]byte, error) {
 	}
 	if info.Police != nil {
 		data, err := marshalPolice(info.Police)
-		if err != nil {
-			return []byte{}, err
-		}
+		concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaU32Police, Data: data})
 	}
 	if info.Flags != nil {
@@ -84,9 +79,7 @@ func marshalU32(info *U32) ([]byte, error) {
 	}
 	if info.Actions != nil {
 		data, err := marshalActions(*info.Actions)
-		if err != nil {
-			return []byte{}, err
-		}
+		concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaU32Act, Data: data})
 	}
 	if info.Divisor != nil {
@@ -105,6 +98,10 @@ func marshalU32(info *U32) ([]byte, error) {
 		options = append(options, tcOption{Interpretation: vtUint64, Type: tcaU32Pcnt, Data: uint64Value(info.Pcnt)})
 	}
 
+	if multiError != nil {
+		return []byte{}, multiError
+	}
+
 	return marshalAttributes(options)
 }
 
@@ -114,6 +111,7 @@ func unmarshalU32(data []byte, info *U32) error {
 	if err != nil {
 		return err
 	}
+	var multiError error
 	ad.ByteOrder = nativeEndian
 	for ad.Next() {
 		switch ad.Type() {
@@ -127,15 +125,13 @@ func unmarshalU32(data []byte, info *U32) error {
 			info.Divisor = uint32Ptr(ad.Uint32())
 		case tcaU32Sel:
 			arg := &U32Sel{}
-			if err := extractU32Sel(ad.Bytes(), arg); err != nil {
-				return err
-			}
+			err := extractU32Sel(ad.Bytes(), arg)
+			concatError(multiError, err)
 			info.Sel = arg
 		case tcaU32Police:
 			pol := &Police{}
-			if err := unmarshalPolice(ad.Bytes(), pol); err != nil {
-				return err
-			}
+			err := unmarshalPolice(ad.Bytes(), pol)
+			concatError(multiError, err)
 			info.Police = pol
 		case tcaU32InDev:
 			info.InDev = stringPtr(ad.String())
@@ -143,17 +139,15 @@ func unmarshalU32(data []byte, info *U32) error {
 			info.Pcnt = uint64Ptr(ad.Uint64())
 		case tcaU32Mark:
 			arg := &U32Mark{}
-			if err := unmarshalStruct(ad.Bytes(), arg); err != nil {
-				return err
-			}
+			err := unmarshalStruct(ad.Bytes(), arg)
+			concatError(multiError, err)
 			info.Mark = arg
 		case tcaU32Flags:
 			info.Flags = uint32Ptr(ad.Uint32())
 		case tcaU32Act:
 			actions := &[]*Action{}
-			if err := unmarshalActions(ad.Bytes(), actions); err != nil {
-				return err
-			}
+			err := unmarshalActions(ad.Bytes(), actions)
+			concatError(multiError, err)
 			info.Actions = actions
 		case tcaU32Pad:
 			// padding does not contain data, we just skip it
@@ -161,7 +155,7 @@ func unmarshalU32(data []byte, info *U32) error {
 			return fmt.Errorf("unmarshalU32()\t%d\n\t%v", ad.Type(), ad.Bytes())
 		}
 	}
-	return nil
+	return multiError
 }
 
 // U32Sel from include/uapi/linux/pkt_sched.h

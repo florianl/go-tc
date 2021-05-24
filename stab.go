@@ -36,14 +36,14 @@ func unmarshalStab(data []byte, stab *Stab) error {
 	if err != nil {
 		return err
 	}
+	var multiError error
 	ad.ByteOrder = nativeEndian
 	for ad.Next() {
 		switch ad.Type() {
 		case tcaStabBase:
 			base := &SizeSpec{}
-			if err := unmarshalStruct(ad.Bytes(), base); err != nil {
-				return err
-			}
+			err := unmarshalStruct(ad.Bytes(), base)
+			concatError(multiError, err)
 			stab.Base = base
 		case tcaStabData:
 			tmp := ad.Bytes()
@@ -52,7 +52,7 @@ func unmarshalStab(data []byte, stab *Stab) error {
 			return fmt.Errorf("unmarshalStab()\t%d\n\t%v", ad.Type(), ad.Bytes())
 		}
 	}
-	return nil
+	return multiError
 }
 
 func marshalStab(info *Stab) ([]byte, error) {
@@ -62,16 +62,20 @@ func marshalStab(info *Stab) ([]byte, error) {
 		return []byte{}, fmt.Errorf("Stab: %w", ErrNoArg)
 	}
 
+	var multiError error
+
 	// TODO: improve logic and check combination
 	if info.Base != nil {
 		data, err := marshalStruct(info.Base)
-		if err != nil {
-			return []byte{}, err
-		}
+		concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaStabBase, Data: data})
 	}
 	if info.Data != nil {
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaStabData, Data: *info.Data})
+	}
+
+	if multiError != nil {
+		return []byte{}, multiError
 	}
 
 	return marshalAttributes(options)
