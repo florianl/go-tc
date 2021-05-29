@@ -70,20 +70,19 @@ func unmarshalSample(data []byte, info *Sample) error {
 	if err != nil {
 		return err
 	}
+	var multiError error
 	ad.ByteOrder = nativeEndian
 	for ad.Next() {
 		switch ad.Type() {
 		case tcaSampleParms:
 			parms := &SampleParms{}
-			if err := unmarshalStruct(ad.Bytes(), parms); err != nil {
-				return err
-			}
+			err = unmarshalStruct(ad.Bytes(), parms)
+			concatError(multiError, err)
 			info.Parms = parms
 		case tcaSampleTm:
 			tcft := &Tcft{}
-			if err := unmarshalStruct(ad.Bytes(), tcft); err != nil {
-				return err
-			}
+			err = unmarshalStruct(ad.Bytes(), tcft)
+			concatError(multiError, err)
 			info.Tm = tcft
 		case tcaSampleRate:
 			info.Rate = uint32Ptr(ad.Uint32())
@@ -97,5 +96,5 @@ func unmarshalSample(data []byte, info *Sample) error {
 			return fmt.Errorf("unmarshalSample()\t%d\n\t%v", ad.Type(), ad.Bytes())
 		}
 	}
-	return nil
+	return concatError(multiError, ad.Err())
 }

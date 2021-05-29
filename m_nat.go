@@ -59,20 +59,19 @@ func unmarshalNat(data []byte, info *Nat) error {
 	if err != nil {
 		return err
 	}
+	var multiError error
 	ad.ByteOrder = nativeEndian
 	for ad.Next() {
 		switch ad.Type() {
 		case tcaNatParms:
 			parms := &NatParms{}
-			if err := unmarshalStruct(ad.Bytes(), parms); err != nil {
-				return err
-			}
+			err = unmarshalStruct(ad.Bytes(), parms)
+			concatError(multiError, err)
 			info.Parms = parms
 		case tcaNatTm:
 			tcft := &Tcft{}
-			if err := unmarshalStruct(ad.Bytes(), tcft); err != nil {
-				return err
-			}
+			err = unmarshalStruct(ad.Bytes(), tcft)
+			concatError(multiError, err)
 			info.Tm = tcft
 		case tcaNatPad:
 			// padding does not contain data, we just skip it
@@ -80,5 +79,5 @@ func unmarshalNat(data []byte, info *Nat) error {
 			return fmt.Errorf("unmarshalNat()\t%d\n\t%v", ad.Type(), ad.Bytes())
 		}
 	}
-	return nil
+	return concatError(multiError, ad.Err())
 }

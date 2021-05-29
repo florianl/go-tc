@@ -80,14 +80,14 @@ func unmarshalIfe(data []byte, info *Ife) error {
 	if err != nil {
 		return err
 	}
+	var multiError error
 	ad.ByteOrder = nativeEndian
 	for ad.Next() {
 		switch ad.Type() {
 		case tcaIfeParms:
 			parms := &IfeParms{}
-			if err := unmarshalStruct(ad.Bytes(), parms); err != nil {
-				return err
-			}
+			err = unmarshalStruct(ad.Bytes(), parms)
+			concatError(multiError, err)
 			info.Parms = parms
 		case tcaIfeSMac:
 			tmp := ad.Bytes()
@@ -97,9 +97,8 @@ func unmarshalIfe(data []byte, info *Ife) error {
 			info.DMac = &tmp
 		case tcaIfeTm:
 			tcft := &Tcft{}
-			if err := unmarshalStruct(ad.Bytes(), tcft); err != nil {
-				return err
-			}
+			err = unmarshalStruct(ad.Bytes(), tcft)
+			concatError(multiError, err)
 			info.Tm = tcft
 		case tcaIfeType:
 			tmp := ad.Uint16()
@@ -110,5 +109,5 @@ func unmarshalIfe(data []byte, info *Ife) error {
 			return fmt.Errorf("unmarshalIfe()\t%d\n\t%v", ad.Type(), ad.Bytes())
 		}
 	}
-	return nil
+	return concatError(multiError, ad.Err())
 }

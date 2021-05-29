@@ -38,14 +38,14 @@ func unmarshalIpt(data []byte, info *Ipt) error {
 	if err != nil {
 		return err
 	}
+	var multiError error
 	ad.ByteOrder = nativeEndian
 	for ad.Next() {
 		switch ad.Type() {
 		case tcaIptTm:
 			tcft := &Tcft{}
-			if err := unmarshalStruct(ad.Bytes(), tcft); err != nil {
-				return err
-			}
+			err = unmarshalStruct(ad.Bytes(), tcft)
+			concatError(multiError, err)
 			info.Tm = tcft
 		case tcaIptTable:
 			info.Table = stringPtr(ad.String())
@@ -55,9 +55,8 @@ func unmarshalIpt(data []byte, info *Ipt) error {
 			info.Index = uint32Ptr(ad.Uint32())
 		case tcaIptCnt:
 			tmp := &IptCnt{}
-			if err := unmarshalStruct(ad.Bytes(), tmp); err != nil {
-				return err
-			}
+			err = unmarshalStruct(ad.Bytes(), tmp)
+			concatError(multiError, err)
 			info.Cnt = tmp
 		case tcaIptPad:
 			// padding does not contain data, we just skip it
@@ -65,7 +64,7 @@ func unmarshalIpt(data []byte, info *Ipt) error {
 			return fmt.Errorf("UnmarshalIpt()\t%d\n\t%v", ad.Type(), ad.Bytes())
 		}
 	}
-	return nil
+	return concatError(multiError, ad.Err())
 }
 
 // marshalIpt returns the binary encoding of Ipt

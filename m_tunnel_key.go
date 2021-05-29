@@ -110,20 +110,19 @@ func unmarshalTunnelKey(data []byte, info *TunnelKey) error {
 	if err != nil {
 		return err
 	}
+	var multiError error
 	ad.ByteOrder = nativeEndian
 	for ad.Next() {
 		switch ad.Type() {
 		case tcaTunnelKeyTm:
 			tm := &Tcft{}
-			if err := unmarshalStruct(ad.Bytes(), tm); err != nil {
-				return err
-			}
+			err = unmarshalStruct(ad.Bytes(), tm)
+			concatError(multiError, err)
 			info.Tm = tm
 		case tcaTunnelKeyParms:
 			parms := &TunnelParms{}
-			if err := unmarshalStruct(ad.Bytes(), parms); err != nil {
-				return err
-			}
+			err = unmarshalStruct(ad.Bytes(), parms)
+			concatError(multiError, err)
 			info.Parms = parms
 		case tcaTunnelKeyEncIPv4Src:
 			tmp := uint32ToIP(ad.Uint32())
@@ -133,15 +132,11 @@ func unmarshalTunnelKey(data []byte, info *TunnelKey) error {
 			info.KeyEncDst = &tmp
 		case tcaTunnelKeyEncIPv6Src:
 			tmp, err := bytesToIP(ad.Bytes())
-			if err != nil {
-				return err
-			}
+			concatError(multiError, err)
 			info.KeyEncSrc = &tmp
 		case tcaTunnelKeyEncIPv6Dst:
 			tmp, err := bytesToIP(ad.Bytes())
-			if err != nil {
-				return err
-			}
+			concatError(multiError, err)
 			info.KeyEncDst = &tmp
 		case tcaTunnelKeyEncKeyID:
 			tmp := ad.Uint32()
@@ -164,5 +159,5 @@ func unmarshalTunnelKey(data []byte, info *TunnelKey) error {
 			return fmt.Errorf("unmarshalTunnelKey()\t%d\n\t%v", ad.Type(), ad.Bytes())
 		}
 	}
-	return nil
+	return concatError(multiError, ad.Err())
 }

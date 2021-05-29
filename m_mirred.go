@@ -35,20 +35,19 @@ func unmarshalMirred(data []byte, info *Mirred) error {
 	if err != nil {
 		return err
 	}
+	var multiError error
 	ad.ByteOrder = nativeEndian
 	for ad.Next() {
 		switch ad.Type() {
 		case tcaMirredParms:
 			param := &MirredParam{}
-			if err := unmarshalStruct(ad.Bytes(), param); err != nil {
-				return err
-			}
+			err = unmarshalStruct(ad.Bytes(), param)
+			concatError(multiError, err)
 			info.Parms = param
 		case tcaMirredTm:
 			tm := &Tcft{}
-			if err := unmarshalStruct(ad.Bytes(), tm); err != nil {
-				return err
-			}
+			err = unmarshalStruct(ad.Bytes(), tm)
+			concatError(multiError, err)
 			info.Tm = tm
 		case tcaMirredPad:
 			// padding does not contain data, we just skip it
@@ -56,7 +55,7 @@ func unmarshalMirred(data []byte, info *Mirred) error {
 			return fmt.Errorf("unmarshalMirred()\t%d\n\t%v", ad.Type(), ad.Bytes())
 		}
 	}
-	return nil
+	return concatError(multiError, ad.Err())
 }
 
 // marshalMirred returns the binary encoding of Mirred

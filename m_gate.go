@@ -78,20 +78,19 @@ func unmarshalGate(data []byte, info *Gate) error {
 	if err != nil {
 		return err
 	}
+	var multiError error
 	ad.ByteOrder = nativeEndian
 	for ad.Next() {
 		switch ad.Type() {
 		case tcaGateParms:
 			parms := &GateParms{}
-			if err := unmarshalStruct(ad.Bytes(), parms); err != nil {
-				return err
-			}
+			err = unmarshalStruct(ad.Bytes(), parms)
+			concatError(multiError, err)
 			info.Parms = parms
 		case tcaGateTm:
 			tcft := &Tcft{}
-			if err := unmarshalStruct(ad.Bytes(), tcft); err != nil {
-				return err
-			}
+			err = unmarshalStruct(ad.Bytes(), tcft)
+			concatError(multiError, err)
 			info.Tm = tcft
 		case tcaGatePad:
 			// padding does not contain data, we just skip it
@@ -111,7 +110,7 @@ func unmarshalGate(data []byte, info *Gate) error {
 			return fmt.Errorf("UnmarshalGate()\t%d\n\t%v", ad.Type(), ad.Bytes())
 		}
 	}
-	return ad.Err()
+	return concatError(multiError, ad.Err())
 }
 
 // GateParms from include/uapi/linux/tc_act/tc_gate.h

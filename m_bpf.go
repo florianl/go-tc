@@ -37,20 +37,19 @@ func unmarshalActBpf(data []byte, info *ActBpf) error {
 	if err != nil {
 		return err
 	}
+	var multiError error
 	ad.ByteOrder = nativeEndian
 	for ad.Next() {
 		switch ad.Type() {
 		case tcaActBpfTm:
 			tm := &Tcft{}
-			if err := unmarshalStruct(ad.Bytes(), tm); err != nil {
-				return err
-			}
+			err = unmarshalStruct(ad.Bytes(), tm)
+			concatError(multiError, err)
 			info.Tm = tm
 		case tcaActBpfParms:
 			parms := &ActBpfParms{}
-			if err := unmarshalStruct(ad.Bytes(), parms); err != nil {
-				return err
-			}
+			err = unmarshalStruct(ad.Bytes(), parms)
+			concatError(multiError, err)
 			info.Parms = parms
 		case tcaActBpfOpsLen:
 			info.OpsLen = uint16Ptr(ad.Uint16())
@@ -70,7 +69,7 @@ func unmarshalActBpf(data []byte, info *ActBpf) error {
 			return fmt.Errorf("UnmarshalActBpf()\t%d\n\t%v", ad.Type(), ad.Bytes())
 		}
 	}
-	return nil
+	return concatError(multiError, ad.Err())
 }
 
 // marshalActBpf returns the binary encoding of ActBpf

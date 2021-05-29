@@ -48,19 +48,20 @@ func marshalGact(info *Gact) ([]byte, error) {
 	if info.Tm != nil {
 		return []byte{}, ErrNoArgAlter
 	}
+	var multiError error
+
 	if info.Prob != nil {
 		data, err := marshalStruct(info.Prob)
-		if err != nil {
-			return []byte{}, err
-		}
+		concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaGactProb, Data: data})
 	}
 	if info.Parms != nil {
 		data, err := marshalStruct(info.Parms)
-		if err != nil {
-			return []byte{}, err
-		}
+		concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaGactParm, Data: data})
+	}
+	if multiError != nil {
+		return []byte{}, multiError
 	}
 	return marshalAttributes(options)
 }
@@ -71,26 +72,24 @@ func unmarshalGact(data []byte, info *Gact) error {
 	if err != nil {
 		return err
 	}
+	var multiError error
 	ad.ByteOrder = nativeEndian
 	for ad.Next() {
 		switch ad.Type() {
 		case tcaGactTm:
 			tcft := &Tcft{}
-			if err := unmarshalStruct(ad.Bytes(), tcft); err != nil {
-				return err
-			}
+			err = unmarshalStruct(ad.Bytes(), tcft)
+			concatError(multiError, err)
 			info.Tm = tcft
 		case tcaGactParm:
 			parms := &GactParms{}
-			if err := unmarshalStruct(ad.Bytes(), parms); err != nil {
-				return err
-			}
+			err = unmarshalStruct(ad.Bytes(), parms)
+			concatError(multiError, err)
 			info.Parms = parms
 		case tcaGactProb:
 			prob := &GactProb{}
-			if err := unmarshalStruct(ad.Bytes(), prob); err != nil {
-				return err
-			}
+			err = unmarshalStruct(ad.Bytes(), prob)
+			concatError(multiError, err)
 			info.Prob = prob
 		case tcaGactPad:
 			// padding does not contain data, we just skip it
@@ -98,5 +97,5 @@ func unmarshalGact(data []byte, info *Gact) error {
 			return fmt.Errorf("UnmarshalGact()\t%d\n\t%v", ad.Type(), ad.Bytes())
 		}
 	}
-	return nil
+	return concatError(multiError, ad.Err())
 }

@@ -46,20 +46,19 @@ func unmarshalCsum(data []byte, info *Csum) error {
 	if err != nil {
 		return err
 	}
+	var multiError error
 	ad.ByteOrder = nativeEndian
 	for ad.Next() {
 		switch ad.Type() {
 		case tcaCsumParms:
 			parms := &CsumParms{}
-			if err := unmarshalStruct(ad.Bytes(), parms); err != nil {
-				return err
-			}
+			err = unmarshalStruct(ad.Bytes(), parms)
+			concatError(multiError, err)
 			info.Parms = parms
 		case tcaCsumTm:
 			tcft := &Tcft{}
-			if err := unmarshalStruct(ad.Bytes(), tcft); err != nil {
-				return err
-			}
+			err = unmarshalStruct(ad.Bytes(), tcft)
+			concatError(multiError, err)
 			info.Tm = tcft
 		case tcaCsumPad:
 			// padding does not contain data, we just skip it
@@ -67,7 +66,7 @@ func unmarshalCsum(data []byte, info *Csum) error {
 			return fmt.Errorf("UnmarshalCsum()\t%d\n\t%v", ad.Type(), ad.Bytes())
 		}
 	}
-	return nil
+	return concatError(multiError, ad.Err())
 }
 
 // CsumParms from include/uapi/linux/tc_act/tc_csum.h
