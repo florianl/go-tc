@@ -155,13 +155,26 @@ func generateQfq(t *testing.T) []byte {
 	return data
 }
 
+func generateUnknown(t *testing.T) []byte {
+	t.Helper()
+	options := []tcOption{}
+	options = append(options, tcOption{Interpretation: vtString, Type: tcaKind, Data: "unknown"})
+
+	data, err := marshalAttributes(options)
+	if err != nil {
+		t.Fatalf("could not generate test data: %v", err)
+	}
+	return data
+}
+
 func TestExtractTcmsgAttributes(t *testing.T) {
 	tests := map[string]struct {
 		input    []byte
 		expected *Attribute
 		err      error
 	}{
-		"empty": {input: []byte{}, expected: &Attribute{}},
+		"empty":   {input: []byte{}, expected: &Attribute{}},
+		"unknown": {input: generateUnknown(t), expected: &Attribute{Kind: "unknown"}},
 		"clsact": {input: generateClsact(t), expected: &Attribute{Kind: "clsact", HwOffload: uint8Ptr(0x60),
 			EgressBlock: uint32Ptr(0x1337), IngressBlock: uint32Ptr(0xcafe), Chain: uint32Ptr(42)}},
 		"htb": {input: generateHtb(t), expected: &Attribute{Kind: "htb",
@@ -185,11 +198,14 @@ func TestExtractTcmsgAttributes(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			value := &Attribute{}
 			if err := extractTcmsgAttributes(0xCAFE, testcase.input, value); err != nil {
-				if testcase.err != nil && testcase.err.Error() == err.Error() {
+				if errors.Is(err, testcase.err) {
 					// we received the expected error. everything is fine
 					return
 				}
 				t.Fatalf("Received error '%v', but expected '%v'", err, testcase.err)
+			}
+			if testcase.err != nil {
+				t.Fatalf("Expected error '%v' but got none", testcase.err)
 			}
 			if diff := cmp.Diff(value, testcase.expected); diff != "" {
 				t.Fatalf("ExtractTcmsgAttributes missmatch (-want +got):\n%s", diff)
