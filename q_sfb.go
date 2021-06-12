@@ -32,13 +32,13 @@ func unmarshalSfb(data []byte, info *Sfb) error {
 			}
 			info.Parms = opt
 		default:
-			return fmt.Errorf("extractSbfOptions()\t%d\n\t%v", ad.Type(), ad.Bytes())
+			return fmt.Errorf("extractSfbOptions()\t%d\n\t%v", ad.Type(), ad.Bytes())
 		}
 	}
 	return nil
 }
 
-// marshalSbf returns the binary encoding of Sfb
+// marshalSfb returns the binary encoding of Sfb
 func marshalSfb(info *Sfb) ([]byte, error) {
 	options := []tcOption{}
 
