@@ -204,6 +204,12 @@ func extractTCAOptions(data []byte, tc *Attribute, kind string) error {
 			return err
 		}
 		tc.Sfb = info
+	case "sfq":
+		info := &Sfq{}
+		if err := unmarshalSfq(data, info); err != nil {
+			return err
+		}
+		tc.Sfq = info
 	case "red":
 		info := &Red{}
 		if err := unmarshalRed(data, info); err != nil {

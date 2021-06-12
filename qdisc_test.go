@@ -36,6 +36,7 @@ func TestQdisc(t *testing.T) {
 		fqCodel *FqCodel
 		red     *Red
 		sfb     *Sfb
+		sfq     *Sfq
 		cbq     *Cbq
 		codel   *Codel
 		hhf     *Hhf
@@ -51,6 +52,11 @@ func TestQdisc(t *testing.T) {
 			fqCodel: &FqCodel{Target: uint32Ptr(42), Limit: uint32Ptr(0xCAFE)}},
 		"red": {kind: "red", red: &Red{MaxP: uint32Ptr(42)}},
 		"sfb": {kind: "sfb", sfb: &Sfb{Parms: &SfbQopt{Max: 0xFF}}},
+		"sfq": {kind: "sfq", sfq: &Sfq{V0: SfqQopt{
+			PerturbPeriod: 64,
+			Limit:         3000,
+			Flows:         512,
+		}}},
 		"cbq": {kind: "cbq", cbq: &Cbq{LssOpt: &CbqLssOpt{OffTime: 10}, WrrOpt: &CbqWrrOpt{Weight: 42},
 			FOpt: &CbqFOpt{Split: 2}, OVLStrategy: &CbqOvl{Penalty: 2}}},
 		"codel": {kind: "codel", codel: &Codel{Target: uint32Ptr(1), Limit: uint32Ptr(2), Interval: uint32Ptr(3),
@@ -82,6 +88,7 @@ func TestQdisc(t *testing.T) {
 					FqCodel: testcase.fqCodel,
 					Red:     testcase.red,
 					Sfb:     testcase.sfb,
+					Sfq:     testcase.sfq,
 					Cbq:     testcase.cbq,
 					Codel:   testcase.codel,
 					Hhf:     testcase.hhf,

@@ -104,6 +104,8 @@ func validateQdiscObject(action int, info *Object) ([]tcOption, error) {
 		data, err = marshalTbf(info.Tbf)
 	case "sfb":
 		data, err = marshalSfb(info.Sfb)
+	case "sfq":
+		data, err = marshalSfq(info.Sfq)
 	case "red":
 		data, err = marshalRed(info.Red)
 	case "qfq":

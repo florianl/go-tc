@@ -184,6 +184,7 @@ type Attribute struct {
 	Hhf     *Hhf
 	Tbf     *Tbf
 	Sfb     *Sfb
+	Sfq     *Sfq
 	Red     *Red
 	MqPrio  *MqPrio
 	Pfifo   *FifoOpt
