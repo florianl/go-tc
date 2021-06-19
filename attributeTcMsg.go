@@ -13,6 +13,7 @@ func extractTcmsgAttributes(action int, data []byte, info *Attribute) error {
 	}
 	var options []byte
 	var xStats []byte
+	var multiError error
 	ad.ByteOrder = nativeEndian
 	for ad.Next() {
 		switch ad.Type() {
@@ -32,15 +33,13 @@ func extractTcmsgAttributes(action int, data []byte, info *Attribute) error {
 			xStats = ad.Bytes()
 		case tcaStats:
 			tcstats := &Stats{}
-			if err := unmarshalStruct(ad.Bytes(), tcstats); err != nil {
-				return err
-			}
+			err := unmarshalStruct(ad.Bytes(), tcstats)
+			concatError(multiError, err)
 			info.Stats = tcstats
 		case tcaStats2:
 			tcstats2 := &Stats2{}
-			if err := unmarshalStruct(ad.Bytes(), tcstats2); err != nil {
-				return err
-			}
+			err := unmarshalStruct(ad.Bytes(), tcstats2)
+			concatError(multiError, err)
 			info.Stats2 = tcstats2
 		case tcaHwOffload:
 			info.HwOffload = uint8Ptr(ad.Uint8())
@@ -50,15 +49,19 @@ func extractTcmsgAttributes(action int, data []byte, info *Attribute) error {
 			info.IngressBlock = uint32Ptr(ad.Uint32())
 		case tcaStab:
 			stab := &Stab{}
-			if err := unmarshalStab(ad.Bytes(), stab); err != nil {
-				return err
-			}
+			err := unmarshalStab(ad.Bytes(), stab)
+			concatError(multiError, err)
 			info.Stab = stab
 		default:
 			return fmt.Errorf("extractTcmsgAttributes()\t%d\n\t%v", ad.Type(), ad.Bytes())
 
 		}
 	}
+	concatError(multiError, ad.Err())
+	if multiError != nil {
+		return err
+	}
+
 	if len(options) > 0 {
 		if (action&actionMask == actionQdisc) && hasQOpt(info.Kind) {
 			err = extractQOpt(options, info, info.Kind)
@@ -93,146 +96,126 @@ func hasQOpt(kind string) bool {
 }
 
 func extractQOpt(data []byte, tc *Attribute, kind string) error {
+	var multiError error
 	switch kind {
 	case "hfsc":
 		info := &HfscQOpt{}
-		if err := unmarshalHfscQOpt(data, info); err != nil {
-			return err
-		}
+		err := unmarshalHfscQOpt(data, info)
+		concatError(multiError, err)
 		tc.HfscQOpt = info
 	case "qfq":
 		info := &Qfq{}
-		if err := unmarshalQfq(data, info); err != nil {
-			return err
-		}
+		err := unmarshalQfq(data, info)
+		concatError(multiError, err)
 		tc.Qfq = info
 	case "htb":
 		info := &Htb{}
-		if err := unmarshalHtb(data, info); err != nil {
-			return err
-		}
+		err := unmarshalHtb(data, info)
+		concatError(multiError, err)
 		tc.Htb = info
 	default:
 		return fmt.Errorf("no QOpts for %s", kind)
 	}
-	return nil
+	return multiError
 }
 
 func extractTCAOptions(data []byte, tc *Attribute, kind string) error {
+	var multiError error
 	switch kind {
 	case "choke":
 		info := &Choke{}
-		if err := unmarshalChoke(data, info); err != nil {
-			return err
-		}
+		err := unmarshalChoke(data, info)
+		concatError(multiError, err)
 		tc.Choke = info
 	case "fq_codel":
 		info := &FqCodel{}
-		if err := unmarshalFqCodel(data, info); err != nil {
-			return err
-		}
+		err := unmarshalFqCodel(data, info)
+		concatError(multiError, err)
 		tc.FqCodel = info
 	case "codel":
 		info := &Codel{}
-		if err := unmarshalCodel(data, info); err != nil {
-			return err
-		}
+		err := unmarshalCodel(data, info)
+		concatError(multiError, err)
 		tc.Codel = info
 	case "fq":
 		info := &Fq{}
-		if err := unmarshalFq(data, info); err != nil {
-			return err
-		}
+		err := unmarshalFq(data, info)
+		concatError(multiError, err)
 		tc.Fq = info
 	case "pie":
 		info := &Pie{}
-		if err := unmarshalPie(data, info); err != nil {
-			return err
-		}
+		err := unmarshalPie(data, info)
+		concatError(multiError, err)
 		tc.Pie = info
 	case "hhf":
 		info := &Hhf{}
-		if err := unmarshalHhf(data, info); err != nil {
-			return err
-		}
+		err := unmarshalHhf(data, info)
+		concatError(multiError, err)
 		tc.Hhf = info
 	case "htb":
 		info := &Htb{}
-		if err := unmarshalHtb(data, info); err != nil {
-			return err
-		}
+		err := unmarshalHtb(data, info)
+		concatError(multiError, err)
 		tc.Htb = info
 	case "hfsc":
 		info := &Hfsc{}
-		if err := unmarshalHfsc(data, info); err != nil {
-			return err
-		}
+		err := unmarshalHfsc(data, info)
+		concatError(multiError, err)
 		tc.Hfsc = info
 	case "dsmark":
 		info := &Dsmark{}
-		if err := unmarshalDsmark(data, info); err != nil {
-			return err
-		}
+		err := unmarshalDsmark(data, info)
+		concatError(multiError, err)
 		tc.Dsmark = info
 	case "drr":
 		info := &Drr{}
-		if err := unmarshalDrr(data, info); err != nil {
-			return err
-		}
+		err := unmarshalDrr(data, info)
+		concatError(multiError, err)
 		tc.Drr = info
 	case "cbq":
 		info := &Cbq{}
-		if err := unmarshalCbq(data, info); err != nil {
-			return err
-		}
+		err := unmarshalCbq(data, info)
+		concatError(multiError, err)
 		tc.Cbq = info
 	case "atm":
 		info := &Atm{}
-		if err := unmarshalAtm(data, info); err != nil {
-			return err
-		}
+		err := unmarshalAtm(data, info)
+		concatError(multiError, err)
 		tc.Atm = info
 	case "tbf":
 		info := &Tbf{}
-		if err := unmarshalTbf(data, info); err != nil {
-			return err
-		}
+		err := unmarshalTbf(data, info)
+		concatError(multiError, err)
 		tc.Tbf = info
 	case "sfb":
 		info := &Sfb{}
-		if err := unmarshalSfb(data, info); err != nil {
-			return err
-		}
+		err := unmarshalSfb(data, info)
+		concatError(multiError, err)
 		tc.Sfb = info
 	case "sfq":
 		info := &Sfq{}
-		if err := unmarshalSfq(data, info); err != nil {
-			return err
-		}
+		err := unmarshalSfq(data, info)
+		concatError(multiError, err)
 		tc.Sfq = info
 	case "red":
 		info := &Red{}
-		if err := unmarshalRed(data, info); err != nil {
-			return err
-		}
+		err := unmarshalRed(data, info)
+		concatError(multiError, err)
 		tc.Red = info
 	case "pfifo":
 		limit := &FifoOpt{}
-		if err := unmarshalStruct(data, limit); err != nil {
-			return err
-		}
+		err := unmarshalStruct(data, limit)
+		concatError(multiError, err)
 		tc.Pfifo = limit
 	case "mqprio":
 		info := &MqPrio{}
-		if err := unmarshalMqPrio(data, info); err != nil {
-			return err
-		}
+		err := unmarshalMqPrio(data, info)
+		concatError(multiError, err)
 		tc.MqPrio = info
 	case "bfifo":
 		limit := &FifoOpt{}
-		if err := unmarshalStruct(data, limit); err != nil {
-			return err
-		}
+		err := unmarshalStruct(data, limit)
+		concatError(multiError, err)
 		tc.Bfifo = limit
 	case "clsact":
 		return extractClsact(data)
@@ -240,155 +223,133 @@ func extractTCAOptions(data []byte, tc *Attribute, kind string) error {
 		return extractIngress(data)
 	case "qfq":
 		info := &Qfq{}
-		if err := unmarshalQfq(data, info); err != nil {
-			return err
-		}
+		err := unmarshalQfq(data, info)
+		concatError(multiError, err)
 		tc.Qfq = info
 	case "basic":
 		info := &Basic{}
-		if err := unmarshalBasic(data, info); err != nil {
-			return err
-		}
+		err := unmarshalBasic(data, info)
+		concatError(multiError, err)
 		tc.Basic = info
 	case "bpf":
 		info := &Bpf{}
-		if err := unmarshalBpf(data, info); err != nil {
-			return err
-		}
+		err := unmarshalBpf(data, info)
+		concatError(multiError, err)
 		tc.BPF = info
 	case "cgroup":
 		info := &Cgroup{}
-		if err := unmarshalCgroup(data, info); err != nil {
-			return err
-		}
+		err := unmarshalCgroup(data, info)
+		concatError(multiError, err)
 		tc.Cgroup = info
 	case "u32":
 		info := &U32{}
-		if err := unmarshalU32(data, info); err != nil {
-			return err
-		}
+		err := unmarshalU32(data, info)
+		concatError(multiError, err)
 		tc.U32 = info
 	case "flower":
 		info := &Flower{}
-		if err := unmarshalFlower(data, info); err != nil {
-			return err
-		}
+		err := unmarshalFlower(data, info)
+		concatError(multiError, err)
 		tc.Flower = info
 	case "rsvp":
 		info := &Rsvp{}
-		if err := unmarshalRsvp(data, info); err != nil {
-			return err
-		}
+		err := unmarshalRsvp(data, info)
+		concatError(multiError, err)
 		tc.Rsvp = info
 	case "route4":
 		info := &Route4{}
-		if err := unmarshalRoute4(data, info); err != nil {
-			return err
-		}
+		err := unmarshalRoute4(data, info)
+		concatError(multiError, err)
 		tc.Route4 = info
 	case "fw":
 		info := &Fw{}
-		if err := unmarshalFw(data, info); err != nil {
-			return err
-		}
+		err := unmarshalFw(data, info)
+		concatError(multiError, err)
 		tc.Fw = info
 	case "flow":
 		info := &Flow{}
-		if err := unmarshalFlow(data, info); err != nil {
-			return err
-		}
+		err := unmarshalFlow(data, info)
+		concatError(multiError, err)
 		tc.Flow = info
 	case "matchall":
 		info := &Matchall{}
-		if err := unmarshalMatchall(data, info); err != nil {
-			return err
-		}
+		err := unmarshalMatchall(data, info)
+		concatError(multiError, err)
 		tc.Matchall = info
 	case "netem":
 		info := &Netem{}
-		if err := unmarshalNetem(data, info); err != nil {
-			return err
-		}
+		err := unmarshalNetem(data, info)
+		concatError(multiError, err)
 		tc.Netem = info
 	case "cake":
 		info := &Cake{}
-		if err := unmarshalCake(data, info); err != nil {
-			return err
-		}
+		err := unmarshalCake(data, info)
+		concatError(multiError, err)
 		tc.Cake = info
 	default:
 		return fmt.Errorf("extractTCAOptions(): unsupported kind %s: %w", kind, ErrUnknownKind)
 	}
 
-	return nil
+	return multiError
 }
 
 func extractXStats(data []byte, tc *XStats, kind string) error {
+	var multiError error
 	switch kind {
 	case "sfb":
 		info := &SfbXStats{}
-		if err := unmarshalStruct(data, info); err != nil {
-			return err
-		}
+		err := unmarshalStruct(data, info)
+		concatError(multiError, err)
 		tc.Sfb = info
 	case "red":
 		info := &RedXStats{}
-		if err := unmarshalStruct(data, info); err != nil {
-			return err
-		}
+		err := unmarshalStruct(data, info)
+		concatError(multiError, err)
 		tc.Red = info
 	case "choke":
 		info := &ChokeXStats{}
-		if err := unmarshalStruct(data, info); err != nil {
-			return err
-		}
+		err := unmarshalStruct(data, info)
+		concatError(multiError, err)
 		tc.Choke = info
 	case "htb":
 		info := &HtbXStats{}
-		if err := unmarshalStruct(data, info); err != nil {
-			return err
-		}
+		err := unmarshalStruct(data, info)
+		concatError(multiError, err)
 		tc.Htb = info
 	case "cbq":
 		info := &CbqXStats{}
-		if err := unmarshalStruct(data, info); err != nil {
-			return err
-		}
+		err := unmarshalStruct(data, info)
+		concatError(multiError, err)
 		tc.Cbq = info
 	case "codel":
 		info := &CodelXStats{}
-		if err := unmarshalStruct(data, info); err != nil {
-			return err
-		}
+		err := unmarshalStruct(data, info)
+		concatError(multiError, err)
 		tc.Codel = info
 	case "hhf":
 		info := &HhfXStats{}
-		if err := unmarshalStruct(data, info); err != nil {
-			return err
-		}
+		err := unmarshalStruct(data, info)
+		concatError(multiError, err)
 		tc.Hhf = info
 	case "pie":
 		info := &PieXStats{}
-		if err := unmarshalStruct(data, info); err != nil {
-			return err
-		}
+		err := unmarshalStruct(data, info)
+		concatError(multiError, err)
 		tc.Pie = info
 	case "fq_codel":
 		info := &FqCodelXStats{}
-		if err := unmarshalFqCodelXStats(data, info); err != nil {
-			return err
-		}
+		err := unmarshalFqCodelXStats(data, info)
+		concatError(multiError, err)
 		tc.FqCodel = info
 	case "hfsc":
 		info := &HfscXStats{}
-		if err := unmarshalStruct(data, info); err != nil {
-			return err
-		}
+		err := unmarshalStruct(data, info)
+		concatError(multiError, err)
 		tc.Hfsc = info
 	default:
 		return fmt.Errorf("extractXStats(): unsupported kind: %s", kind)
 	}
-	return nil
+	return multiError
 }
 
 func extractClsact(data []byte) error {
