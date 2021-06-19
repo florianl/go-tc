@@ -28,38 +28,36 @@ func unmarshalHfsc(data []byte, info *Hfsc) error {
 	if err != nil {
 		return err
 	}
+	var multiError error
 	ad.ByteOrder = nativeEndian
 	for ad.Next() {
 		switch ad.Type() {
 		case tcaHfscRsc:
 			curve := &ServiceCurve{}
-			if err := unmarshalStruct(ad.Bytes(), curve); err != nil {
-				return err
-			}
+			err := unmarshalStruct(ad.Bytes(), curve)
+			concatError(multiError, err)
 			info.Rsc = curve
 		case tcaHfscFsc:
 			curve := &ServiceCurve{}
-			if err := unmarshalStruct(ad.Bytes(), curve); err != nil {
-				return err
-			}
+			err := unmarshalStruct(ad.Bytes(), curve)
+			concatError(multiError, err)
 			info.Fsc = curve
 		case tcaHfscUsc:
 			curve := &ServiceCurve{}
-			if err := unmarshalStruct(ad.Bytes(), curve); err != nil {
-				return err
-			}
+			err := unmarshalStruct(ad.Bytes(), curve)
+			concatError(multiError, err)
 			info.Usc = curve
 		default:
 			return fmt.Errorf("unmarshalHfsc()\t%d\n\t%v", ad.Type(), ad.Bytes())
 		}
 	}
-	return nil
+	return concatError(multiError, ad.Err())
 }
 
 // marshalHfsc returns the binary encoding of Hfsc
 func marshalHfsc(info *Hfsc) ([]byte, error) {
 	options := []tcOption{}
-
+	var multiError error
 	if info == nil {
 		return []byte{}, fmt.Errorf("Hfsc: %w", ErrNoArg)
 	}
@@ -68,26 +66,22 @@ func marshalHfsc(info *Hfsc) ([]byte, error) {
 
 	if info.Rsc != nil {
 		data, err := marshalStruct(info.Rsc)
-		if err != nil {
-			return []byte{}, err
-		}
+		concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaHfscRsc, Data: data})
 	}
 	if info.Fsc != nil {
 		data, err := marshalStruct(info.Fsc)
-		if err != nil {
-			return []byte{}, err
-		}
+		concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaHfscFsc, Data: data})
 	}
 	if info.Usc != nil {
 		data, err := marshalStruct(info.Usc)
-		if err != nil {
-			return []byte{}, err
-		}
+		concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaHfscUsc, Data: data})
 	}
-
+	if multiError != nil {
+		return []byte{}, multiError
+	}
 	return marshalAttributes(options)
 }
 

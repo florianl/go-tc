@@ -97,32 +97,29 @@ func unmarshalNetem(data []byte, info *Netem) error {
 	if err != nil {
 		return err
 	}
+	var multiError error
 	ad.ByteOrder = nativeEndian
 	for ad.Next() {
 		switch ad.Type() {
 		case tcaNetemCorr:
 			tmp := &NetemCorr{}
-			if err := unmarshalStruct(ad.Bytes(), tmp); err != nil {
-				return err
-			}
+			err := unmarshalStruct(ad.Bytes(), tmp)
+			concatError(multiError, err)
 			info.Corr = tmp
 		case tcaNetemReorder:
 			tmp := &NetemReorder{}
-			if err := unmarshalStruct(ad.Bytes(), tmp); err != nil {
-				return err
-			}
+			err := unmarshalStruct(ad.Bytes(), tmp)
+			concatError(multiError, err)
 			info.Reorder = tmp
 		case tcaNetemCorrupt:
 			tmp := &NetemCorrupt{}
-			if err := unmarshalStruct(ad.Bytes(), tmp); err != nil {
-				return err
-			}
+			err := unmarshalStruct(ad.Bytes(), tmp)
+			concatError(multiError, err)
 			info.Corrupt = tmp
 		case tcaNetemRate:
 			tmp := &NetemRate{}
-			if err := unmarshalStruct(ad.Bytes(), tmp); err != nil {
-				return err
-			}
+			err := unmarshalStruct(ad.Bytes(), tmp)
+			concatError(multiError, err)
 			info.Rate = tmp
 		case tcaNetemEcn:
 			tmp := ad.Uint32()
@@ -132,21 +129,18 @@ func unmarshalNetem(data []byte, info *Netem) error {
 			info.Rate64 = &tmp
 		case tcaNetemLatency64:
 			var val int64
-			if err := unmarshalNetlinkAttribute(ad.Bytes(), &val); err != nil {
-				return err
-			}
+			err := unmarshalNetlinkAttribute(ad.Bytes(), &val)
+			concatError(multiError, err)
 			info.Latency64 = &val
 		case tcaNetemJitter64:
 			var val int64
-			if err := unmarshalNetlinkAttribute(ad.Bytes(), &val); err != nil {
-				return err
-			}
+			err := unmarshalNetlinkAttribute(ad.Bytes(), &val)
+			concatError(multiError, err)
 			info.Jitter64 = &val
 		case tcaNetemSlot:
 			tmp := &NetemSlot{}
-			if err := unmarshalStruct(ad.Bytes(), tmp); err != nil {
-				return err
-			}
+			err := unmarshalStruct(ad.Bytes(), tmp)
+			concatError(multiError, err)
 			info.Slot = tmp
 		case tcaNetemPad:
 			// padding does not contain data, we just skip it
@@ -154,43 +148,35 @@ func unmarshalNetem(data []byte, info *Netem) error {
 			return fmt.Errorf("unmarshalNetem()\t%d\n\t%v", ad.Type(), ad.Bytes())
 		}
 	}
-	return nil
+	return concatError(multiError, ad.Err())
 }
 
 // marshalNetem returns the binary encoding of Qfq
 func marshalNetem(info *Netem) ([]byte, error) {
 	options := []tcOption{}
-
+	var multiError error
 	if info == nil {
 		return []byte{}, fmt.Errorf("Netem: %w", ErrNoArg)
 	}
 
 	if info.Corr != nil {
 		data, err := marshalStruct(info.Corr)
-		if err != nil {
-			return []byte{}, err
-		}
+		concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaNetemCorr, Data: data})
 	}
 	if info.Reorder != nil {
 		data, err := marshalStruct(info.Reorder)
-		if err != nil {
-			return []byte{}, err
-		}
+		concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaNetemReorder, Data: data})
 	}
 	if info.Corrupt != nil {
 		data, err := marshalStruct(info.Corrupt)
-		if err != nil {
-			return []byte{}, err
-		}
+		concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaNetemCorrupt, Data: data})
 	}
 	if info.Rate != nil {
 		data, err := marshalStruct(info.Rate)
-		if err != nil {
-			return []byte{}, err
-		}
+		concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaNetemRate, Data: data})
 	}
 	if info.Ecn != nil {
@@ -207,19 +193,18 @@ func marshalNetem(info *Netem) ([]byte, error) {
 	}
 	if info.Slot != nil {
 		data, err := marshalStruct(info.Slot)
-		if err != nil {
-			return []byte{}, err
-		}
+		concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaNetemSlot, Data: data})
 	}
 
 	data, err := marshalAttributes(options)
+	concatError(multiError, err)
 
 	var qoptErr error
 	var qoptData []byte
 	if qoptData, qoptErr = marshalStruct(info.Qopt); qoptErr != nil {
-		return []byte{}, err
+		return []byte{}, qoptErr
 	}
 
-	return append(qoptData[:], data[:]...), err
+	return append(qoptData[:], data[:]...), multiError
 }
