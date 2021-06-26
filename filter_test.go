@@ -102,6 +102,11 @@ func TestFilter(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 	})
+	t.Run("replace nil", func(t *testing.T) {
+		if err := tcSocket.Filter().Replace(nil); !errors.Is(err, ErrNoArg) {
+			t.Fatalf("unexpected error: %v", err)
+		}
+	})
 	t.Run("add nil", func(t *testing.T) {
 		if err := tcSocket.Filter().Add(nil); !errors.Is(err, ErrNoArg) {
 			t.Fatalf("unexpected error: %v", err)
@@ -109,6 +114,29 @@ func TestFilter(t *testing.T) {
 	})
 	t.Run("get nil", func(t *testing.T) {
 		if _, err := tcSocket.Filter().Get(nil); !errors.Is(err, ErrNoArg) {
+			t.Fatalf("unexpected error: %v", err)
+		}
+	})
+}
+
+func TestValidateFilterObject(t *testing.T) {
+	t.Run("IfIndex == 0", func(t *testing.T) {
+		if _, err := validateFilterObject(unix.RTM_NEWTFILTER, &Object{
+			Msg{Ifindex: 0},
+			Attribute{},
+		}); !errors.Is(err, ErrInvalidDev) {
+			t.Fatalf("unexpected error: %v", err)
+		}
+	})
+	t.Run("stats", func(t *testing.T) {
+		if _, err := validateFilterObject(unix.RTM_NEWTFILTER, &Object{
+			Msg{
+				Ifindex: 42,
+			},
+			Attribute{
+				Stats: &Stats{Bytes: 42},
+			},
+		}); !errors.Is(err, ErrInvalidArg) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 	})
