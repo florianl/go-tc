@@ -36,6 +36,10 @@ type tcOption struct {
 const nlaFNnested = (1 << 15)
 
 func marshalAttributes(options []tcOption) ([]byte, error) {
+	if len(options) == 0 {
+		return []byte{}, nil
+	}
+	var multiError error
 	ad := netlink.NewAttributeEncoder()
 
 	for _, option := range options {
@@ -56,45 +60,41 @@ func marshalAttributes(options []tcOption) ([]byte, error) {
 			ad.Flag(option.Type, true)
 		case vtInt8:
 			data := bytes.NewBuffer(make([]byte, 0, 1))
-			if err := binary.Write(data, nativeEndian, (option.Data).(int8)); err != nil {
-				return []byte{}, err
-			}
+			err := binary.Write(data, nativeEndian, (option.Data).(int8))
+			concatError(multiError, err)
 			ad.Bytes(option.Type, data.Bytes())
 		case vtInt16:
 			data := bytes.NewBuffer(make([]byte, 0, 2))
-			if err := binary.Write(data, nativeEndian, (option.Data).(int16)); err != nil {
-				return []byte{}, err
-			}
+			err := binary.Write(data, nativeEndian, (option.Data).(int16))
+			concatError(multiError, err)
 			ad.Bytes(option.Type, data.Bytes())
 		case vtInt32:
 			data := bytes.NewBuffer(make([]byte, 0, 4))
-			if err := binary.Write(data, nativeEndian, (option.Data).(int32)); err != nil {
-				return []byte{}, err
-			}
+			err := binary.Write(data, nativeEndian, (option.Data).(int32))
+			concatError(multiError, err)
 			ad.Bytes(option.Type, data.Bytes())
 		case vtInt64:
 			data := bytes.NewBuffer(make([]byte, 0, 8))
-			if err := binary.Write(data, nativeEndian, (option.Data).(int64)); err != nil {
-				return []byte{}, err
-			}
+			err := binary.Write(data, nativeEndian, (option.Data).(int64))
+			concatError(multiError, err)
 			ad.Bytes(option.Type, data.Bytes())
 		case vtUint16Be:
 			data := bytes.NewBuffer(make([]byte, 0, 2))
-			if err := binary.Write(data, binary.BigEndian, (option.Data).(uint16)); err != nil {
-				return []byte{}, err
-			}
+			err := binary.Write(data, binary.BigEndian, (option.Data).(uint16))
+			concatError(multiError, err)
 			ad.Bytes(option.Type, data.Bytes())
 		case vtUint32Be:
 			data := bytes.NewBuffer(make([]byte, 0, 4))
-			if err := binary.Write(data, binary.BigEndian, (option.Data).(uint32)); err != nil {
-				return []byte{}, err
-			}
+			err := binary.Write(data, binary.BigEndian, (option.Data).(uint32))
+			concatError(multiError, err)
 			ad.Bytes(option.Type, data.Bytes())
 		default:
 			return []byte{}, fmt.Errorf("unknown interpretation: %d", option.Interpretation)
 		}
 	}
-
+	if multiError != nil {
+		return []byte{}, multiError
+	}
 	return ad.Encode()
 }
 
