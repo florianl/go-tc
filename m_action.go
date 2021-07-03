@@ -119,7 +119,7 @@ func marshalActions(info []*Action) ([]byte, error) {
 	options := []tcOption{}
 
 	for i, action := range info {
-		data, err := marshalAction(action)
+		data, err := marshalAction(action, tcaActOptions|nlaFNnested)
 		if err != nil {
 			return []byte{}, err
 		}
@@ -130,7 +130,7 @@ func marshalActions(info []*Action) ([]byte, error) {
 }
 
 // marshalAction returns the binary encoding of Action
-func marshalAction(info *Action) ([]byte, error) {
+func marshalAction(info *Action, actOption uint16) ([]byte, error) {
 	options := []tcOption{}
 
 	if info == nil {
@@ -147,59 +147,59 @@ func marshalAction(info *Action) ([]byte, error) {
 	case "bpf":
 		data, err := marshalActBpf(info.Bpf)
 		concatError(multiError, err)
-		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaActOptions, Data: data})
+		options = append(options, tcOption{Interpretation: vtBytes, Type: actOption, Data: data})
 	case "connmark":
 		data, err := marshalConnmark(info.ConnMark)
 		concatError(multiError, err)
-		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaActOptions, Data: data})
+		options = append(options, tcOption{Interpretation: vtBytes, Type: actOption, Data: data})
 	case "csum":
 		data, err := marshalCsum(info.CSum)
 		concatError(multiError, err)
-		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaActOptions, Data: data})
+		options = append(options, tcOption{Interpretation: vtBytes, Type: actOption, Data: data})
 	case "defact":
 		data, err := marshalDefact(info.Defact)
 		concatError(multiError, err)
-		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaActOptions, Data: data})
+		options = append(options, tcOption{Interpretation: vtBytes, Type: actOption, Data: data})
 	case "gact":
 		data, err := marshalGact(info.Gact)
 		concatError(multiError, err)
-		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaActOptions, Data: data})
+		options = append(options, tcOption{Interpretation: vtBytes, Type: actOption, Data: data})
 	case "gate":
 		data, err := marshalGate(info.Gate)
 		concatError(multiError, err)
-		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaActOptions, Data: data})
+		options = append(options, tcOption{Interpretation: vtBytes, Type: actOption, Data: data})
 	case "ife":
 		data, err := marshalIfe(info.Ife)
 		concatError(multiError, err)
-		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaActOptions, Data: data})
+		options = append(options, tcOption{Interpretation: vtBytes, Type: actOption, Data: data})
 	case "ipt":
 		data, err := marshalIpt(info.Ipt)
 		concatError(multiError, err)
-		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaActOptions, Data: data})
+		options = append(options, tcOption{Interpretation: vtBytes, Type: actOption, Data: data})
 	case "mirred":
 		data, err := marshalMirred(info.Mirred)
 		concatError(multiError, err)
-		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaActOptions, Data: data})
+		options = append(options, tcOption{Interpretation: vtBytes, Type: actOption, Data: data})
 	case "nat":
 		data, err := marshalNat(info.Nat)
 		concatError(multiError, err)
-		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaActOptions, Data: data})
+		options = append(options, tcOption{Interpretation: vtBytes, Type: actOption, Data: data})
 	case "sample":
 		data, err := marshalSample(info.Sample)
 		concatError(multiError, err)
-		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaActOptions, Data: data})
+		options = append(options, tcOption{Interpretation: vtBytes, Type: actOption, Data: data})
 	case "vlan":
 		data, err := marshalVlan(info.VLan)
 		concatError(multiError, err)
-		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaActOptions, Data: data})
+		options = append(options, tcOption{Interpretation: vtBytes, Type: actOption, Data: data})
 	case "police":
 		data, err := marshalPolice(info.Police)
 		concatError(multiError, err)
-		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaActOptions, Data: data})
+		options = append(options, tcOption{Interpretation: vtBytes, Type: actOption, Data: data})
 	case "tunnel_key":
 		data, err := marshalTunnelKey(info.TunnelKey)
 		concatError(multiError, err)
-		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaActOptions, Data: data})
+		options = append(options, tcOption{Interpretation: vtBytes, Type: actOption, Data: data})
 	default:
 		return []byte{}, fmt.Errorf("unknown kind '%s'", info.Kind)
 	}

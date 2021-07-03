@@ -29,7 +29,7 @@ func marshalCgroup(info *Cgroup) ([]byte, error) {
 	var multiError error
 	// TODO: improve logic and check combinations
 	if info.Action != nil {
-		data, err := marshalAction(info.Action)
+		data, err := marshalAction(info.Action, tcaActOptions)
 		concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaCgroupAct, Data: data})
 

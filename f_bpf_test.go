@@ -26,6 +26,19 @@ func TestBpf(t *testing.T) {
 			Name:    stringPtr("testing"),
 			Tag:     bytesPtr([]byte{0xAA, 0x55}),
 			ID:      uint32Ptr(42)}},
+		"filter add dev XXX ingress bpf bytecode '1,6 0 0 4294967295,' flowid 1:1 action drop": {
+			val: Bpf{Ops: bytesPtr([]byte{0x6, 0x0, 0x0, 0x0, 0xff, 0xff, 0xff, 0xff}),
+				OpsLen:  uint16Ptr(1),
+				ClassID: uint32Ptr(0x10001),
+				Action: &Action{
+					Kind: "gact",
+					Gact: &Gact{
+						Parms: &GactParms{
+							Action: 2, // drop
+						},
+					},
+				}},
+		},
 	}
 
 	for name, testcase := range tests {

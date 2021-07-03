@@ -80,7 +80,7 @@ func TestAction(t *testing.T) {
 		})
 	}
 	t.Run("nil", func(t *testing.T) {
-		_, err := marshalAction(nil)
+		_, err := marshalAction(nil, tcaActOptions)
 		if !errors.Is(err, ErrNoArg) {
 			t.Fatalf("unexpected error: %v", err)
 		}
