@@ -60,7 +60,6 @@ func unmarshalNat(data []byte, info *Nat) error {
 		return err
 	}
 	var multiError error
-	ad.ByteOrder = nativeEndian
 	for ad.Next() {
 		switch ad.Type() {
 		case tcaNatParms:

@@ -38,7 +38,6 @@ func unmarshalActBpf(data []byte, info *ActBpf) error {
 		return err
 	}
 	var multiError error
-	ad.ByteOrder = nativeEndian
 	for ad.Next() {
 		switch ad.Type() {
 		case tcaActBpfTm:

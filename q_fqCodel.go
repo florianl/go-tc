@@ -91,7 +91,6 @@ func unmarshalFqCodel(data []byte, info *FqCodel) error {
 	if err != nil {
 		return err
 	}
-	ad.ByteOrder = nativeEndian
 	for ad.Next() {
 		switch ad.Type() {
 		case tcaFqCodelTarget:

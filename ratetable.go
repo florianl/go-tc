@@ -103,7 +103,6 @@ func stripRateTable(t *testing.T, orig []byte, skip []uint16) ([]byte, error) {
 	if err != nil {
 		return []byte{}, err
 	}
-	ad.ByteOrder = nativeEndian
 	for ad.Next() {
 		if !skipAttribute(t, ad.Type(), skip) {
 			attrs = append(attrs, netlink.Attribute{

@@ -111,7 +111,6 @@ func injectAttribute(t *testing.T, orig, new []byte, tcaAttribute uint16) []byte
 	if err != nil {
 		t.Fatalf("Failed to decode attributes: %v", err)
 	}
-	ad.ByteOrder = nativeEndian
 	for ad.Next() {
 		attrs = append(attrs, netlink.Attribute{
 			Type: ad.Type(),
@@ -144,7 +143,6 @@ func changeEndianess(t *testing.T, orig []byte, attrs map[uint16]valueType) []by
 	if err != nil {
 		t.Fatalf("Failed to decode attributes: %v", err)
 	}
-	ad.ByteOrder = nativeEndian
 	for ad.Next() {
 		vT, ok := attrs[ad.Type()]
 		if !ok {

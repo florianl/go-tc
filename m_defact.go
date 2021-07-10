@@ -61,7 +61,6 @@ func unmarshalDefact(data []byte, info *Defact) error {
 		return err
 	}
 	var multiError error
-	ad.ByteOrder = nativeEndian
 	for ad.Next() {
 		switch ad.Type() {
 		case tcaDefParms:

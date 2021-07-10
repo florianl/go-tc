@@ -176,7 +176,6 @@ func unmarshalFlower(data []byte, info *Flower) error {
 		return err
 	}
 	var multiError error
-	ad.ByteOrder = nativeEndian
 	for ad.Next() {
 		switch ad.Type() {
 		case tcaFlowerClassID:

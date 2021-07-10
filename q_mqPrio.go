@@ -28,7 +28,6 @@ func unmarshalMqPrio(data []byte, info *MqPrio) error {
 	if err != nil {
 		return err
 	}
-	ad.ByteOrder = nativeEndian
 	for ad.Next() {
 		switch ad.Type() {
 		case tcaMqPrioMode:

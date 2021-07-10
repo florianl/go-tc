@@ -30,7 +30,6 @@ func unmarshalDsmark(data []byte, info *Dsmark) error {
 	if err != nil {
 		return err
 	}
-	ad.ByteOrder = nativeEndian
 	for ad.Next() {
 		switch ad.Type() {
 		case tcaDsmarkIndices:

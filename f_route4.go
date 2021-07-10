@@ -30,7 +30,6 @@ func unmarshalRoute4(data []byte, info *Route4) error {
 	if err != nil {
 		return err
 	}
-	ad.ByteOrder = nativeEndian
 	for ad.Next() {
 		switch ad.Type() {
 		case tcaRoute4ClassID:

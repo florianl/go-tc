@@ -64,7 +64,6 @@ func unmarshalActions(data []byte, actions *[]*Action) error {
 	if err != nil {
 		return err
 	}
-	ad.ByteOrder = nativeEndian
 	for ad.Next() {
 		action := &Action{}
 		if err := unmarshalAction(ad.Bytes(), action); err != nil {
@@ -82,7 +81,6 @@ func unmarshalAction(data []byte, info *Action) error {
 		return err
 	}
 	var actOptions []byte
-	ad.ByteOrder = nativeEndian
 	for ad.Next() {
 		switch ad.Type() {
 		case tcaActKind:

@@ -37,7 +37,6 @@ func unmarshalStab(data []byte, stab *Stab) error {
 		return err
 	}
 	var multiError error
-	ad.ByteOrder = nativeEndian
 	for ad.Next() {
 		switch ad.Type() {
 		case tcaStabBase:

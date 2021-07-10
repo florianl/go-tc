@@ -79,7 +79,6 @@ func unmarshalEmatch(data []byte, info *Ematch) error {
 		return err
 	}
 	var multiError error
-	ad.ByteOrder = nativeEndian
 	for ad.Next() {
 		switch ad.Type() {
 		case tcaEmatchTreeHdr:
@@ -130,7 +129,6 @@ func unmarshalEmatchTreeList(data []byte, info *[]EmatchMatch) error {
 		return err
 	}
 	var multiError error
-	ad.ByteOrder = nativeEndian
 	for ad.Next() {
 		match := EmatchMatch{}
 		tmp := ad.Bytes()

@@ -34,7 +34,6 @@ func unmarshalPie(data []byte, info *Pie) error {
 	if err != nil {
 		return err
 	}
-	ad.ByteOrder = nativeEndian
 	for ad.Next() {
 		switch ad.Type() {
 		case tcaPieTarget:

@@ -14,7 +14,6 @@ func extractTcmsgAttributes(action int, data []byte, info *Attribute) error {
 	var options []byte
 	var xStats []byte
 	var multiError error
-	ad.ByteOrder = nativeEndian
 	for ad.Next() {
 		switch ad.Type() {
 		case tcaKind:

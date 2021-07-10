@@ -112,7 +112,6 @@ func unmarshalU32(data []byte, info *U32) error {
 		return err
 	}
 	var multiError error
-	ad.ByteOrder = nativeEndian
 	for ad.Next() {
 		switch ad.Type() {
 		case tcaU32ClassID:

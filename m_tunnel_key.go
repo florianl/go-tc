@@ -111,7 +111,6 @@ func unmarshalTunnelKey(data []byte, info *TunnelKey) error {
 		return err
 	}
 	var multiError error
-	ad.ByteOrder = nativeEndian
 	for ad.Next() {
 		switch ad.Type() {
 		case tcaTunnelKeyTm:

@@ -79,7 +79,6 @@ func unmarshalGate(data []byte, info *Gate) error {
 		return err
 	}
 	var multiError error
-	ad.ByteOrder = nativeEndian
 	for ad.Next() {
 		switch ad.Type() {
 		case tcaGateParms:

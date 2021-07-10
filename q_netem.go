@@ -98,7 +98,6 @@ func unmarshalNetem(data []byte, info *Netem) error {
 		return err
 	}
 	var multiError error
-	ad.ByteOrder = nativeEndian
 	for ad.Next() {
 		switch ad.Type() {
 		case tcaNetemCorr:
