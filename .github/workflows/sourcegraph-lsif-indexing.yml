@@ -1,0 +1,20 @@
+name: "sourcegraph LSIF indexing"
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  lsif-go:
+    # this line will prevent forks of this repo from uploading lsif indexes
+    if: github.repository == 'github.com/florianl/go-tc'
+    runs-on: ubuntu-latest
+    container: sourcegraph/lsif-go:latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Generate LSIF data
+        run: lsif-go
+      - name: Upload LSIF data
+        # this will upload to Sourcegraph.com, you may need to substitute a different command.
+        # by default, we ignore failures to avoid disrupting CI pipelines with non-critical errors.
+        run: src lsif upload -github-token=${{ secrets.GITHUB_TOKEN }} -ignore-upload-failure
