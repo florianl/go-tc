@@ -35,19 +35,18 @@ func unmarshalHtb(data []byte, info *Htb) error {
 	if err != nil {
 		return err
 	}
+	var multiError error
 	for ad.Next() {
 		switch ad.Type() {
 		case tcaHtbParms:
 			opt := &HtbOpt{}
-			if err := unmarshalStruct(ad.Bytes(), opt); err != nil {
-				return err
-			}
+			err := unmarshalStruct(ad.Bytes(), opt)
+			concatError(multiError, err)
 			info.Parms = opt
 		case tcaHtbInit:
 			glob := &HtbGlob{}
-			if err := unmarshalStruct(ad.Bytes(), glob); err != nil {
-				return err
-			}
+			err := unmarshalStruct(ad.Bytes(), glob)
+			concatError(multiError, err)
 			info.Init = glob
 		case tcaHtbCtab:
 			info.Ctab = bytesPtr(ad.Bytes())
@@ -65,7 +64,7 @@ func unmarshalHtb(data []byte, info *Htb) error {
 			return fmt.Errorf("unmarshalHtb()\t%d\n\t%v", ad.Type(), ad.Bytes())
 		}
 	}
-	return nil
+	return concatError(multiError, ad.Err())
 }
 
 // marshalHtb returns the binary encoding of Qfq
@@ -75,19 +74,16 @@ func marshalHtb(info *Htb) ([]byte, error) {
 	if info == nil {
 		return []byte{}, fmt.Errorf("Htb: %w", ErrNoArg)
 	}
+	var multiError error
 	// TODO: improve logic and check combinations
 	if info.Parms != nil {
 		data, err := marshalStruct(info.Parms)
-		if err != nil {
-			return []byte{}, err
-		}
+		concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaHtbParms, Data: data})
 	}
 	if info.Init != nil {
 		data, err := marshalStruct(info.Init)
-		if err != nil {
-			return []byte{}, err
-		}
+		concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaHtbInit, Data: data})
 	}
 	if info.DirectQlen != nil {
@@ -98,6 +94,9 @@ func marshalHtb(info *Htb) ([]byte, error) {
 	}
 	if info.Ceil64 != nil {
 		options = append(options, tcOption{Interpretation: vtUint64, Type: tcaHtbCeil64, Data: uint64Value(info.Ceil64)})
+	}
+	if multiError != nil {
+		return []byte{}, multiError
 	}
 	return marshalAttributes(options)
 }

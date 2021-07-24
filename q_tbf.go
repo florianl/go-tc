@@ -31,13 +31,13 @@ func unmarshalTbf(data []byte, info *Tbf) error {
 	if err != nil {
 		return err
 	}
+	var multiError error
 	for ad.Next() {
 		switch ad.Type() {
 		case tcaTbfParms:
 			qopt := &TbfQopt{}
-			if err := unmarshalStruct(ad.Bytes(), qopt); err != nil {
-				return err
-			}
+			err := unmarshalStruct(ad.Bytes(), qopt)
+			concatError(multiError, err)
 			info.Parms = qopt
 		case tcaTbfBurst:
 			info.Burst = uint32Ptr(ad.Uint32())
@@ -49,7 +49,7 @@ func unmarshalTbf(data []byte, info *Tbf) error {
 			return fmt.Errorf("unmarshalTbf()\t%d\n\t%v", ad.Type(), ad.Bytes())
 		}
 	}
-	return nil
+	return concatError(multiError, ad.Err())
 }
 
 // marshalTbf returns the binary encoding of Tbf
@@ -59,7 +59,7 @@ func marshalTbf(info *Tbf) ([]byte, error) {
 	if info == nil || info.Parms == nil {
 		return []byte{}, fmt.Errorf("Tbf: %w", ErrNoArg)
 	}
-
+	var multiError error
 	// TODO: improve logic and check combinations
 	if info.Parms.Rate.Rate != 0 {
 		ratePolicy := Policy{}
@@ -69,9 +69,7 @@ func marshalTbf(info *Tbf) ([]byte, error) {
 		ratePolicy.Rate.Rate = info.Parms.Rate.Rate
 
 		rtab, err := generateRateTable(&ratePolicy)
-		if err != nil {
-			return []byte{}, fmt.Errorf("Tbf: %w", err)
-		}
+		concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaTbfRtab, Data: rtab})
 	}
 	if info.Parms.PeakRate.Rate != 0 {
@@ -82,15 +80,11 @@ func marshalTbf(info *Tbf) ([]byte, error) {
 		ratePolicy.PeakRate.Rate = info.Parms.PeakRate.Rate
 
 		ptab, err := generateRateTable(&ratePolicy)
-		if err != nil {
-			return []byte{}, fmt.Errorf("Tbf: %w", err)
-		}
+		concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaTbfPtab, Data: ptab})
 	}
 	data, err := marshalStruct(info.Parms)
-	if err != nil {
-		return []byte{}, fmt.Errorf("Tbf: %v", err)
-	}
+	concatError(multiError, err)
 	options = append(options, tcOption{Interpretation: vtBytes, Type: tcaTbfParms, Data: data})
 
 	if info.Burst != nil {
@@ -98,6 +92,10 @@ func marshalTbf(info *Tbf) ([]byte, error) {
 	}
 	if info.Pburst != nil {
 		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaTbfPburst, Data: uint32Value(info.Pburst)})
+	}
+
+	if multiError != nil {
+		return []byte{}, fmt.Errorf("Tbf: %w", multiError)
 	}
 
 	return marshalAttributes(options)
