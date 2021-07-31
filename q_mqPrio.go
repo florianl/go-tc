@@ -42,7 +42,7 @@ func unmarshalMqPrio(data []byte, info *MqPrio) error {
 			return fmt.Errorf("unmarshalMqPrio()\t%d\n\t%v", ad.Type(), ad.Bytes())
 		}
 	}
-	return nil
+	return ad.Err()
 }
 
 // marshalMqPrio returns the binary encoding of MqPrio
