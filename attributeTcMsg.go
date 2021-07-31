@@ -181,6 +181,13 @@ func extractTCAOptions(data []byte, tc *Attribute, kind string) error {
 		err := unmarshalAtm(data, info)
 		concatError(multiError, err)
 		tc.Atm = info
+	case "pfifo_fast":
+		fallthrough
+	case "prio":
+		info := &Prio{}
+		err := unmarshalPrio(data, info)
+		concatError(multiError, err)
+		tc.Prio = info
 	case "tbf":
 		info := &Tbf{}
 		err := unmarshalTbf(data, info)

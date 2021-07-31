@@ -137,6 +137,8 @@ func validateQdiscObject(action int, info *Object) ([]tcOption, error) {
 		data, err = marshalHtb(info.Htb)
 	case "netem":
 		data, err = marshalNetem(info.Netem)
+	case "prio":
+		data, err = marshalPrio(info.Prio)
 	case "clsact":
 		// clsact is parameterless
 	case "ingress":

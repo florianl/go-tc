@@ -201,6 +201,7 @@ type Attribute struct {
 	Cbq      *Cbq
 	Atm      *Atm
 	Qfq      *Qfq
+	Prio     *Prio
 }
 
 // XStats contains further statistics to the TCA_KIND

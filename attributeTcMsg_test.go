@@ -225,6 +225,10 @@ func TestExtractTCAOptions(t *testing.T) {
 		"clsactWithData": {kind: "clsact", data: []byte{0xde, 0xad, 0xc0, 0xde}, err: ErrInvalidArg},
 		"ingress":        {kind: "ingress", expected: &Attribute{}},
 		"unknown":        {kind: "unknown", err: ErrUnknownKind},
+		"pfifo_fast": {kind: "pfifo_fast",
+			data: []byte{0x03, 0x00, 0x00, 0x00, 0x01, 0x02, 0x02, 0x02, 0x01, 0x02, 0x00, 0x00, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01},
+			expected: &Attribute{Prio: &Prio{Bands: 3,
+				PrioMap: [16]uint8{1, 2, 2, 2, 1, 2, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1}}}},
 	}
 
 	for name, testcase := range tests {

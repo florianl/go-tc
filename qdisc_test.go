@@ -45,6 +45,7 @@ func TestQdisc(t *testing.T) {
 		netem   *Netem
 		cake    *Cake
 		htb     *Htb
+		prio    *Prio
 	}{
 		"clsact":   {kind: "clsact"},
 		"emptyHtb": {kind: "htb", err: ErrNoArg},
@@ -69,6 +70,8 @@ func TestQdisc(t *testing.T) {
 		"netem": {kind: "netem", netem: &Netem{Ecn: uint32Ptr(64)}},
 		"cake":  {kind: "cake", cake: &Cake{BaseRate: uint64Ptr(128)}},
 		"htb":   {kind: "htb", htb: &Htb{Rate64: uint64Ptr(96)}},
+		"prio": {kind: "prio", prio: &Prio{Bands: 3,
+			PrioMap: [16]uint8{1, 2, 2, 2, 1, 2, 9, 9, 1, 1, 1, 1, 1, 1, 1, 1}}},
 	}
 
 	tcMsg := Msg{
@@ -97,6 +100,7 @@ func TestQdisc(t *testing.T) {
 					Netem:   testcase.netem,
 					Cake:    testcase.cake,
 					Htb:     testcase.htb,
+					Prio:    testcase.prio,
 				},
 			}
 
