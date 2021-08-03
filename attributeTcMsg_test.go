@@ -314,7 +314,7 @@ func TestQdiscAttribute(t *testing.T) {
 		"hfsc":     {val: &Attribute{Kind: "hfsc", HfscQOpt: &HfscQOpt{DefCls: 42}}},
 		"hhf":      {val: &Attribute{Kind: "hhf", Hhf: &Hhf{BacklogLimit: uint32Ptr(1), Quantum: uint32Ptr(2), HHFlowsLimit: uint32Ptr(3), ResetTimeout: uint32Ptr(4), AdmitBytes: uint32Ptr(5), EVICTTimeout: uint32Ptr(6), NonHHWeight: uint32Ptr(7)}}},
 		"htb":      {val: &Attribute{Kind: "htb", Htb: &Htb{Init: &HtbGlob{Version: 0x3, Rate2Quantum: 0xa, Defcls: 0x30}}}},
-		"mqprio":   {val: &Attribute{Kind: "mqprio", MqPrio: &MqPrio{Mode: uint16Ptr(1), Shaper: uint16Ptr(2), MinRate64: uint64Ptr(3), MaxRate64: uint64Ptr(4)}}},
+		"mqprio":   {val: &Attribute{Kind: "mqprio", MqPrio: &MqPrio{Opt: &MqPrioQopt{}, Mode: uint16Ptr(1), Shaper: uint16Ptr(2), MinRate64: uint64Ptr(3), MaxRate64: uint64Ptr(4)}}},
 		"pie":      {val: &Attribute{Kind: "pie", Pie: &Pie{Target: uint32Ptr(1), Limit: uint32Ptr(2), TUpdate: uint32Ptr(3), Alpha: uint32Ptr(4), Beta: uint32Ptr(5), ECN: uint32Ptr(6), Bytemode: uint32Ptr(7)}}},
 		"qfq":      {val: &Attribute{Kind: "qfq"}},
 		"red":      {val: &Attribute{Kind: "red", Red: &Red{MaxP: uint32Ptr(2), Parms: &RedQOpt{QthMin: 2, QthMax: 4}}}},
