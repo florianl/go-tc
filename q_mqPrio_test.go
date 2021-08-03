@@ -13,7 +13,8 @@ func TestMqPrio(t *testing.T) {
 		err1 error
 		err2 error
 	}{
-		"simple": {val: MqPrio{Mode: uint16Ptr(1), Shaper: uint16Ptr(2), MinRate64: uint64Ptr(3), MaxRate64: uint64Ptr(4)}},
+		"simple": {val: MqPrio{Opt: &MqPrioQopt{}, Mode: uint16Ptr(1),
+			Shaper: uint16Ptr(2), MinRate64: uint64Ptr(3), MaxRate64: uint64Ptr(4)}},
 	}
 
 	for name, testcase := range tests {
@@ -41,6 +42,12 @@ func TestMqPrio(t *testing.T) {
 	}
 	t.Run("nil", func(t *testing.T) {
 		_, err := marshalMqPrio(nil)
+		if !errors.Is(err, ErrNoArg) {
+			t.Fatalf("unexpected error: %v", err)
+		}
+	})
+	t.Run("options are nil", func(t *testing.T) {
+		_, err := marshalMqPrio(&MqPrio{})
 		if !errors.Is(err, ErrNoArg) {
 			t.Fatalf("unexpected error: %v", err)
 		}
