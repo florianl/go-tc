@@ -29,7 +29,7 @@ jobs:
     - name: Integrationtest for linux
       if: matrix.platform == 'ubuntu-latest'
       run: |
-        go test -race -v -exec=sudo -tags integration -covermode=atomic -coverprofile=provile.cov ./...
+        go test -race -v -exec=sudo -tags integration -covermode=atomic -coverprofile=profile.cov ./...
     - name: coveralls.io
       if: matrix.platform == 'ubuntu-latest'
       env:
