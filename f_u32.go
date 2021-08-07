@@ -154,7 +154,7 @@ func unmarshalU32(data []byte, info *U32) error {
 			return fmt.Errorf("unmarshalU32()\t%d\n\t%v", ad.Type(), ad.Bytes())
 		}
 	}
-	return multiError
+	return concatError(multiError, ad.Err())
 }
 
 // U32Sel from include/uapi/linux/pkt_sched.h

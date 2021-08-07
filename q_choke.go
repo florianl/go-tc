@@ -39,7 +39,7 @@ func unmarshalChoke(data []byte, info *Choke) error {
 			return fmt.Errorf("unmarshalChoke()\t%d\n\t%v", ad.Type(), ad.Bytes())
 		}
 	}
-	return nil
+	return ad.Err()
 }
 
 // marshalChoke returns the binary encoding of Choke

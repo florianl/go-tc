@@ -34,7 +34,7 @@ func unmarshalSfb(data []byte, info *Sfb) error {
 			return fmt.Errorf("extractSfbOptions()\t%d\n\t%v", ad.Type(), ad.Bytes())
 		}
 	}
-	return nil
+	return ad.Err()
 }
 
 // marshalSfb returns the binary encoding of Sfb

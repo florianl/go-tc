@@ -54,7 +54,7 @@ func unmarshalHhf(data []byte, info *Hhf) error {
 			return fmt.Errorf("unmarshalHhf()\t%d\n\t%v", ad.Type(), ad.Bytes())
 		}
 	}
-	return nil
+	return ad.Err()
 }
 
 // marshalHhf returns the binary encoding of Hhf

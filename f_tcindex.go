@@ -76,5 +76,5 @@ func unmarshalTcIndex(data []byte, info *TcIndex) error {
 			return fmt.Errorf("unmarshalTcIndex()\t%d\n\t%v", ad.Type(), ad.Bytes())
 		}
 	}
-	return nil
+	return ad.Err()
 }

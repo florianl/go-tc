@@ -46,7 +46,7 @@ func unmarshalCodel(data []byte, info *Codel) error {
 			return fmt.Errorf("unmarshalCodel()\t%d\n\t%v", ad.Type(), ad.Bytes())
 		}
 	}
-	return nil
+	return ad.Err()
 }
 
 // marshalCodel returns the binary encoding of Red

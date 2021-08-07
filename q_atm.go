@@ -49,7 +49,7 @@ func unmarshalAtm(data []byte, info *Atm) error {
 
 		}
 	}
-	return nil
+	return ad.Err()
 }
 
 // marshalAtm returns the binary encoding of Atm

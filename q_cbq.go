@@ -34,51 +34,46 @@ func unmarshalCbq(data []byte, info *Cbq) error {
 	if err != nil {
 		return err
 	}
+	var multiError error
 	for ad.Next() {
 		switch ad.Type() {
 		case tcaCbqLssOpt:
 			arg := &CbqLssOpt{}
-			if err := unmarshalStruct(ad.Bytes(), arg); err != nil {
-				return err
-			}
+			err := unmarshalStruct(ad.Bytes(), arg)
+			concatError(multiError, err)
 			info.LssOpt = arg
 		case tcaCbqWrrOpt:
 			arg := &CbqWrrOpt{}
-			if err := unmarshalStruct(ad.Bytes(), arg); err != nil {
-				return err
-			}
+			err := unmarshalStruct(ad.Bytes(), arg)
+			concatError(multiError, err)
 			info.WrrOpt = arg
 		case tcaCbqFOpt:
 			arg := &CbqFOpt{}
-			if err := unmarshalStruct(ad.Bytes(), arg); err != nil {
-				return err
-			}
+			err := unmarshalStruct(ad.Bytes(), arg)
+			concatError(multiError, err)
 			info.FOpt = arg
 		case tcaCbqOVLStrategy:
 			arg := &CbqOvl{}
-			if err := unmarshalStruct(ad.Bytes(), arg); err != nil {
-				return err
-			}
+			err := unmarshalStruct(ad.Bytes(), arg)
+			concatError(multiError, err)
 			info.OVLStrategy = arg
 		case tcaCbqRate:
 			arg := &RateSpec{}
-			if err := unmarshalStruct(ad.Bytes(), arg); err != nil {
-				return err
-			}
+			err := unmarshalStruct(ad.Bytes(), arg)
+			concatError(multiError, err)
 			info.Rate = arg
 		case tcaCbqRTab:
 			info.RTab = ad.Bytes()
 		case tcaCbqPolice:
 			arg := &CbqPolice{}
-			if err := unmarshalStruct(ad.Bytes(), arg); err != nil {
-				return err
-			}
+			err := unmarshalStruct(ad.Bytes(), arg)
+			concatError(multiError, err)
 			info.Police = arg
 		default:
 			return fmt.Errorf("unmarshalCbq()\t%d\n\t%v", ad.Type(), ad.Bytes())
 		}
 	}
-	return nil
+	return concatError(multiError, ad.Err())
 }
 
 // marshalCbq returns the binary encoding of Qfq
@@ -90,42 +85,35 @@ func marshalCbq(info *Cbq) ([]byte, error) {
 	}
 	// TODO: improve logic and check combinations
 
+	var multiError error
 	if info.LssOpt != nil {
 		data, err := marshalStruct(info.LssOpt)
-		if err != nil {
-			return []byte{}, err
-		}
+		concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaCbqLssOpt, Data: data})
 	}
 	if info.WrrOpt != nil {
 		data, err := marshalStruct(info.WrrOpt)
-		if err != nil {
-			return []byte{}, err
-		}
+		concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaCbqWrrOpt, Data: data})
 	}
 	if info.FOpt != nil {
 		data, err := marshalStruct(info.FOpt)
-		if err != nil {
-			return []byte{}, err
-		}
+		concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaCbqFOpt, Data: data})
 	}
 	if info.OVLStrategy != nil {
 		data, err := marshalStruct(info.OVLStrategy)
-		if err != nil {
-			return []byte{}, err
-		}
+		concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaCbqOVLStrategy, Data: data})
 	}
 	if info.Police != nil {
 		data, err := marshalStruct(info.Police)
-		if err != nil {
-			return []byte{}, err
-		}
+		concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaCbqPolice, Data: data})
 	}
-
+	if multiError != nil {
+		return []byte{}, multiError
+	}
 	return marshalAttributes(options)
 }
 

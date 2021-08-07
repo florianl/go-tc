@@ -115,5 +115,5 @@ func unmarshalFqCodel(data []byte, info *FqCodel) error {
 			return fmt.Errorf("unmarshalFqCodel()\t%d\n\t%v", ad.Type(), ad.Bytes())
 		}
 	}
-	return nil
+	return ad.Err()
 }

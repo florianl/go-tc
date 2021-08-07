@@ -115,7 +115,7 @@ func unmarshalCake(data []byte, info *Cake) error {
 			return fmt.Errorf("unmarshalCake()\t%d\n\t%v", ad.Type(), ad.Bytes())
 		}
 	}
-	return nil
+	return ad.Err()
 }
 
 // marshalCake returns the binary encoding of Red

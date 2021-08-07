@@ -54,7 +54,7 @@ func unmarshalPie(data []byte, info *Pie) error {
 			return fmt.Errorf("extractPieOptions()\t%d\n\t%v", ad.Type(), ad.Bytes())
 		}
 	}
-	return nil
+	return ad.Err()
 }
 
 // marshalPie returns the binary encoding of Qfq

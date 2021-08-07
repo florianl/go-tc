@@ -39,7 +39,7 @@ func unmarshalRed(data []byte, info *Red) error {
 			return fmt.Errorf("unmarshalRed()\t%d\n\t%v", ad.Type(), ad.Bytes())
 		}
 	}
-	return nil
+	return ad.Err()
 }
 
 // marshalRed returns the binary encoding of Red

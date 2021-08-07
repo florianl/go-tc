@@ -39,7 +39,7 @@ func unmarshalEtsQuanta(data []byte, info *[]uint32) error {
 			return fmt.Errorf("unmarshalEtsQuanta()\t%d\n\t%v", ad.Type(), ad.Bytes())
 		}
 	}
-	return nil
+	return ad.Err()
 }
 
 // marshalEtsQuanta
