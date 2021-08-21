@@ -30,9 +30,9 @@ func TestFlower(t *testing.T) {
 			KeyEthType:           uint16Ptr(2),
 			KeyIPProto:           uint8Ptr(3),
 			KeyIPv4Src:           netIPPtr(net.ParseIP("1.2.3.4")),
-			KeyIPv4SrcMask:       netIPMaskPtr(net.CIDRMask(20, 32)),
+			KeyIPv4SrcMask:       netIPPtr(net.ParseIP("255.255.255.0")),
 			KeyIPv4Dst:           netIPPtr(net.ParseIP("4.3.2.1")),
-			KeyIPv4DstMask:       netIPMaskPtr(net.CIDRMask(21, 32)),
+			KeyIPv4DstMask:       netIPPtr(net.ParseIP("255.255.0.0")),
 			KeyTCPSrc:            uint16Ptr(4),
 			KeyTCPDst:            uint16Ptr(5),
 			KeyUDPSrc:            uint16Ptr(6),
@@ -42,9 +42,9 @@ func TestFlower(t *testing.T) {
 			KeyVlanEthType:       uint16Ptr(10),
 			KeyEncKeyID:          uint32Ptr(11),
 			KeyEncIPv4Src:        netIPPtr(net.ParseIP("3.4.1.2")),
-			KeyEncIPv4SrcMask:    netIPMaskPtr(net.CIDRMask(22, 32)),
+			KeyEncIPv4SrcMask:    netIPPtr(net.ParseIP("255.0.0.0")),
 			KeyEncIPv4Dst:        netIPPtr(net.ParseIP("4.3.2.1")),
-			KeyEncIPv4DstMask:    netIPMaskPtr(net.CIDRMask(23, 32)),
+			KeyEncIPv4DstMask:    netIPPtr(net.ParseIP("0.0.0.0")),
 			KeyTCPSrcMask:        uint16Ptr(12),
 			KeyTCPDstMask:        uint16Ptr(13),
 			KeyUDPSrcMask:        uint16Ptr(14),
@@ -93,20 +93,12 @@ func TestFlower(t *testing.T) {
 
 	endianessMix := make(map[uint16]valueType)
 	endianessMix[tcaFlowerKeyEthType] = vtUint16Be
-	endianessMix[tcaFlowerKeyIPv4Src] = vtUint32Be
-	endianessMix[tcaFlowerKeyIPv4SrcMask] = vtUint32Be
-	endianessMix[tcaFlowerKeyIPv4Dst] = vtUint32Be
-	endianessMix[tcaFlowerKeyIPv4DstMask] = vtUint32Be
 	endianessMix[tcaFlowerKeyTCPSrc] = vtUint16Be
 	endianessMix[tcaFlowerKeyTCPDst] = vtUint16Be
 	endianessMix[tcaFlowerKeyUDPSrc] = vtUint16Be
 	endianessMix[tcaFlowerKeyUDPDst] = vtUint16Be
 	endianessMix[tcaFlowerKeyVlanEthType] = vtUint16Be
 	endianessMix[tcaFlowerKeyEncKeyID] = vtUint32Be
-	endianessMix[tcaFlowerKeyEncIPv4Src] = vtUint32Be
-	endianessMix[tcaFlowerKeyEncIPv4SrcMask] = vtUint32Be
-	endianessMix[tcaFlowerKeyEncIPv4Dst] = vtUint32Be
-	endianessMix[tcaFlowerKeyEncIPv4DstMask] = vtUint32Be
 	endianessMix[tcaFlowerKeyTCPSrcMask] = vtUint16Be
 	endianessMix[tcaFlowerKeyTCPDstMask] = vtUint16Be
 	endianessMix[tcaFlowerKeyUDPSrcMask] = vtUint16Be

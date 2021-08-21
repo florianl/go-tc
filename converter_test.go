@@ -66,31 +66,6 @@ func TestConvertNetHardwareAddr(t *testing.T) {
 	})
 }
 
-func TestConvertNetIPMask(t *testing.T) {
-	tests := map[string]struct {
-		value net.IPMask
-	}{
-		"broadcast":    {value: net.IPv4Mask(255, 255, 255, 255)},
-		"default mask": {value: net.ParseIP("127.0.0.1").DefaultMask()},
-	}
-
-	for name, testcase := range tests {
-		t.Run(name, func(t *testing.T) {
-			ptr := netIPMaskPtr(testcase.value)
-			value := netIPMaskValue(ptr)
-			if diff := cmp.Diff(value, testcase.value); diff != "" {
-				t.Fatalf("Missmatch (-want +got):\n%s", diff)
-			}
-		})
-	}
-	t.Run("nil", func(t *testing.T) {
-		value := netIPMaskValue(nil)
-		if diff := cmp.Diff(value, net.IPMask{}); diff != "" {
-			t.Fatalf("Missmatch (-want +got):\n%s", diff)
-		}
-	})
-}
-
 func TestConvertString(t *testing.T) {
 	tests := map[string]struct {
 		value string
