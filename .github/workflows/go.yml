@@ -31,12 +31,12 @@ jobs:
       run: |
         go test -race -v -exec=sudo -tags integration -covermode=atomic -coverprofile=profile.cov ./...
     - name: coveralls.io
-      if: matrix.platform == 'ubuntu-latest'
+      if: matrix.platform == 'ubuntu-latest' && startsWith(matrix.go-version, '1.17')
       env:
-        COVERALLS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        COVERALLS_TOKEN: ${{ secrets.COVERALLS_TOKEN }}
       run: |
         go get -u github.com/mattn/goveralls
-        goveralls -tags integration -coverprofile=profile.cov -service=github
+        goveralls -v -tags integration -coverprofile=profile.cov -service=github
   code-check:
     strategy:
       matrix:
