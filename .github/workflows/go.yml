@@ -33,7 +33,7 @@ jobs:
     - name: coveralls.io
       if: matrix.platform == 'ubuntu-latest' && startsWith(matrix.go-version, '1.17')
       env:
-        COVERALLS_TOKEN: ${{ secrets.COVERALLS_TOKEN }}
+        COVERALLS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         go install github.com/mattn/goveralls@v0.0.9
         goveralls -v -tags integration -coverprofile=profile.cov -service=github
