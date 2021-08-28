@@ -35,7 +35,7 @@ jobs:
       env:
         COVERALLS_TOKEN: ${{ secrets.COVERALLS_TOKEN }}
       run: |
-        go get -u github.com/mattn/goveralls
+        go install github.com/mattn/goveralls@v0.0.9
         goveralls -v -tags integration -coverprofile=profile.cov -service=github
   code-check:
     strategy:
