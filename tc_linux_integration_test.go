@@ -3,12 +3,16 @@
 package tc
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net"
+	"os"
 	"testing"
+	"time"
 
 	"github.com/florianl/go-tc/internal/unix"
+	"github.com/mdlayher/netlink"
 )
 
 // Get requests don't need special priviledges
@@ -163,4 +167,41 @@ func TestSocket(t *testing.T) {
 			t.Fatalf("failed to close test socket: %v", err)
 		}
 	})
+}
+
+func TestMonitorWithErrorFunc(t *testing.T) {
+	config := Config{}
+
+	tcSocket, err := Open(&config)
+	if err != nil {
+		t.Fatalf("Could not open socket for TC: %v", err)
+	}
+	defer func() {
+		if err := tcSocket.Close(); err != nil {
+			t.Fatalf("Coult not close TC socket: %v", err)
+		}
+	}()
+
+	hook := func(action uint16, m Object) int {
+		fmt.Fprintf(os.Stdout, "[%02d]\t%v\n", action, m)
+		return 0
+	}
+
+	errFunc := func(err error) int {
+		if opError, ok := err.(*netlink.OpError); ok {
+			if opError.Timeout() || opError.Temporary() {
+				return 0
+			}
+		}
+		return 1
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+
+	if err := tcSocket.MonitorWithErrorFunc(ctx, 10*time.Millisecond, hook, errFunc); err != nil {
+		t.Fatal(err)
+	}
+	cancel()
+
+	<-ctx.Done()
 }

@@ -249,8 +249,33 @@ func marshalXStats(v XStats) ([]byte, error) {
 // action will have the value of unix.RTM_[NEW|GET|DEL][QDISC|TCLASS|FILTER].
 type HookFunc func(action uint16, m Object) int
 
+// ErrorFunc is a function that receives all errors that happen while reading
+// from a Netlinkgroup. To stop receiving messages return something different than 0.
+type ErrorFunc func(e error) int
+
 // Monitor NETLINK_ROUTE messages
+func (tc *Tc) MonitorWithErrorFunc(ctx context.Context, deadline time.Duration,
+	fn HookFunc, errfn ErrorFunc) error {
+	return tc.monitor(ctx, deadline, fn, errfn)
+}
+
+// Monitor NETLINK_ROUTE messages
+//
+// Deprecated: Use MonitorWithErrorFunc() instead.
 func (tc *Tc) Monitor(ctx context.Context, deadline time.Duration, fn HookFunc) error {
+	return tc.monitor(ctx, deadline, fn, func(err error) int {
+		if opError, ok := err.(*netlink.OpError); ok {
+			if opError.Timeout() || opError.Temporary() {
+				return 0
+			}
+		}
+		tc.logger.Printf("Could not receive message: %v\n", err)
+		return 1
+	})
+}
+
+func (tc *Tc) monitor(ctx context.Context, deadline time.Duration,
+	fn HookFunc, errfn ErrorFunc) error {
 	ifinfomsg, err := marshalStruct(unix.IfInfomsg{
 		Family: unix.AF_UNSPEC,
 	})
@@ -258,7 +283,8 @@ func (tc *Tc) Monitor(ctx context.Context, deadline time.Duration, fn HookFunc) 
 		return err
 	}
 
-	rtattr, err := marshalAttributes([]tcOption{{Interpretation: vtUint32, Type: unix.IFLA_EXT_MASK, Data: uint32(1)}})
+	rtattr, err := marshalAttributes([]tcOption{
+		{Interpretation: vtUint32, Type: unix.IFLA_EXT_MASK, Data: uint32(1)}})
 	if err != nil {
 		return err
 	}
@@ -288,25 +314,19 @@ func (tc *Tc) Monitor(ctx context.Context, deadline time.Duration, fn HookFunc) 
 	}
 
 	go func() {
-		defer func() {
+		go func() {
+			<-ctx.Done()
+			stop := time.Now().Add(deadline)
+			tc.con.SetReadDeadline(stop)
 			tc.con.LeaveGroup(unix.RTNLGRP_TC)
 		}()
 		for {
-			select {
-			case <-ctx.Done():
-				return
-			default:
-			}
-			deadline := time.Now().Add(deadline)
-			tc.con.SetReadDeadline(deadline)
 			msgs, err := tc.con.Receive()
 			if err != nil {
-				if oerr, ok := err.(*netlink.OpError); ok {
-					if oerr.Timeout() {
-						continue
-					}
+				if ret := errfn(err); ret != 0 {
+					return
 				}
-				return
+				continue
 			}
 			for _, msg := range msgs {
 				var monitored Object
