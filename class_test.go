@@ -22,7 +22,32 @@ func TestClass(t *testing.T) {
 		t.Fatalf("expected ErrNoArg, received: %v", err)
 	}
 
+	err = tcSocket.Class().Replace(&Object{
+		Msg{
+			Ifindex: 0,
+		},
+		Attribute{},
+	})
+	if err != ErrInvalidDev {
+		t.Fatalf("expected ErrInvalidDev, received: %v", err)
+	}
+
 	err = tcSocket.Class().Delete(nil)
+	if err != ErrNoArg {
+		t.Fatalf("expected ErrNoArg, received: %v", err)
+	}
+
+	err = tcSocket.Class().Delete(&Object{
+		Msg{
+			Ifindex: 0,
+		},
+		Attribute{},
+	})
+	if err != ErrInvalidDev {
+		t.Fatalf("expected ErrInvalidDev, received: %v", err)
+	}
+
+	_, err = tcSocket.Class().Get(nil)
 	if err != ErrNoArg {
 		t.Fatalf("expected ErrNoArg, received: %v", err)
 	}
