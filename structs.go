@@ -225,25 +225,24 @@ type FqCodelXStats struct {
 
 func unmarshalFqCodelXStats(data []byte, info *FqCodelXStats) error {
 	info.Type = nativeEndian.Uint32(data[:4])
+	var multiError error
 	switch info.Type {
 	case tcaFqCodelXStatsQdisc:
 		b := bytes.NewReader(data[4:])
 		stats := &FqCodelQdStats{}
-		if err := binary.Read(b, nativeEndian, stats); err != nil {
-			return err
-		}
+		err := binary.Read(b, nativeEndian, stats)
+		concatError(multiError, err)
 		info.Qd = stats
 	case tcaFqCodelXStatsClass:
 		b := bytes.NewReader(data[4:])
 		stats := &FqCodelClStats{}
-		if err := binary.Read(b, nativeEndian, stats); err != nil {
-			return err
-		}
+		err := binary.Read(b, nativeEndian, stats)
+		concatError(multiError, err)
 		info.Cl = stats
 	default:
 		return fmt.Errorf("extractFqCodelXStats(): unsupported type: %d", info.Type)
 	}
-	return nil
+	return multiError
 }
 func marshalFqCodelXStats(v *FqCodelXStats) ([]byte, error) {
 	if v == nil {
