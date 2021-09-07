@@ -25,13 +25,13 @@ func unmarshalChoke(data []byte, info *Choke) error {
 	if err != nil {
 		return err
 	}
+	var multiError error
 	for ad.Next() {
 		switch ad.Type() {
 		case tcaChokeParms:
 			opt := &RedQOpt{}
-			if err := unmarshalStruct(ad.Bytes(), opt); err != nil {
-				return err
-			}
+			err = unmarshalStruct(ad.Bytes(), opt)
+			concatError(multiError, err)
 			info.Parms = opt
 		case tcaChokeMaxP:
 			info.MaxP = uint32Ptr(ad.Uint32())
@@ -39,7 +39,7 @@ func unmarshalChoke(data []byte, info *Choke) error {
 			return fmt.Errorf("unmarshalChoke()\t%d\n\t%v", ad.Type(), ad.Bytes())
 		}
 	}
-	return ad.Err()
+	return concatError(multiError, ad.Err())
 }
 
 // marshalChoke returns the binary encoding of Choke
