@@ -71,7 +71,7 @@ func unmarshalEtsPrioMap(data []byte, info *[]uint8) error {
 			return fmt.Errorf("unmarshalEtsPrioMap()\t%d\n\t%v", ad.Type(), ad.Bytes())
 		}
 	}
-	return nil
+	return ad.Err()
 }
 
 // marshalEtsPrioMap
@@ -95,6 +95,7 @@ func unmarshalEts(data []byte, info *Ets) error {
 	if err != nil {
 		return err
 	}
+	var multiError error
 	for ad.Next() {
 		switch ad.Type() {
 		case tcaEtsNBands:
@@ -105,21 +106,19 @@ func unmarshalEts(data []byte, info *Ets) error {
 			info.NStrict = &tmp
 		case tcaEtsQuanta:
 			var tmp []uint32
-			if err := unmarshalEtsQuanta(ad.Bytes(), &tmp); err != nil {
-				return err
-			}
+			err := unmarshalEtsQuanta(ad.Bytes(), &tmp)
+			concatError(multiError, err)
 			info.Quanta = &tmp
 		case tcaEtsPrioMap:
 			var tmp []uint8
-			if err := unmarshalEtsPrioMap(ad.Bytes(), &tmp); err != nil {
-				return err
-			}
+			err := unmarshalEtsPrioMap(ad.Bytes(), &tmp)
+			concatError(multiError, err)
 			info.PrioMap = &tmp
 		default:
 			return fmt.Errorf("unmarshalEts()\t%d\n\t%v", ad.Type(), ad.Bytes())
 		}
 	}
-	return nil
+	return concatError(multiError, ad.Err())
 }
 
 // marshalEts returns the binary encoding of Ets
