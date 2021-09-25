@@ -1,4 +1,5 @@
-//+build integration,linux,go1.16
+//go:build integration && linux && go1.16
+// +build integration,linux,go1.16
 
 package tc
 
