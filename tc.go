@@ -191,6 +191,7 @@ type Attribute struct {
 	Bfifo   *FifoOpt
 	Choke   *Choke
 	Netem   *Netem
+	Plug    *Plug
 
 	// Classful qdiscs
 	Htb      *Htb

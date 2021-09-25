@@ -46,6 +46,7 @@ func TestQdisc(t *testing.T) {
 		cake    *Cake
 		htb     *Htb
 		prio    *Prio
+		plug    *Plug
 	}{
 		"clsact":   {kind: "clsact"},
 		"emptyHtb": {kind: "htb", err: ErrNoArg},
@@ -72,6 +73,7 @@ func TestQdisc(t *testing.T) {
 		"htb":   {kind: "htb", htb: &Htb{Rate64: uint64Ptr(96)}},
 		"prio": {kind: "prio", prio: &Prio{Bands: 3,
 			PrioMap: [16]uint8{1, 2, 2, 2, 1, 2, 9, 9, 1, 1, 1, 1, 1, 1, 1, 1}}},
+		"plug": {kind: "plug", plug: &Plug{Action: PlugReleaseIndefinite}},
 	}
 
 	tcMsg := Msg{
@@ -101,6 +103,7 @@ func TestQdisc(t *testing.T) {
 					Cake:    testcase.cake,
 					Htb:     testcase.htb,
 					Prio:    testcase.prio,
+					Plug:    testcase.plug,
 				},
 			}
 

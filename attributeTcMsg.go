@@ -292,6 +292,11 @@ func extractTCAOptions(data []byte, tc *Attribute, kind string) error {
 		err := unmarshalCake(data, info)
 		concatError(multiError, err)
 		tc.Cake = info
+	case "plug":
+		info := &Plug{}
+		err := unmarshalPlug(data, info)
+		concatError(multiError, err)
+		tc.Plug = info
 	default:
 		return fmt.Errorf("extractTCAOptions(): unsupported kind %s: %w", kind, ErrUnknownKind)
 	}
