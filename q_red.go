@@ -25,13 +25,12 @@ func unmarshalRed(data []byte, info *Red) error {
 	if err != nil {
 		return err
 	}
+	var multiError error
 	for ad.Next() {
 		switch ad.Type() {
 		case tcaRedParms:
 			opt := &RedQOpt{}
-			if err := unmarshalStruct(ad.Bytes(), opt); err != nil {
-				return err
-			}
+			multiError = unmarshalStruct(ad.Bytes(), opt)
 			info.Parms = opt
 		case tcaRedMaxP:
 			info.MaxP = uint32Ptr(ad.Uint32())
@@ -39,7 +38,7 @@ func unmarshalRed(data []byte, info *Red) error {
 			return fmt.Errorf("unmarshalRed()\t%d\n\t%v", ad.Type(), ad.Bytes())
 		}
 	}
-	return ad.Err()
+	return concatError(multiError, ad.Err())
 }
 
 // marshalRed returns the binary encoding of Red
