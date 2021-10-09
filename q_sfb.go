@@ -22,19 +22,18 @@ func unmarshalSfb(data []byte, info *Sfb) error {
 	if err != nil {
 		return err
 	}
+	var multiError error
 	for ad.Next() {
 		switch ad.Type() {
 		case tcaSfbParms:
 			opt := &SfbQopt{}
-			if err := unmarshalStruct(ad.Bytes(), opt); err != nil {
-				return err
-			}
+			multiError = unmarshalStruct(ad.Bytes(), opt)
 			info.Parms = opt
 		default:
 			return fmt.Errorf("extractSfbOptions()\t%d\n\t%v", ad.Type(), ad.Bytes())
 		}
 	}
-	return ad.Err()
+	return concatError(multiError, ad.Err())
 }
 
 // marshalSfb returns the binary encoding of Sfb
