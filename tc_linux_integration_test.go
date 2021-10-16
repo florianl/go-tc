@@ -206,3 +206,31 @@ func TestMonitorWithErrorFunc(t *testing.T) {
 
 	<-ctx.Done()
 }
+
+func TestMonitor(t *testing.T) {
+	config := Config{}
+
+	tcSocket, err := Open(&config)
+	if err != nil {
+		t.Fatalf("Could not open socket for TC: %v", err)
+	}
+	defer func() {
+		if err := tcSocket.Close(); err != nil {
+			t.Fatalf("Coult not close TC socket: %v", err)
+		}
+	}()
+
+	hook := func(action uint16, m Object) int {
+		fmt.Fprintf(os.Stdout, "[%02d]\t%v\n", action, m)
+		return 0
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+
+	if err := tcSocket.MonitorWithErrorFunc(ctx, 10*time.Millisecond, hook); err != nil {
+		t.Fatal(err)
+	}
+	cancel()
+
+	<-ctx.Done()
+}

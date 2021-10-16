@@ -4,6 +4,7 @@
 package tc
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/florianl/go-tc/internal/unix"
@@ -192,5 +193,40 @@ func TestGenerateRateTable(t *testing.T) {
 			}
 		})
 	}
+	t.Run("nil", func(t *testing.T) {
+		if _, err := generateRateTable(nil); !errors.Is(err, ErrNoArg) {
+			t.Fatalf("unexpected error: %v", err)
+		}
+	})
+}
 
+func TestAdjustSize(t *testing.T) {
+	tests := map[string]struct {
+		sz, mpu, linklayer uint
+		size               uint32
+	}{
+		"LINKLAYER_ETHERNET": {
+			sz:        42,
+			mpu:       42,
+			linklayer: unix.LINKLAYER_ETHERNET,
+			size:      42,
+		},
+		"LINKLAYER_ATM": {
+			sz:        42,
+			mpu:       42,
+			linklayer: unix.LINKLAYER_ATM,
+			size:      53,
+		},
+	}
+
+	for name, test := range tests {
+		name := name
+		test := test
+		t.Run(name, func(t *testing.T) {
+			size := adjustSize(test.sz, test.mpu, test.linklayer)
+			if size != test.size {
+				t.Fatalf("expected %d but got %d", test.size, size)
+			}
+		})
+	}
 }
