@@ -227,7 +227,7 @@ func TestMonitor(t *testing.T) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 
-	if err := tcSocket.MonitorWithErrorFunc(ctx, 10*time.Millisecond, hook); err != nil {
+	if err := tcSocket.Monitor(ctx, 10*time.Millisecond, hook); err != nil {
 		t.Fatal(err)
 	}
 	cancel()
