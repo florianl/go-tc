@@ -2,8 +2,10 @@ package tc
 
 import (
 	"bytes"
+	"context"
 	"encoding/binary"
 	"testing"
+	"time"
 
 	"github.com/florianl/go-tc/internal/unix"
 	"github.com/google/go-cmp/cmp"
@@ -115,6 +117,44 @@ func (c *socket) LeaveGroup(g uint32) error { return nil }
 // A socket is a netlink.Socket used for testing.
 type socket struct {
 	msgs []netlink.Message
+}
+
+func testHookConn(t *testing.T) (*Tc, func()) {
+	t.Helper()
+
+	hookSocket := &socket{}
+	c := &Tc{con: netlink.NewConn(hookSocket, 1)}
+
+	return c, func() {
+		if err := c.Close(); err != nil {
+			t.Fatalf("failed to close: %v", err)
+		}
+	}
+}
+
+func TestMonitor(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping test in short mode.")
+	}
+	tcSocket, done := testHookConn(t)
+	defer done()
+
+	ctx, cancel := context.WithTimeout(context.Background(), 7*time.Second)
+	defer cancel()
+
+	testHook := func(action uint16, m Object) int {
+		t.Logf("Action: %d\nObject: %#v\n", action, m)
+		return 1
+	}
+
+	// the deadline of 10 * time.Millisecond does not have an effect for the test,
+	// as the functionality is not implemented for the test socket
+	err := tcSocket.Monitor(ctx, 10*time.Millisecond, testHook)
+	if err != nil {
+		t.Fatalf("could not start tc monitor: %v", err)
+	}
+
+	<-ctx.Done()
 }
 
 func alterResponses(t *testing.T, cache *[]netlink.Message) []byte {

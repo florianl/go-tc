@@ -207,7 +207,7 @@ func TestMonitorWithErrorFunc(t *testing.T) {
 	<-ctx.Done()
 }
 
-func TestMonitor(t *testing.T) {
+func TestMonitorIntegration(t *testing.T) {
 	config := Config{}
 
 	tcSocket, err := Open(&config)
