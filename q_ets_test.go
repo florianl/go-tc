@@ -54,4 +54,10 @@ func TestEts(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 	})
+	t.Run("marshalEtsPrioMap(nil)", func(t *testing.T) {
+		_, err := marshalEtsPrioMap(nil)
+		if !errors.Is(err, ErrNoArg) {
+			t.Fatalf("unexpected error: %v", err)
+		}
+	})
 }
