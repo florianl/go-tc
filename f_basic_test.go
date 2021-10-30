@@ -14,7 +14,7 @@ func TestBasic(t *testing.T) {
 		err2 error
 	}{
 		"simple": {val: Basic{ClassID: uint32Ptr(2)}},
-		"with ematch": {val: Basic{ClassID: uint32Ptr(3),
+		"with ematch & police": {val: Basic{ClassID: uint32Ptr(3),
 			Ematch: &Ematch{
 				Hdr: &EmatchTreeHdr{NMatches: 1},
 				Matches: &[]EmatchMatch{
@@ -29,6 +29,7 @@ func TestBasic(t *testing.T) {
 					},
 				},
 			},
+			Police: &Police{AvRate: uint32Ptr(1337), Result: uint32Ptr(12)},
 		},
 		},
 	}

@@ -56,6 +56,7 @@ func marshalBasic(info *Basic) ([]byte, error) {
 	if info == nil {
 		return []byte{}, fmt.Errorf("Basic: %w", ErrNoArg)
 	}
+	var multiError error
 
 	// TODO: improve logic and check combinations
 	if info.ClassID != nil {
@@ -63,10 +64,16 @@ func marshalBasic(info *Basic) ([]byte, error) {
 	}
 	if info.Ematch != nil {
 		data, err := marshalEmatch(info.Ematch)
-		if err != nil {
-			return []byte{}, err
-		}
+		concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaBasicEmatches, Data: data})
+	}
+	if info.Police != nil {
+		data, err := marshalPolice(info.Police)
+		concatError(multiError, err)
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaBasicPolice, Data: data})
+	}
+	if multiError != nil {
+		return []byte{}, multiError
 	}
 	return marshalAttributes(options)
 }
