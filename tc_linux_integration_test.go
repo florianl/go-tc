@@ -1,5 +1,5 @@
-//go:build integration && linux
-// +build integration,linux
+//go:build integration && linux && go1.17
+// +build integration,linux,go1.17
 
 package tc
 
