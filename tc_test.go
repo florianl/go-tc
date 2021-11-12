@@ -221,6 +221,12 @@ func alterResponses(t *testing.T, cache *[]netlink.Message) []byte {
 				t.Fatalf("could not marshal Xstats struct: %v", err)
 			}
 			attrs = append(attrs, tcOption{Interpretation: vtBytes, Type: tcaXstats, Data: data})
+		case "sfq":
+			data, err := marshalXStats(XStats{Sfq: &SfqXStats{Allot: 42}})
+			if err != nil {
+				t.Fatalf("could not marshal Xstats struct: %v", err)
+			}
+			attrs = append(attrs, tcOption{Interpretation: vtBytes, Type: tcaXstats, Data: data})
 		case "red":
 			data, err := marshalXStats(XStats{Red: &RedXStats{Early: 1, PDrop: 2, Other: 3, Marked: 4}})
 			if err != nil {

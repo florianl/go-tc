@@ -312,6 +312,11 @@ func extractXStats(data []byte, tc *XStats, kind string) error {
 		err := unmarshalStruct(data, info)
 		concatError(multiError, err)
 		tc.Sfb = info
+	case "sfq":
+		info := &SfqXStats{}
+		err := unmarshalStruct(data, info)
+		concatError(multiError, err)
+		tc.Sfq = info
 	case "red":
 		info := &RedXStats{}
 		err := unmarshalStruct(data, info)
