@@ -2,6 +2,7 @@ package tc
 
 import (
 	"fmt"
+	"net"
 
 	"github.com/mdlayher/netlink"
 )
@@ -20,8 +21,8 @@ const (
 // Ife contains attribute of the ife discipline
 type Ife struct {
 	Parms *IfeParms
-	SMac  *[]byte
-	DMac  *[]byte
+	SMac  *net.HardwareAddr
+	DMac  *net.HardwareAddr
 	Type  *uint16
 	Tm    *Tcft
 }
@@ -55,18 +56,10 @@ func marshalIfe(info *Ife) ([]byte, error) {
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaIfeParms, Data: data})
 	}
 	if info.SMac != nil {
-		// TODO: use constant instead of 6
-		if len(*info.SMac) != 6 {
-			return []byte{}, fmt.Errorf("invalid length for SMac")
-		}
-		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaIfeSMac, Data: *info.SMac})
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaIfeSMac, Data: []byte(*info.SMac)})
 	}
 	if info.DMac != nil {
-		// TODO: use constant instead of 6
-		if len(*info.DMac) != 6 {
-			return []byte{}, fmt.Errorf("invalid length for DMac")
-		}
-		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaIfeDMac, Data: *info.DMac})
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaIfeDMac, Data: []byte(*info.DMac)})
 	}
 	if info.Type != nil {
 		options = append(options, tcOption{Interpretation: vtUint16, Type: tcaIfeType, Data: *info.Type})
@@ -89,10 +82,10 @@ func unmarshalIfe(data []byte, info *Ife) error {
 			concatError(multiError, err)
 			info.Parms = parms
 		case tcaIfeSMac:
-			tmp := ad.Bytes()
+			tmp := net.HardwareAddr(ad.Bytes())
 			info.SMac = &tmp
 		case tcaIfeDMac:
-			tmp := ad.Bytes()
+			tmp := net.HardwareAddr(ad.Bytes())
 			info.DMac = &tmp
 		case tcaIfeTm:
 			tcft := &Tcft{}

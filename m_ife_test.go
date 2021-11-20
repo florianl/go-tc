@@ -3,13 +3,17 @@ package tc
 import (
 	"errors"
 	"fmt"
+	"net"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
 )
 
 func TestIfe(t *testing.T) {
-	var mac []byte = []byte{0xc, 0x0, 0xf, 0xf, 0xe, 0xe}
+	mac, err := net.ParseMAC("00:11:22:33:44:55")
+	if err != nil {
+		t.Fatalf("failed to parse mac: %v", err)
+	}
 	tests := map[string]struct {
 		val  Ife
 		err1 error
