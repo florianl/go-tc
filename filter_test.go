@@ -42,6 +42,7 @@ func TestFilter(t *testing.T) {
 		flower     *Flower
 		matchall   *Matchall
 		cgroup     *Cgroup
+		tcindex    *TcIndex
 		errAdd     error
 		errReplace error
 	}{
@@ -52,6 +53,7 @@ func TestFilter(t *testing.T) {
 		"matchall":        {kind: "matchall", matchall: &Matchall{ClassID: uint32Ptr(13)}},
 		"cgroup": {kind: "cgroup", cgroup: &Cgroup{Action: &Action{Kind: "vlan",
 			VLan: &VLan{PushID: uint16Ptr(12)}}}},
+		"tcindex": {kind: "tcindex", tcindex: &TcIndex{Mask: uint16Ptr(42), ClassID: uint32Ptr(1337)}},
 	}
 
 	for name, testcase := range tests {
@@ -65,6 +67,7 @@ func TestFilter(t *testing.T) {
 					Flower:   testcase.flower,
 					Matchall: testcase.matchall,
 					Cgroup:   testcase.cgroup,
+					TcIndex:  testcase.tcindex,
 				},
 			}
 

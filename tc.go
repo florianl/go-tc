@@ -174,6 +174,7 @@ type Attribute struct {
 	Flow     *Flow
 	Flower   *Flower
 	Matchall *Matchall
+	TcIndex  *TcIndex
 
 	// Classless qdiscs
 	Cake    *Cake

@@ -86,6 +86,8 @@ func marshalFilterOptions(kind string, info *Object) ([]byte, error) {
 		data, err = marshalU32(info.U32)
 	case "matchall":
 		data, err = marshalMatchall(info.Matchall)
+	case "tcindex":
+		data, err = marshalTcIndex(info.TcIndex)
 	default:
 		return []byte{}, fmt.Errorf("can't marshal %s: %w", kind, ErrNotImplemented)
 	}
@@ -143,7 +145,7 @@ func validateFilterObject(action int, info *Object) ([]tcOption, error) {
 }
 
 func isFilter(f string) bool {
-	for _, filter := range []string{"basic", "bpf", "cgroup", "flow", "flower", "fw", "route4", "rsvp", "u32", "matchall"} {
+	for _, filter := range []string{"basic", "bpf", "cgroup", "flow", "flower", "fw", "matchall", "route4", "rsvp", "u32", "tcindex"} {
 		if f == filter {
 			return true
 		}

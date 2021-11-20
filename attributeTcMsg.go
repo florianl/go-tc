@@ -67,19 +67,16 @@ func extractTcmsgAttributes(action int, data []byte, info *Attribute) error {
 		} else {
 			err = extractTCAOptions(options, info, info.Kind)
 		}
-		if err != nil {
-			return err
-		}
+		concatError(multiError, err)
 	}
 
 	if len(xStats) > 0 {
 		tcxstats := &XStats{}
-		if err := extractXStats(xStats, tcxstats, info.Kind); err != nil {
-			return err
-		}
+		err := extractXStats(xStats, tcxstats, info.Kind)
+		concatError(multiError, err)
 		info.XStats = tcxstats
 	}
-	return nil
+	return multiError
 }
 
 func hasQOpt(kind string) bool {
@@ -297,6 +294,11 @@ func extractTCAOptions(data []byte, tc *Attribute, kind string) error {
 		err := unmarshalPlug(data, info)
 		concatError(multiError, err)
 		tc.Plug = info
+	case "tcindex":
+		info := &TcIndex{}
+		err := unmarshalTcIndex(data, info)
+		concatError(multiError, err)
+		tc.TcIndex = info
 	default:
 		return fmt.Errorf("extractTCAOptions(): unsupported kind %s: %w", kind, ErrUnknownKind)
 	}
