@@ -30,6 +30,7 @@ func unmarshalAtm(data []byte, info *Atm) error {
 	if err != nil {
 		return err
 	}
+	var multiError error
 	for ad.Next() {
 		switch ad.Type() {
 		case tcaAtmFD:
@@ -38,9 +39,8 @@ func unmarshalAtm(data []byte, info *Atm) error {
 			info.Excess = uint32Ptr(ad.Uint32())
 		case tcaAtmAddr:
 			arg := &AtmPvc{}
-			if err := unmarshalStruct(ad.Bytes(), arg); err != nil {
-				return err
-			}
+			err := unmarshalStruct(ad.Bytes(), arg)
+			concatError(multiError, err)
 			info.Addr = arg
 		case tcaAtmState:
 			info.State = uint32Ptr(ad.Uint32())
@@ -49,7 +49,7 @@ func unmarshalAtm(data []byte, info *Atm) error {
 
 		}
 	}
-	return ad.Err()
+	return concatError(multiError, ad.Err())
 }
 
 // marshalAtm returns the binary encoding of Atm
