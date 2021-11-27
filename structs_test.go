@@ -16,15 +16,16 @@ func TestFqCodelXStats(t *testing.T) {
 		err1 error
 		err2 error
 	}{
-		"Qdisc": {val: FqCodelXStats{Type: 0, Qd: &FqCodelQdStats{MaxPacket: 123}}},
-		"Class": {val: FqCodelXStats{Type: 1, Cl: &FqCodelClStats{Deficit: -1}}},
+		"Qdisc":   {val: FqCodelXStats{Type: 0, Qd: &FqCodelQdStats{MaxPacket: 123}}},
+		"Class":   {val: FqCodelXStats{Type: 1, Cl: &FqCodelClStats{Deficit: -1}}},
+		"Unknown": {val: FqCodelXStats{Type: 2}, err1: ErrInvalidArg},
 	}
 
 	for name, testcase := range tests {
 		t.Run(name, func(t *testing.T) {
 			data, err1 := marshalFqCodelXStats(&testcase.val)
 			if err1 != nil {
-				if testcase.err1 != nil && testcase.err1.Error() == err1.Error() {
+				if errors.Is(err1, testcase.err1) {
 					return
 				}
 				t.Fatalf("Unexpected error: %v", err1)
@@ -43,9 +44,19 @@ func TestFqCodelXStats(t *testing.T) {
 			}
 		})
 	}
-	t.Run("nil", func(t *testing.T) {
+	t.Run("nil-marshalFqCodelXStats", func(t *testing.T) {
 		_, err := marshalFqCodelXStats(nil)
 		if !errors.Is(err, ErrNoArg) {
+			t.Fatalf("unexpected error: %v", err)
+		}
+	})
+	t.Run("unknown-unmarshalFqCodelXStats", func(t *testing.T) {
+		var buf bytes.Buffer
+		unknownType := uint32(2)
+		if err := binary.Write(&buf, nativeEndian, unknownType); err != nil {
+			t.Fatalf("failed to marshal bytes: %v", err)
+		}
+		if err := unmarshalFqCodelXStats(buf.Bytes(), &FqCodelXStats{}); !errors.Is(err, ErrInvalidArg) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 	})
