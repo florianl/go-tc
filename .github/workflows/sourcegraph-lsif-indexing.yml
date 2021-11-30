@@ -2,7 +2,7 @@ name: "sourcegraph LSIF indexing"
 
 on:
   push:
-    branches: [master]
+    branches: [main]
 
 jobs:
   lsif-go:
