@@ -2,6 +2,7 @@ package tc
 
 import (
 	"errors"
+	"io"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -41,9 +42,14 @@ func TestNetem(t *testing.T) {
 			}
 		})
 	}
-	t.Run("nil", func(t *testing.T) {
+	t.Run("nil-marshalNetem", func(t *testing.T) {
 		_, err := marshalNetem(nil)
 		if !errors.Is(err, ErrNoArg) {
+			t.Fatalf("unexpected error: %v", err)
+		}
+	})
+	t.Run("nil-unmarshalNetem", func(t *testing.T) {
+		if err := unmarshalNetem([]byte{}, nil); !errors.Is(err, io.EOF) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 	})

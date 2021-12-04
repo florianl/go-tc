@@ -42,6 +42,7 @@ func unmarshalFlow(data []byte, info *Flow) error {
 	if err != nil {
 		return err
 	}
+	var multiError error
 	for ad.Next() {
 		switch ad.Type() {
 		case tcaFlowKeys:
@@ -64,15 +65,14 @@ func unmarshalFlow(data []byte, info *Flow) error {
 			info.PerTurb = uint32Ptr(ad.Uint32())
 		case tcaFlowEMatches:
 			ematch := &Ematch{}
-			if err := unmarshalEmatch(ad.Bytes(), ematch); err != nil {
-				return err
-			}
+			err := unmarshalEmatch(ad.Bytes(), ematch)
+			concatError(multiError, err)
 			info.Ematch = ematch
 		default:
 			return fmt.Errorf("unmarshalFlow()\t%d\n\t%v", ad.Type(), ad.Bytes())
 		}
 	}
-	return ad.Err()
+	return concatError(multiError, ad.Err())
 }
 
 // marshalFlow returns the binary encoding of Flow
