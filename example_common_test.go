@@ -1,3 +1,6 @@
+//go:build linux
+// +build linux
+
 package tc_test
 
 // Collection of functions that are used often in examples.
