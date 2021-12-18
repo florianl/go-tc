@@ -1,6 +1,8 @@
 package tc
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type U32Match struct {
 	Mask    uint32 // big endian

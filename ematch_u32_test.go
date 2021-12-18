@@ -2,6 +2,7 @@ package tc
 
 import (
 	"errors"
+	"io"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -24,9 +25,14 @@ func TestU32Match(t *testing.T) {
 	if diff := cmp.Diff(in, out); diff != "" {
 		t.Fatalf("U32Match missmatch (-want +got):\n%s", diff)
 	}
-	t.Run("nil", func(t *testing.T) {
+	t.Run("nil-marshalU32Match", func(t *testing.T) {
 		_, err := marshalU32Match(nil)
 		if !errors.Is(err, ErrNoArg) {
+			t.Fatalf("unexpected error: %v", err)
+		}
+	})
+	t.Run("nil-unmarshalU32Match", func(t *testing.T) {
+		if err := unmarshalU32Match([]byte{}, &U32Match{}); !errors.Is(err, io.EOF) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 	})
