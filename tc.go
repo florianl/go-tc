@@ -43,6 +43,14 @@ func Open(config *Config) (*Tc, error) {
 	return &tc, nil
 }
 
+func (tc *Tc) SetOption(o netlink.ConnOption, enable bool) error {
+	err := tc.con.SetOption(o, enable)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 // Close the connection
 func (tc *Tc) Close() error {
 	return tc.con.Close()
