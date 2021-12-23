@@ -43,6 +43,7 @@ func Open(config *Config) (*Tc, error) {
 	return &tc, nil
 }
 
+// SetOption allows to enable or disable netlink socket options.
 func (tc *Tc) SetOption(o netlink.ConnOption, enable bool) error {
 	err := tc.con.SetOption(o, enable)
 	if err != nil {

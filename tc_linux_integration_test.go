@@ -234,3 +234,37 @@ func TestMonitorIntegration(t *testing.T) {
 
 	<-ctx.Done()
 }
+
+func TestSetOption(t *testing.T) {
+	tests := map[string]struct {
+		option netlink.ConnOption
+		enable bool
+		err    bool
+	}{
+		"enable ListenAllNSID":  {option: netlink.ListenAllNSID, enable: true, err: false},
+		"disbale ListenAllNSID": {option: netlink.ListenAllNSID, enable: false, err: false},
+		"invalid option":        {option: netlink.ConnOption(-1), enable: true, err: true},
+	}
+
+	for name, test := range tests {
+		name := name
+		test := test
+		t.Run(name, func(t *testing.T) {
+			tcSocket, err := Open(&Config{})
+			if err != nil {
+				t.Fatalf("Could not open socket for TC: %v", err)
+			}
+			defer func() {
+				if err := tcSocket.Close(); err != nil {
+					t.Fatalf("Coult not close TC socket: %v", err)
+				}
+			}()
+			err = tcSocket.SetOption(test.option, test.enable)
+			if err != nil && !test.err {
+				t.Fatalf("Expected no error but got '%v'", err)
+			} else if err == nil && test.err {
+				t.Fatalf("Expected error but got nil")
+			}
+		})
+	}
+}
