@@ -2,6 +2,7 @@ package tc
 
 import (
 	"errors"
+	"io"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -29,9 +30,14 @@ func TestCmpMatch(t *testing.T) {
 	if diff := cmp.Diff(in, out); diff != "" {
 		t.Fatalf("CmpMatch missmatch (-want +got):\n%s", diff)
 	}
-	t.Run("nil", func(t *testing.T) {
+	t.Run("nil-marshalCmpMatch", func(t *testing.T) {
 		_, err := marshalCmpMatch(nil)
 		if !errors.Is(err, ErrNoArg) {
+			t.Fatalf("unexpected error: %v", err)
+		}
+	})
+	t.Run("nil-unmarshalCmpMatch", func(t *testing.T) {
+		if err := unmarshalCmpMatch([]byte{}, nil); !errors.Is(err, io.EOF) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 	})
