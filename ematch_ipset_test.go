@@ -2,6 +2,7 @@ package tc
 
 import (
 	"errors"
+	"io"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -46,6 +47,17 @@ func TestIPSetMatch(t *testing.T) {
 		}
 		if _, err := marshalIPSetMatch(&in); !errors.Is(err, ErrInvalidArg) {
 			t.Fatalf("Expected ErrInvalidArg but got '%v'", err)
+		}
+	})
+	t.Run("nil-marshalIPSetMatch", func(t *testing.T) {
+		_, err := marshalIPSetMatch(nil)
+		if !errors.Is(err, ErrNoArg) {
+			t.Fatalf("unexpected error: %v", err)
+		}
+	})
+	t.Run("nil-unmarshalIPSetMatch", func(t *testing.T) {
+		if err := unmarshalIPSetMatch([]byte{}, nil); !errors.Is(err, io.EOF) {
+			t.Fatalf("unexpected error: %v", err)
 		}
 	})
 }
