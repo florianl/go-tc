@@ -123,24 +123,99 @@ func TestFilter(t *testing.T) {
 }
 
 func TestValidateFilterObject(t *testing.T) {
-	t.Run("IfIndex == 0", func(t *testing.T) {
-		if _, err := validateFilterObject(unix.RTM_NEWTFILTER, &Object{
-			Msg{Ifindex: 0},
-			Attribute{},
-		}); !errors.Is(err, ErrInvalidDev) {
-			t.Fatalf("unexpected error: %v", err)
-		}
-	})
-	t.Run("stats", func(t *testing.T) {
-		if _, err := validateFilterObject(unix.RTM_NEWTFILTER, &Object{
-			Msg{
-				Ifindex: 42,
+	tests := map[string]struct {
+		action int
+		info   Object
+		err    error
+	}{
+		"IfIndex = 0": {action: unix.RTM_NEWTFILTER,
+			info: Object{
+				Msg: Msg{
+					Ifindex: 0,
+				},
 			},
-			Attribute{
-				Stats: &Stats{Bytes: 42},
+			err: ErrInvalidDev,
+		},
+		"stats": {action: unix.RTM_NEWTFILTER,
+			info: Object{
+				Msg: Msg{
+					Ifindex: 42,
+				},
+				Attribute: Attribute{
+					Stats: &Stats{Bytes: 42},
+				},
 			},
-		}); !errors.Is(err, ErrInvalidArg) {
-			t.Fatalf("unexpected error: %v", err)
-		}
-	})
+			err: ErrInvalidArg},
+		"not a filter": {action: unix.RTM_NEWTFILTER,
+			info: Object{
+				Msg: Msg{
+					Ifindex: 42,
+				},
+				Attribute: Attribute{
+					Kind: "not-a-filter",
+				},
+			},
+			err: ErrNoArg},
+		"missing filter args": {action: unix.RTM_NEWTFILTER,
+			info: Object{
+				Msg: Msg{
+					Ifindex: 42,
+				},
+				Attribute: Attribute{
+					Kind: "basic",
+				},
+			},
+			err: ErrNoArg},
+		"basic": {action: unix.RTM_NEWTFILTER,
+			info: Object{
+				Msg: Msg{
+					Ifindex: 42,
+				},
+				Attribute: Attribute{
+					Kind: "basic",
+					Basic: &Basic{
+						ClassID: uint32Ptr(42),
+					},
+				},
+			}},
+	}
+	for name, test := range tests {
+		name := name
+		test := test
+		t.Run(name, func(t *testing.T) {
+			options, err := validateFilterObject(test.action, &test.info)
+			if !errors.Is(err, test.err) {
+				t.Fatalf("expected '%v' but got '%v'", test.err, err)
+			}
+			_ = options
+		})
+	}
+}
+
+func TestMarshalFilterOptions(t *testing.T) {
+	tests := map[string]struct {
+		kind string
+		info Object
+		err  error
+	}{
+		"unknown": {kind: "unknown", err: ErrNotImplemented},
+		"basic": {kind: "basic", info: Object{
+			Attribute: Attribute{
+				Kind: "basic",
+				Basic: &Basic{
+					ClassID: uint32Ptr(1337),
+				},
+			},
+		}},
+	}
+	for name, test := range tests {
+		name := name
+		test := test
+		t.Run(name, func(t *testing.T) {
+			_, err := marshalFilterOptions(test.kind, &test.info)
+			if !errors.Is(err, test.err) {
+				t.Fatalf("expected '%v' but got '%v'", test.err, err)
+			}
+		})
+	}
 }
