@@ -4,6 +4,7 @@ go 1.13
 
 require (
 	github.com/BurntSushi/toml v1.0.0 // indirect
+	github.com/cilium/ebpf v0.7.0
 	github.com/google/go-cmp v0.5.6
 	github.com/josharian/native v0.0.0-20200817173448-b6b71def0850
 	github.com/jsimonetti/rtnetlink v0.0.0-20211022192332-93da33804786
