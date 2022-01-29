@@ -242,7 +242,7 @@ func TestSetOption(t *testing.T) {
 		err    bool
 	}{
 		"enable ListenAllNSID":  {option: netlink.ListenAllNSID, enable: true, err: false},
-		"disbale ListenAllNSID": {option: netlink.ListenAllNSID, enable: false, err: false},
+		"disable ListenAllNSID": {option: netlink.ListenAllNSID, enable: false, err: false},
 		"invalid option":        {option: netlink.ConnOption(-1), enable: true, err: true},
 	}
 
