@@ -264,7 +264,8 @@ type HookFunc func(action uint16, m Object) int
 // from a Netlinkgroup. To stop receiving messages return something different than 0.
 type ErrorFunc func(e error) int
 
-// Monitor NETLINK_ROUTE messages
+// MonitorWithErrorFunc handles NETLINK_ROUTE messages and calls for each HookFunc.
+// Received errors tigger the given ErrorFunc.
 func (tc *Tc) MonitorWithErrorFunc(ctx context.Context, deadline time.Duration,
 	fn HookFunc, errfn ErrorFunc) error {
 	return tc.monitor(ctx, deadline, fn, errfn)
