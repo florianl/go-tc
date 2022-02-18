@@ -9,7 +9,6 @@ import (
 )
 
 func init() {
-
 	fd, err := os.Open("/proc/net/psched")
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "could not open /proc/net/psched: %v\n", err)

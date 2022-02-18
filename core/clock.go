@@ -1,7 +1,9 @@
 package core
 
-var tickInUSec float64
-var clockFactor float64
+var (
+	tickInUSec  float64
+	clockFactor float64
+)
 
 const (
 	// iproute2/include/utils.h:timeUnitsPerSec
@@ -24,7 +26,6 @@ func Tick2Time(tick uint32) uint32 {
 // It returns the time, that is needed to transmit a given size for a given rate.
 func XmitTime(rate uint64, size uint32) uint32 {
 	return Time2Tick(uint32(timeUnitsPerSec * (float64(size) / float64(rate))))
-
 }
 
 // XmitSize implements iproute2/tc/tc_core:tc_calc_xmitsize().
