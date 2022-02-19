@@ -222,7 +222,7 @@ func extractU32Sel(data []byte, info *U32Sel) error {
 	return nil
 }
 
-//U32Mark from include/uapi/linux/pkt_sched.h
+// U32Mark from include/uapi/linux/pkt_sched.h
 type U32Mark struct {
 	Val     uint32
 	Mask    uint32

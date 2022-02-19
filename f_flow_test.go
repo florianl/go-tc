@@ -13,13 +13,16 @@ func TestFlow(t *testing.T) {
 		err1 error
 		err2 error
 	}{
-		"simple": {val: Flow{Keys: uint32Ptr(12), Mode: uint32Ptr(34), BaseClass: uint32Ptr(56), RShift: uint32Ptr(78),
-			Addend: uint32Ptr(90), Mask: uint32Ptr(21), XOR: uint32Ptr(43), Divisor: uint32Ptr(65), PerTurb: uint32Ptr(87)}},
+		"simple": {val: Flow{
+			Keys: uint32Ptr(12), Mode: uint32Ptr(34), BaseClass: uint32Ptr(56), RShift: uint32Ptr(78),
+			Addend: uint32Ptr(90), Mask: uint32Ptr(21), XOR: uint32Ptr(43), Divisor: uint32Ptr(65), PerTurb: uint32Ptr(87),
+		}},
 		"with ematch": {val: Flow{
 			Ematch: &Ematch{
 				Hdr: &EmatchTreeHdr{NMatches: 1},
 				Matches: &[]EmatchMatch{
-					{Hdr: EmatchHdr{MatchID: 0x0, Kind: EmatchU32, Flags: 0x0, Pad: 0x0},
+					{
+						Hdr: EmatchHdr{MatchID: 0x0, Kind: EmatchU32, Flags: 0x0, Pad: 0x0},
 						// match 'u32(u16 0x1122 0xffff at nexthdr+4)'
 						U32Match: &U32Match{
 							Mask:    0xffff,
@@ -29,7 +32,8 @@ func TestFlow(t *testing.T) {
 						},
 					},
 				},
-			}}},
+			},
+		}},
 	}
 
 	for name, testcase := range tests {

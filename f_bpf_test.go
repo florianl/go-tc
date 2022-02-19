@@ -13,21 +13,28 @@ func TestBpf(t *testing.T) {
 		err1 error
 		err2 error
 	}{
-		"simple": {val: Bpf{Ops: bytesPtr([]byte{0x6, 0x0, 0x0, 0x0, 0xff, 0xff, 0xff, 0xff}),
+		"simple": {val: Bpf{
+			Ops:     bytesPtr([]byte{0x6, 0x0, 0x0, 0x0, 0xff, 0xff, 0xff, 0xff}),
 			OpsLen:  uint16Ptr(0x1),
 			ClassID: uint32Ptr(0x10001),
-			Flags:   uint32Ptr(0x1)}},
-		"da obj /tmp/bpf.o sec foo": {val: Bpf{FD: uint32Ptr(8), Name: stringPtr("bpf.o:[foo]"),
-			Flags: uint32Ptr(0x1), FlagsGen: uint32Ptr(0x2)}},
-		"all options": {val: Bpf{Ops: bytesPtr([]byte{0x6, 0x0, 0x0, 0x0, 0xff, 0xff, 0xff, 0xff}),
+			Flags:   uint32Ptr(0x1),
+		}},
+		"da obj /tmp/bpf.o sec foo": {val: Bpf{
+			FD: uint32Ptr(8), Name: stringPtr("bpf.o:[foo]"),
+			Flags: uint32Ptr(0x1), FlagsGen: uint32Ptr(0x2),
+		}},
+		"all options": {val: Bpf{
+			Ops:     bytesPtr([]byte{0x6, 0x0, 0x0, 0x0, 0xff, 0xff, 0xff, 0xff}),
 			OpsLen:  uint16Ptr(0x1),
 			ClassID: uint32Ptr(0x10001),
 			FD:      uint32Ptr(42),
 			Name:    stringPtr("testing"),
 			Tag:     bytesPtr([]byte{0xAA, 0x55}),
-			ID:      uint32Ptr(42)}},
+			ID:      uint32Ptr(42),
+		}},
 		"filter add dev XXX ingress bpf bytecode '1,6 0 0 4294967295,' flowid 1:1 action drop": {
-			val: Bpf{Ops: bytesPtr([]byte{0x6, 0x0, 0x0, 0x0, 0xff, 0xff, 0xff, 0xff}),
+			val: Bpf{
+				Ops:     bytesPtr([]byte{0x6, 0x0, 0x0, 0x0, 0xff, 0xff, 0xff, 0xff}),
 				OpsLen:  uint16Ptr(1),
 				ClassID: uint32Ptr(0x10001),
 				Action: &Action{
@@ -37,7 +44,8 @@ func TestBpf(t *testing.T) {
 							Action: 2, // drop
 						},
 					},
-				}},
+				},
+			},
 		},
 	}
 

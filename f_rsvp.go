@@ -55,7 +55,6 @@ func unmarshalRsvp(data []byte, info *Rsvp) error {
 		}
 	}
 	return concatError(multiError, ad.Err())
-
 }
 
 // marshalRsvp returns the binary encoding of Rsvp

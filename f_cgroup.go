@@ -71,5 +71,4 @@ func unmarshalCgroup(data []byte, info *Cgroup) error {
 		}
 	}
 	return concatError(multiError, ad.Err())
-
 }

@@ -14,8 +14,10 @@ func TestTcIndex(t *testing.T) {
 		err2 error
 	}{
 		"empty": {},
-		"simple": {val: TcIndex{Hash: uint32Ptr(1), Mask: uint16Ptr(2), Shift: uint32Ptr(3),
-			FallThrough: uint32Ptr(4), ClassID: uint32Ptr(5)}},
+		"simple": {val: TcIndex{
+			Hash: uint32Ptr(1), Mask: uint16Ptr(2), Shift: uint32Ptr(3),
+			FallThrough: uint32Ptr(4), ClassID: uint32Ptr(5),
+		}},
 	}
 
 	for name, testcase := range tests {

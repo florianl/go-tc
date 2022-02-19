@@ -18,13 +18,17 @@ func TestU32(t *testing.T) {
 		err2 error
 	}{
 		"empty": {},
-		"simple": {val: U32{ClassID: uint32Ptr(0xFFFF),
-			Mark: &U32Mark{Val: 0x55, Mask: 0xAA, Success: 0x1},
-			Hash: uint32Ptr(1234), Pcnt: uint64Ptr(4321), InDev: stringPtr("foobar")}},
+		"simple": {val: U32{
+			ClassID: uint32Ptr(0xFFFF),
+			Mark:    &U32Mark{Val: 0x55, Mask: 0xAA, Success: 0x1},
+			Hash:    uint32Ptr(1234), Pcnt: uint64Ptr(4321), InDev: stringPtr("foobar"),
+		}},
 		"divisor": {val: U32{Divisor: uint32Ptr(1), Link: uint32Ptr(42)}},
-		"extended": {val: U32{ClassID: uint32Ptr(0xFFFF),
-			Mark:   &U32Mark{Val: 0x55, Mask: 0xAA, Success: 0x1},
-			Police: &Police{AvRate: uint32Ptr(1337), Result: uint32Ptr(12)}}},
+		"extended": {val: U32{
+			ClassID: uint32Ptr(0xFFFF),
+			Mark:    &U32Mark{Val: 0x55, Mask: 0xAA, Success: 0x1},
+			Police:  &Police{AvRate: uint32Ptr(1337), Result: uint32Ptr(12)},
+		}},
 		"policy": {val: U32{
 			Sel: &U32Sel{
 				Flags: 0x1,
@@ -43,7 +47,8 @@ func TestU32(t *testing.T) {
 				},
 			},
 		}},
-		"multiple Keys": {val: U32{ClassID: uint32Ptr(0xFFFF), Mark: &U32Mark{Val: 0x55, Mask: 0xAA, Success: 0x1},
+		"multiple Keys": {val: U32{
+			ClassID: uint32Ptr(0xFFFF), Mark: &U32Mark{Val: 0x55, Mask: 0xAA, Success: 0x1},
 			Sel: &U32Sel{
 				Flags: 0x0,
 				NKeys: 0x3,
@@ -52,7 +57,8 @@ func TestU32(t *testing.T) {
 					{Mask: 0xFF00, Val: 0xAA00, Off: 0x3, OffMask: 0x5},
 					{Mask: 0xF0F0, Val: 0x5050, Off: 0xC, OffMask: 0xC},
 				},
-			}}},
+			},
+		}},
 		"actions": {val: U32{Flags: uint32Ptr(0x8), Actions: &actions}},
 	}
 

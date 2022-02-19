@@ -25,7 +25,8 @@ func TestCgroup(t *testing.T) {
 			Ematch: &Ematch{
 				Hdr: &EmatchTreeHdr{NMatches: 1},
 				Matches: &[]EmatchMatch{
-					{Hdr: EmatchHdr{MatchID: 0x0, Kind: EmatchU32, Flags: 0x0, Pad: 0x0},
+					{
+						Hdr: EmatchHdr{MatchID: 0x0, Kind: EmatchU32, Flags: 0x0, Pad: 0x0},
 						// match 'u32(u16 0x1122 0xffff at nexthdr+4)'
 						U32Match: &U32Match{
 							Mask:    0xffff,
@@ -35,7 +36,8 @@ func TestCgroup(t *testing.T) {
 						},
 					},
 				},
-			}}},
+			},
+		}},
 	}
 
 	for name, testcase := range tests {

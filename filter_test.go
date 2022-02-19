@@ -51,14 +51,15 @@ func TestFilter(t *testing.T) {
 		"u32-exactMatch":  {kind: "u32", u32: &U32{ClassID: uint32Ptr(13)}},
 		"flower":          {kind: "flower", flower: &Flower{ClassID: uint32Ptr(13)}},
 		"matchall":        {kind: "matchall", matchall: &Matchall{ClassID: uint32Ptr(13)}},
-		"cgroup": {kind: "cgroup", cgroup: &Cgroup{Action: &Action{Kind: "vlan",
-			VLan: &VLan{PushID: uint16Ptr(12)}}}},
+		"cgroup": {kind: "cgroup", cgroup: &Cgroup{Action: &Action{
+			Kind: "vlan",
+			VLan: &VLan{PushID: uint16Ptr(12)},
+		}}},
 		"tcindex": {kind: "tcindex", tcindex: &TcIndex{Mask: uint16Ptr(42), ClassID: uint32Ptr(1337)}},
 	}
 
 	for name, testcase := range tests {
 		t.Run(name, func(t *testing.T) {
-
 			testFilter := Object{
 				tcMsg,
 				Attribute{
@@ -128,7 +129,8 @@ func TestValidateFilterObject(t *testing.T) {
 		info   Object
 		err    error
 	}{
-		"IfIndex = 0": {action: unix.RTM_NEWTFILTER,
+		"IfIndex = 0": {
+			action: unix.RTM_NEWTFILTER,
 			info: Object{
 				Msg: Msg{
 					Ifindex: 0,
@@ -136,7 +138,8 @@ func TestValidateFilterObject(t *testing.T) {
 			},
 			err: ErrInvalidDev,
 		},
-		"stats": {action: unix.RTM_NEWTFILTER,
+		"stats": {
+			action: unix.RTM_NEWTFILTER,
 			info: Object{
 				Msg: Msg{
 					Ifindex: 42,
@@ -145,8 +148,10 @@ func TestValidateFilterObject(t *testing.T) {
 					Stats: &Stats{Bytes: 42},
 				},
 			},
-			err: ErrInvalidArg},
-		"not a filter": {action: unix.RTM_NEWTFILTER,
+			err: ErrInvalidArg,
+		},
+		"not a filter": {
+			action: unix.RTM_NEWTFILTER,
 			info: Object{
 				Msg: Msg{
 					Ifindex: 42,
@@ -155,8 +160,10 @@ func TestValidateFilterObject(t *testing.T) {
 					Kind: "not-a-filter",
 				},
 			},
-			err: ErrNoArg},
-		"missing filter args": {action: unix.RTM_NEWTFILTER,
+			err: ErrNoArg,
+		},
+		"missing filter args": {
+			action: unix.RTM_NEWTFILTER,
 			info: Object{
 				Msg: Msg{
 					Ifindex: 42,
@@ -165,8 +172,10 @@ func TestValidateFilterObject(t *testing.T) {
 					Kind: "basic",
 				},
 			},
-			err: ErrNoArg},
-		"basic": {action: unix.RTM_NEWTFILTER,
+			err: ErrNoArg,
+		},
+		"basic": {
+			action: unix.RTM_NEWTFILTER,
 			info: Object{
 				Msg: Msg{
 					Ifindex: 42,
@@ -177,7 +186,8 @@ func TestValidateFilterObject(t *testing.T) {
 						ClassID: uint32Ptr(42),
 					},
 				},
-			}},
+			},
+		},
 	}
 	for name, test := range tests {
 		name := name
