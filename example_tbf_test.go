@@ -90,7 +90,7 @@ func ExampleTbf() {
 	qdiscs, err := tcnl.Qdisc().Get()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "could not get all qdiscs: %v\n", err)
-		//return
+		// return
 	}
 
 	fmt.Println("## qdiscs:")

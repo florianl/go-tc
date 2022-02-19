@@ -112,5 +112,4 @@ func Example_eBPF() {
 		fmt.Fprintf(os.Stderr, "could not attach filter for eBPF program: %v\n", err)
 		return
 	}
-
 }

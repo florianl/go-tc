@@ -153,7 +153,8 @@ func ExampleHfsc() {
 
 	classes, err := tcnl.Class().Get(&tc.Msg{
 		Family:  unix.AF_UNSPEC,
-		Ifindex: uint32(devID.Index)})
+		Ifindex: uint32(devID.Index),
+	})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "could not get all classes: %v\n", err)
 	}

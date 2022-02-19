@@ -61,7 +61,8 @@ func ExampleNetem() {
 			Netem: &tc.Netem{
 				Qopt: tc.NetemQopt{
 					Limit: 1000,
-					Loss:  42949673},
+					Loss:  42949673,
+				},
 				Ecn: &ecn,
 			},
 		},
