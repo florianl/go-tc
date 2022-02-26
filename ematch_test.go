@@ -8,7 +8,6 @@ import (
 )
 
 func TestEmatch(t *testing.T) {
-
 	tests := map[string]struct {
 		val  Ematch
 		err1 error
@@ -30,14 +29,17 @@ func TestEmatch(t *testing.T) {
 			val: Ematch{
 				Hdr: &EmatchTreeHdr{NMatches: 2},
 				Matches: &[]EmatchMatch{
-					{Hdr: EmatchHdr{MatchID: 0x0, Kind: 0x3, Flags: 0x1, Pad: 0x0},
+					{
+						Hdr: EmatchHdr{MatchID: 0x0, Kind: 0x3, Flags: 0x1, Pad: 0x0},
 						U32Match: &U32Match{
 							Mask:    0xffff,
 							Value:   0x1122,
 							Off:     0x4,
 							OffMask: 0xffffffff,
-						}},
-					{Hdr: EmatchHdr{MatchID: 0x0, Kind: 0x1, Flags: 0x0, Pad: 0x0},
+						},
+					},
+					{
+						Hdr: EmatchHdr{MatchID: 0x0, Kind: 0x1, Flags: 0x0, Pad: 0x0},
 						CmpMatch: &CmpMatch{
 							Val:   0x14,
 							Mask:  0xff00,
@@ -46,7 +48,8 @@ func TestEmatch(t *testing.T) {
 							Flags: 0,
 							Layer: EmatchLayerTransport,
 							Opnd:  EmatchOpndGt,
-						}},
+						},
+					},
 				},
 			},
 		},
@@ -54,7 +57,8 @@ func TestEmatch(t *testing.T) {
 			val: Ematch{
 				Hdr: &EmatchTreeHdr{NMatches: 1, ProgID: 42},
 				Matches: &[]EmatchMatch{
-					{Hdr: EmatchHdr{MatchID: 0, Kind: 0x8, Flags: 0x0, Pad: 0x0},
+					{
+						Hdr: EmatchHdr{MatchID: 0, Kind: 0x8, Flags: 0x0, Pad: 0x0},
 						IPSetMatch: &IPSetMatch{
 							IPSetID: 19,
 							Dir:     []IPSetDir{IPSetSrc, IPSetSrc},

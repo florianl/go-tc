@@ -185,5 +185,4 @@ func marshalEmatchTreeList(info *[]EmatchMatch) ([]byte, error) {
 		options = append(options, tcOption{Interpretation: vtBytes, Type: uint16(i + 1), Data: payload})
 	}
 	return marshalAttributes(options)
-
 }
