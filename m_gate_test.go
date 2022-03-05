@@ -15,9 +15,11 @@ func TestGate(t *testing.T) {
 		err2 error
 	}{
 		"empty": {err1: fmt.Errorf("Gate options are missing")},
-		"all options": {val: Gate{Parms: &GateParms{Index: 1}, Priority: int32Ptr(2),
+		"all options": {val: Gate{
+			Parms: &GateParms{Index: 1}, Priority: int32Ptr(2),
 			BaseTime: uint64Ptr(3), CycleTime: uint64Ptr(4), CycleTimeExt: uint64Ptr(5),
-			Flags: uint32Ptr(6), ClockID: int32Ptr(-7)}},
+			Flags: uint32Ptr(6), ClockID: int32Ptr(-7),
+		}},
 	}
 
 	for name, testcase := range tests {

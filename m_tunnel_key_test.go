@@ -16,14 +16,19 @@ func TestTunnelKey(t *testing.T) {
 		err1 error
 		err2 error
 	}{
-		"simple": {val: TunnelKey{Parms: &TunnelParms{Index: 0x3,
-			Capab:   0x0,
-			Action:  ActPipe,
-			RefCnt:  0x1,
-			BindCnt: 0x1, TunnelKeyAction: 0x0},
+		"simple": {val: TunnelKey{
+			Parms: &TunnelParms{
+				Index:   0x3,
+				Capab:   0x0,
+				Action:  ActPipe,
+				RefCnt:  0x1,
+				BindCnt: 0x1, TunnelKeyAction: 0x0,
+			},
 			KeyEncSrc: &IPv4,
-			KeyEncDst: &IPv4}},
-		"IPv6": {val: TunnelKey{Parms: &TunnelParms{Index: 42},
+			KeyEncDst: &IPv4,
+		}},
+		"IPv6": {val: TunnelKey{
+			Parms:     &TunnelParms{Index: 42},
 			KeyEncSrc: &IPv6, KeyEncDst: &IPv6,
 			KeyEncKeyID:   uint32Ptr(0xAA55),
 			KeyEncDstPort: uint16Ptr(22),
@@ -31,8 +36,10 @@ func TestTunnelKey(t *testing.T) {
 			KeyEncTOS:     uint8Ptr(2),
 			KeyEncTTL:     uint8Ptr(42),
 		}},
-		"invalidArgument": {val: TunnelKey{Tm: &Tcft{Install: 1}},
-			err1: ErrNoArgAlter},
+		"invalidArgument": {
+			val:  TunnelKey{Tm: &Tcft{Install: 1}},
+			err1: ErrNoArgAlter,
+		},
 	}
 
 	endianessMix := make(map[uint16]valueType)
