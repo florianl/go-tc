@@ -55,7 +55,7 @@ type Stats2 struct {
 	// gnet_stats_basic
 	Bytes   uint64
 	Packets uint32
-	//gnet_stats_queue
+	// gnet_stats_queue
 	Qlen       uint32
 	Backlog    uint32
 	Drops      uint32
@@ -243,6 +243,7 @@ func unmarshalFqCodelXStats(data []byte, info *FqCodelXStats) error {
 	}
 	return err
 }
+
 func marshalFqCodelXStats(v *FqCodelXStats) ([]byte, error) {
 	if v == nil {
 		return []byte{}, fmt.Errorf("FqCodelXStats: %w", ErrNoArg)

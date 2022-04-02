@@ -87,5 +87,4 @@ func TestUnmarshalAttributes(t *testing.T) {
 	if valInt64 != -11 {
 		t.Fatalf("expexted: -8\tgot: %d", valInt8)
 	}
-
 }
