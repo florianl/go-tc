@@ -124,6 +124,7 @@ func unmarshalEts(data []byte, info *Ets) error {
 // marshalEts returns the binary encoding of Ets
 func marshalEts(info *Ets) ([]byte, error) {
 	options := []tcOption{}
+	var multiError error
 
 	if info == nil {
 		return []byte{}, fmt.Errorf("Ets: %w", ErrNoArg)
@@ -137,17 +138,17 @@ func marshalEts(info *Ets) ([]byte, error) {
 	}
 	if info.Quanta != nil {
 		data, err := marshalEtsQuanta(info.Quanta)
-		if err != nil {
-			return []byte{}, err
-		}
+		concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaEtsQuanta, Data: data})
 	}
 	if info.PrioMap != nil {
 		data, err := marshalEtsPrioMap(info.PrioMap)
-		if err != nil {
-			return []byte{}, err
-		}
+		concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaEtsPrioMap, Data: data})
+	}
+
+	if multiError != nil {
+		return []byte{}, multiError
 	}
 
 	return marshalAttributes(options)
