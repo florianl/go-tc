@@ -98,7 +98,6 @@ type HfscQOpt struct {
 
 // unmarshalHfscQOpt parses the HfscQOpt-encoded data and stores the result in the value pointed to by info.
 func unmarshalHfscQOpt(data []byte, info *HfscQOpt) error {
-
 	info.DefCls = nativeEndian.Uint16(data)
 
 	return nil

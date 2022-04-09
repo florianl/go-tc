@@ -50,8 +50,10 @@ func TestQdisc(t *testing.T) {
 	}{
 		"clsact":   {kind: "clsact"},
 		"emptyHtb": {kind: "htb", err: ErrNoArg},
-		"fq_codel": {kind: "fq_codel",
-			fqCodel: &FqCodel{Target: uint32Ptr(42), Limit: uint32Ptr(0xCAFE)}},
+		"fq_codel": {
+			kind:    "fq_codel",
+			fqCodel: &FqCodel{Target: uint32Ptr(42), Limit: uint32Ptr(0xCAFE)},
+		},
 		"red": {kind: "red", red: &Red{MaxP: uint32Ptr(42)}},
 		"sfb": {kind: "sfb", sfb: &Sfb{Parms: &SfbQopt{Max: 0xFF}}},
 		"sfq": {kind: "sfq", sfq: &Sfq{V0: SfqQopt{
@@ -59,20 +61,30 @@ func TestQdisc(t *testing.T) {
 			Limit:         3000,
 			Flows:         512,
 		}}},
-		"cbq": {kind: "cbq", cbq: &Cbq{LssOpt: &CbqLssOpt{OffTime: 10}, WrrOpt: &CbqWrrOpt{Weight: 42},
-			FOpt: &CbqFOpt{Split: 2}, OVLStrategy: &CbqOvl{Penalty: 2}}},
-		"codel": {kind: "codel", codel: &Codel{Target: uint32Ptr(1), Limit: uint32Ptr(2), Interval: uint32Ptr(3),
-			ECN: uint32Ptr(4), CEThreshold: uint32Ptr(5)}},
-		"hhf": {kind: "hhf", hhf: &Hhf{BacklogLimit: uint32Ptr(1), Quantum: uint32Ptr(2), HHFlowsLimit: uint32Ptr(3),
-			ResetTimeout: uint32Ptr(4), AdmitBytes: uint32Ptr(5), EVICTTimeout: uint32Ptr(6), NonHHWeight: uint32Ptr(7)}},
-		"pie": {kind: "pie", pie: &Pie{Target: uint32Ptr(1), Limit: uint32Ptr(2), TUpdate: uint32Ptr(3),
-			Alpha: uint32Ptr(4), Beta: uint32Ptr(5), ECN: uint32Ptr(6), Bytemode: uint32Ptr(7)}},
+		"cbq": {kind: "cbq", cbq: &Cbq{
+			LssOpt: &CbqLssOpt{OffTime: 10}, WrrOpt: &CbqWrrOpt{Weight: 42},
+			FOpt: &CbqFOpt{Split: 2}, OVLStrategy: &CbqOvl{Penalty: 2},
+		}},
+		"codel": {kind: "codel", codel: &Codel{
+			Target: uint32Ptr(1), Limit: uint32Ptr(2), Interval: uint32Ptr(3),
+			ECN: uint32Ptr(4), CEThreshold: uint32Ptr(5),
+		}},
+		"hhf": {kind: "hhf", hhf: &Hhf{
+			BacklogLimit: uint32Ptr(1), Quantum: uint32Ptr(2), HHFlowsLimit: uint32Ptr(3),
+			ResetTimeout: uint32Ptr(4), AdmitBytes: uint32Ptr(5), EVICTTimeout: uint32Ptr(6), NonHHWeight: uint32Ptr(7),
+		}},
+		"pie": {kind: "pie", pie: &Pie{
+			Target: uint32Ptr(1), Limit: uint32Ptr(2), TUpdate: uint32Ptr(3),
+			Alpha: uint32Ptr(4), Beta: uint32Ptr(5), ECN: uint32Ptr(6), Bytemode: uint32Ptr(7),
+		}},
 		"choke": {kind: "choke", choke: &Choke{MaxP: uint32Ptr(42)}},
 		"netem": {kind: "netem", netem: &Netem{Ecn: uint32Ptr(64)}},
 		"cake":  {kind: "cake", cake: &Cake{BaseRate: uint64Ptr(128)}},
 		"htb":   {kind: "htb", htb: &Htb{Rate64: uint64Ptr(96)}},
-		"prio": {kind: "prio", prio: &Prio{Bands: 3,
-			PrioMap: [16]uint8{1, 2, 2, 2, 1, 2, 9, 9, 1, 1, 1, 1, 1, 1, 1, 1}}},
+		"prio": {kind: "prio", prio: &Prio{
+			Bands:   3,
+			PrioMap: [16]uint8{1, 2, 2, 2, 1, 2, 9, 9, 1, 1, 1, 1, 1, 1, 1, 1},
+		}},
 		"plug": {kind: "plug", plug: &Plug{Action: PlugReleaseIndefinite}},
 	}
 
@@ -85,7 +97,6 @@ func TestQdisc(t *testing.T) {
 	}
 	for name, testcase := range tests {
 		t.Run(name, func(t *testing.T) {
-
 			testQdisc := Object{
 				tcMsg,
 				Attribute{
@@ -138,7 +149,6 @@ func TestQdisc(t *testing.T) {
 			if err := tcSocket.Qdisc().Delete(&testQdisc); err != nil {
 				t.Fatalf("could not delete qdisc: %v", err)
 			}
-
 		})
 	}
 

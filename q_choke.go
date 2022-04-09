@@ -60,7 +60,6 @@ func marshalChoke(info *Choke) ([]byte, error) {
 
 	if info.MaxP != nil {
 		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaChokeMaxP, Data: uint32Value(info.MaxP)})
-
 	}
 
 	return marshalAttributes(options)
