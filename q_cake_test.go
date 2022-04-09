@@ -13,7 +13,8 @@ func TestCake(t *testing.T) {
 		err1 error
 		err2 error
 	}{
-		"simple": {val: Cake{BaseRate: uint64Ptr(123),
+		"simple": {val: Cake{
+			BaseRate:     uint64Ptr(123),
 			DiffServMode: uint32Ptr(23),
 			Atm:          uint32Ptr(34),
 			FlowMode:     uint32Ptr(45),

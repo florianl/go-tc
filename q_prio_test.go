@@ -13,8 +13,10 @@ func TestPrio(t *testing.T) {
 		err1 error
 		err2 error
 	}{
-		"pfifo_fast": {val: Prio{Bands: 3,
-			PrioMap: [16]uint8{1, 2, 2, 2, 1, 2, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1}}},
+		"pfifo_fast": {val: Prio{
+			Bands:   3,
+			PrioMap: [16]uint8{1, 2, 2, 2, 1, 2, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1},
+		}},
 	}
 
 	for name, testcase := range tests {
