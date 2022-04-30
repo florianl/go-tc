@@ -175,23 +175,39 @@ func TestExtractTcmsgAttributes(t *testing.T) {
 	}{
 		"empty":   {input: []byte{}, expected: &Attribute{}},
 		"unknown": {input: generateUnknown(t), expected: &Attribute{Kind: "unknown"}},
-		"clsact": {input: generateClsact(t), expected: &Attribute{Kind: "clsact", HwOffload: uint8Ptr(0x60),
-			EgressBlock: uint32Ptr(0x1337), IngressBlock: uint32Ptr(0xcafe), Chain: uint32Ptr(42)}},
-		"htb": {input: generateHtb(t), expected: &Attribute{Kind: "htb",
+		"clsact": {input: generateClsact(t), expected: &Attribute{
+			Kind: "clsact", HwOffload: uint8Ptr(0x60),
+			EgressBlock: uint32Ptr(0x1337), IngressBlock: uint32Ptr(0xcafe), Chain: uint32Ptr(42),
+		}},
+		"htb": {input: generateHtb(t), expected: &Attribute{
+			Kind:   "htb",
 			XStats: &XStats{Htb: &HtbXStats{Lends: 0x02, Borrows: 0x03, Giants: 0x04, Tokens: 0x05, CTokens: 0x06}},
-			Htb:    &Htb{DirectQlen: uint32Ptr(0x7b), Rate64: uint64Ptr(0xea), Ceil64: uint64Ptr(0x0159)}}},
-		"pfifo": {input: generatePfifo(t), expected: &Attribute{Kind: "pfifo",
-			Pfifo: &FifoOpt{Limit: 123}, Stats: &Stats{Bytes: 123, Packets: 321, Drops: 0, Overlimits: 42}}},
-		"clsact+stab": {input: generateClsactStab(t), expected: &Attribute{Kind: "clsact",
-			Stab: &Stab{Base: &SizeSpec{CellLog: 0x2a, LinkLayer: 0x01, MTU: 0x05d4}}}},
-		"matchall": {input: generateMatchall(t), expected: &Attribute{Kind: "matchall",
-			Matchall: &Matchall{ClassID: uint32Ptr(22), Flags: uint32Ptr(33)}}},
-		"netem": {input: generateNetem(t), expected: &Attribute{Kind: "netem",
-			Netem: &Netem{Ecn: uint32Ptr(42)}}},
-		"cake": {input: generateCake(t), expected: &Attribute{Kind: "cake",
-			Cake: &Cake{BaseRate: uint64Ptr(424242)}}},
-		"qfq": {input: generateQfq(t), expected: &Attribute{Kind: "qfq",
-			Qfq: &Qfq{Weight: uint32Ptr(1), Lmax: uint32Ptr(2)}}},
+			Htb:    &Htb{DirectQlen: uint32Ptr(0x7b), Rate64: uint64Ptr(0xea), Ceil64: uint64Ptr(0x0159)},
+		}},
+		"pfifo": {input: generatePfifo(t), expected: &Attribute{
+			Kind:  "pfifo",
+			Pfifo: &FifoOpt{Limit: 123}, Stats: &Stats{Bytes: 123, Packets: 321, Drops: 0, Overlimits: 42},
+		}},
+		"clsact+stab": {input: generateClsactStab(t), expected: &Attribute{
+			Kind: "clsact",
+			Stab: &Stab{Base: &SizeSpec{CellLog: 0x2a, LinkLayer: 0x01, MTU: 0x05d4}},
+		}},
+		"matchall": {input: generateMatchall(t), expected: &Attribute{
+			Kind:     "matchall",
+			Matchall: &Matchall{ClassID: uint32Ptr(22), Flags: uint32Ptr(33)},
+		}},
+		"netem": {input: generateNetem(t), expected: &Attribute{
+			Kind:  "netem",
+			Netem: &Netem{Ecn: uint32Ptr(42)},
+		}},
+		"cake": {input: generateCake(t), expected: &Attribute{
+			Kind: "cake",
+			Cake: &Cake{BaseRate: uint64Ptr(424242)},
+		}},
+		"qfq": {input: generateQfq(t), expected: &Attribute{
+			Kind: "qfq",
+			Qfq:  &Qfq{Weight: uint32Ptr(1), Lmax: uint32Ptr(2)},
+		}},
 	}
 
 	for name, testcase := range tests {
@@ -225,10 +241,14 @@ func TestExtractTCAOptions(t *testing.T) {
 		"clsactWithData": {kind: "clsact", data: []byte{0xde, 0xad, 0xc0, 0xde}, err: ErrInvalidArg},
 		"ingress":        {kind: "ingress", expected: &Attribute{}},
 		"unknown":        {kind: "unknown", err: ErrUnknownKind},
-		"pfifo_fast": {kind: "pfifo_fast",
+		"pfifo_fast": {
+			kind: "pfifo_fast",
 			data: []byte{0x03, 0x00, 0x00, 0x00, 0x01, 0x02, 0x02, 0x02, 0x01, 0x02, 0x00, 0x00, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01},
-			expected: &Attribute{Prio: &Prio{Bands: 3,
-				PrioMap: [16]uint8{1, 2, 2, 2, 1, 2, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1}}}},
+			expected: &Attribute{Prio: &Prio{
+				Bands:   3,
+				PrioMap: [16]uint8{1, 2, 2, 2, 1, 2, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1},
+			}},
+		},
 	}
 
 	for name, testcase := range tests {
@@ -244,7 +264,6 @@ func TestExtractTCAOptions(t *testing.T) {
 			if diff := cmp.Diff(value, testcase.expected); diff != "" {
 				t.Fatalf("ExtractTcmsgAttributes missmatch (-want +got):\n%s", diff)
 			}
-
 		})
 	}
 }
@@ -256,12 +275,16 @@ func TestFilterAttribute(t *testing.T) {
 		err2 error
 	}{
 		"basic": {val: &Attribute{Kind: "basic", Basic: &Basic{ClassID: uint32Ptr(2)}}},
-		"bpf": {val: &Attribute{Kind: "bpf", BPF: &Bpf{Ops: bytesPtr([]byte{0x6, 0x0, 0x0, 0x0, 0xff, 0xff, 0xff, 0xff}),
+		"bpf": {val: &Attribute{Kind: "bpf", BPF: &Bpf{
+			Ops:     bytesPtr([]byte{0x6, 0x0, 0x0, 0x0, 0xff, 0xff, 0xff, 0xff}),
 			OpsLen:  uint16Ptr(0x1),
 			ClassID: uint32Ptr(0x10001),
-			Flags:   uint32Ptr(0x1)}}},
-		"flow": {val: &Attribute{Kind: "flow", Flow: &Flow{Keys: uint32Ptr(12), Mode: uint32Ptr(34), BaseClass: uint32Ptr(56), RShift: uint32Ptr(78),
-			Addend: uint32Ptr(90), Mask: uint32Ptr(21), XOR: uint32Ptr(43), Divisor: uint32Ptr(65), PerTurb: uint32Ptr(87)}}},
+			Flags:   uint32Ptr(0x1),
+		}}},
+		"flow": {val: &Attribute{Kind: "flow", Flow: &Flow{
+			Keys: uint32Ptr(12), Mode: uint32Ptr(34), BaseClass: uint32Ptr(56), RShift: uint32Ptr(78),
+			Addend: uint32Ptr(90), Mask: uint32Ptr(21), XOR: uint32Ptr(43), Divisor: uint32Ptr(65), PerTurb: uint32Ptr(87),
+		}}},
 		"fw":     {val: &Attribute{Kind: "fw", Fw: &Fw{ClassID: uint32Ptr(12), InDev: stringPtr("lo"), Mask: uint32Ptr(0xFFFF)}}},
 		"route4": {val: &Attribute{Kind: "route4", Route4: &Route4{ClassID: uint32Ptr(0xFFFF), To: uint32Ptr(2), From: uint32Ptr(3), IIf: uint32Ptr(4)}}},
 		"rsvp":   {val: &Attribute{Kind: "rsvp", Rsvp: &Rsvp{ClassID: uint32Ptr(42), Police: &Police{AvRate: uint32Ptr(1337), Result: uint32Ptr(12)}}}},
