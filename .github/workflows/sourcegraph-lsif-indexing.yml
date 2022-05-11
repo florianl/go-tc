@@ -4,6 +4,9 @@ on:
   push:
     branches: [main]
 
+# Set default permissions as read only.
+permissions: read-all
+
 jobs:
   lsif-go:
     runs-on: ubuntu-latest

@@ -1,5 +1,8 @@
 on: [push, pull_request]
 
+# Set default permissions as read only.
+permissions: read-all
+
 name: Go
 jobs:
 
