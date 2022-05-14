@@ -1,0 +1,69 @@
+name: 'per kernel integration test'
+
+on:
+  schedule:
+    # Run job once a week on saturday at 8:15 AM.
+    - cron: '15 8 * * 6'
+
+jobs:
+  build-initramfs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.18
+        id: go
+
+      - name: checkout 
+        uses: actions/checkout@v3
+
+      - name: compile tests
+        # bluebox works best with statically linked binaries. So we compile all the tests in this
+        # code base into a statically linked executable.
+        run: |
+          go test -ldflags='-extldflags=-static' -trimpath -tags 'osusergo netgo static_build linux' -c
+
+      - name: build initramfs
+        # Install bluebox and generate a initramfs.cpio with the previously created statically linked
+        # tests embedded.
+        run: |
+          go install github.com/florianl/bluebox@latest
+          bluebox -e go-tc.test
+
+      - name: upload initramfs for tests
+        # Upload the generated initramfs.cpio and make it available for the parallel per-kernel tests.
+        uses: actions/upload-artifact@v3
+        with:
+          name: initramfs
+          path: |
+            initramfs.cpio
+
+  per-kernel-tests:
+    needs: build-initramfs
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        kernel-version: ["4.19", "5.10", "5.15"]
+    steps:
+      - name: install qemu && curl
+        # Make sure required software packages are available.
+        run: |
+          sudo apt --yes update
+          sudo apt --yes install qemu-system-x86 curl
+
+      - name: get initramfs
+        # Fetch the initramfs.cpio that was created in the previous step.
+        uses: actions/download-artifact@v3
+        with:
+          name: initramfs
+      
+      - name: get kernel
+        # Fetch the public kernel image that will be used in this test run.
+        run: |
+          curl -s -L -O --fail https://github.com/cilium/ci-kernels/raw/master/linux-${{ matrix.kernel-version }}.bz
+      
+      - name: run tests on kernel
+        # Run the tests.
+        run: |
+          qemu-system-x86_64  -nographic  -append "console=ttyS0" -m 2G -kernel linux-${{ matrix.kernel-version }}.bz -initrd initramfs.cpio
