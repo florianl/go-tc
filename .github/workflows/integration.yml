@@ -22,7 +22,7 @@ jobs:
         # bluebox works best with statically linked binaries. So we compile all the tests in this
         # code base into a statically linked executable.
         run: |
-          go test -ldflags='-extldflags=-static' -trimpath -tags 'osusergo netgo static_build linux' -c
+          go test -ldflags='-extldflags=-static' -trimpath -tags 'osusergo netgo static_build linux integration' -c
 
       - name: build initramfs
         # Install bluebox and generate a initramfs.cpio with the previously created statically linked
