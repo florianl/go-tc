@@ -4,6 +4,10 @@ on:
   schedule:
     # Run job once a week on saturday at 8:15 AM.
     - cron: '15 8 * * 6'
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ '**' ]
 
 jobs:
   build-initramfs:
