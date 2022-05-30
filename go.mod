@@ -3,7 +3,7 @@ module github.com/florianl/go-tc
 go 1.13
 
 require (
-	github.com/cilium/ebpf v0.8.1
+	github.com/cilium/ebpf v0.9.0
 	github.com/google/go-cmp v0.5.8
 	github.com/josharian/native v1.0.0
 	github.com/jsimonetti/rtnetlink v0.0.0-20211022192332-93da33804786
