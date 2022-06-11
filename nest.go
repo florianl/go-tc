@@ -24,6 +24,7 @@ const (
 	vtInt64
 	vtUint16Be
 	vtUint32Be
+	vtInt16Be
 )
 
 type tcOption struct {
@@ -88,8 +89,13 @@ func marshalAttributes(options []tcOption) ([]byte, error) {
 			err := binary.Write(data, binary.BigEndian, (option.Data).(uint32))
 			concatError(multiError, err)
 			ad.Bytes(option.Type, data.Bytes())
+		case vtInt16Be:
+			data := bytes.NewBuffer(make([]byte, 0, 2))
+			err := binary.Write(data, binary.BigEndian, (option.Data).(int16))
+			concatError(multiError, err)
+			ad.Bytes(option.Type, data.Bytes())
 		default:
-			return []byte{}, fmt.Errorf("unknown interpretation: %d", option.Interpretation)
+			multiError = fmt.Errorf("unknown interpretation (%d)", option.Interpretation)
 		}
 	}
 	if multiError != nil {
