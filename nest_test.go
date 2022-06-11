@@ -27,7 +27,8 @@ func TestMarshalAttributes(t *testing.T) {
 		"int64":    {interpretation: vtInt64, attributeType: 11, data: int64(-11), result: []byte{0xC, 0x0, 0xB, 0x0, 0xF5, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}},
 		"uint16Be": {interpretation: vtUint16Be, attributeType: 12, data: uint16(124), result: []byte{0x6, 0x0, 0xC, 0x0, 0x0, 0x7c, 0x0, 0x0}},
 		"uint32Be": {interpretation: vtUint32Be, attributeType: 13, data: uint32(125), result: []byte{0x8, 0x0, 0xD, 0x0, 0x0, 0x0, 0x0, 0x7d}},
-		"unknown":  {interpretation: vtUint32Be + 1, attributeType: 42, data: nil, err: fmt.Errorf("Unknown interpretation: 13")},
+		"int16Be":  {interpretation: vtInt16Be, attributeType: 14, data: int16(-73), result: []byte{0x6, 0x0, 0xE, 0x0, 0xFF, 0xB7, 0x0, 0x0}},
+		"unknown":  {interpretation: vtInt16Be + 1, attributeType: 42, data: nil, err: fmt.Errorf("unknown interpretation (14)")},
 	}
 
 	for name, tc := range tests {
