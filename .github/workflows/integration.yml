@@ -70,4 +70,5 @@ jobs:
       - name: run tests on kernel
         # Run the tests.
         run: |
-          qemu-system-x86_64  -nographic  -append "console=ttyS0" -m 2G -kernel linux-${{ matrix.kernel-version }}.bz -initrd initramfs.cpio
+          qemu-system-x86_64  -nographic  -append "console=ttyS0" -m 2G -kernel linux-${{ matrix.kernel-version }}.bz -initrd initramfs.cpio | tee log.txt
+          grep PASS log.txt
