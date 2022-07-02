@@ -102,6 +102,15 @@ func changeEndianess(t *testing.T, orig []byte, attrs map[uint16]valueType) []by
 				Type: ad.Type(),
 				Data: data.Bytes(),
 			})
+		case vtInt16Be:
+			data := bytes.NewBuffer(make([]byte, 0, 2))
+			if err := binary.Write(data, binary.BigEndian, ad.Int16()); err != nil {
+				t.Fatalf("changeEndianess for %d: %v", ad.Type(), err)
+			}
+			newAttrs = append(newAttrs, netlink.Attribute{
+				Type: ad.Type(),
+				Data: data.Bytes(),
+			})
 		default:
 			t.Fatalf("Unexpected valueType %d", vT)
 		}
