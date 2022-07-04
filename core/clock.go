@@ -1,5 +1,10 @@
 package core
 
+import (
+	"syscall"
+	"time"
+)
+
 var (
 	tickInUSec  float64
 	clockFactor float64
@@ -9,6 +14,17 @@ const (
 	// iproute2/include/utils.h:timeUnitsPerSec
 	timeUnitsPerSec = 1000000
 )
+
+// Duration2TcTime implements iproute2/tc/q_netem.c:get_ticks().
+// It converts a given duration into a time value that can be converted to ticks with Time2Tick().
+// On error it returns syscall.EINVAL.
+func Duration2TcTime(d time.Duration) (uint32, error) {
+	v := uint64(int64(d.Microseconds()) * (timeUnitsPerSec / 1000000))
+	if (v >> 32) != 0 {
+		return 0, syscall.EINVAL
+	}
+	return uint32(v), nil
+}
 
 // Time2Tick implements iproute2/tc/tc_core:tc_core_time2tick().
 // It returns the number of CPU ticks for a given time in usec.

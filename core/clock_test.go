@@ -1,7 +1,10 @@
 package core
 
 import (
+	"errors"
+	"syscall"
 	"testing"
+	"time"
 )
 
 func TestClock(t *testing.T) {
@@ -39,4 +42,31 @@ func TestClock(t *testing.T) {
 			t.Fatalf("expected %d, got %d", a, b)
 		}
 	})
+}
+
+func TestDuration2TcTime(t *testing.T) {
+	tests := map[string]struct {
+		d    time.Duration
+		time uint32
+		err  error
+	}{
+		"73 m":  {d: 73 * time.Minute, err: syscall.EINVAL},
+		"73 s":  {d: 73 * time.Second, time: 73000000},
+		"73 ms": {d: 73 * time.Millisecond, time: 73000},
+		"73 us": {d: 73 * time.Microsecond, time: 73},
+	}
+
+	for name, testcase := range tests {
+		name := name
+		testcase := testcase
+		t.Run(name, func(t *testing.T) {
+			time, err := Duration2TcTime(testcase.d)
+			if !errors.Is(err, testcase.err) {
+				t.Fatalf("Expected %v but got %v", testcase.err, err)
+			}
+			if time != testcase.time {
+				t.Fatalf("Expected %d but got %d", testcase.time, time)
+			}
+		})
+	}
 }
