@@ -1,6 +1,8 @@
 package tc
 
 import (
+	"bytes"
+	"encoding/binary"
 	"fmt"
 
 	"github.com/mdlayher/netlink"
@@ -27,6 +29,7 @@ const (
 type Netem struct {
 	Qopt      NetemQopt
 	Corr      *NetemCorr
+	DelayDist *[]int16
 	Reorder   *NetemReorder
 	Corrupt   *NetemCorrupt
 	Rate      *NetemRate
@@ -105,6 +108,13 @@ func unmarshalNetem(data []byte, info *Netem) error {
 			err := unmarshalStruct(ad.Bytes(), tmp)
 			concatError(multiError, err)
 			info.Corr = tmp
+		case tcaNetemDelayDist:
+			size := len(ad.Bytes()) / 2
+			dist := make([]int16, size)
+			reader := bytes.NewReader(ad.Bytes())
+			err := binary.Read(reader, nativeEndian, dist)
+			concatError(multiError, err)
+			info.DelayDist = &dist
 		case tcaNetemReorder:
 			tmp := &NetemReorder{}
 			err := unmarshalStruct(ad.Bytes(), tmp)
@@ -162,6 +172,12 @@ func marshalNetem(info *Netem) ([]byte, error) {
 		data, err := marshalStruct(info.Corr)
 		concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaNetemCorr, Data: data})
+	}
+	if info.DelayDist != nil {
+		buf := new(bytes.Buffer)
+		err := binary.Write(buf, nativeEndian, *info.DelayDist)
+		concatError(multiError, err)
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaNetemDelayDist, Data: buf.Bytes()})
 	}
 	if info.Reorder != nil {
 		data, err := marshalStruct(info.Reorder)
