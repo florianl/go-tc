@@ -87,6 +87,10 @@ func TestAction(t *testing.T) {
 			Kind: "gact",
 			Gact: &Gact{Prob: &GactProb{PType: 1}, Parms: &GactParms{Index: 2}},
 		}},
+		"mpls": {val: Action{
+			Kind: "mpls",
+			MPLS: &MPLS{TC: uint8Ptr(73)},
+		}},
 	}
 
 	for name, testcase := range tests {
