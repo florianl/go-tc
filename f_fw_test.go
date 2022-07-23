@@ -8,6 +8,14 @@ import (
 )
 
 func TestFw(t *testing.T) {
+	actions := []*Action{
+		{Kind: "gate", Gate: &Gate{
+			Parms: &GateParms{Index: 1}, Priority: int32Ptr(2),
+			BaseTime: uint64Ptr(3), CycleTime: uint64Ptr(4), CycleTimeExt: uint64Ptr(5),
+			Flags: uint32Ptr(6), ClockID: int32Ptr(-7),
+		}},
+	}
+
 	tests := map[string]struct {
 		val  Fw
 		err1 error
@@ -15,6 +23,7 @@ func TestFw(t *testing.T) {
 	}{
 		"simple":   {val: Fw{ClassID: uint32Ptr(12), InDev: stringPtr("lo"), Mask: uint32Ptr(0xFFFF)}},
 		"extended": {val: Fw{ClassID: uint32Ptr(12), InDev: stringPtr("lo"), Mask: uint32Ptr(0xFFFF), Police: &Police{AvRate: uint32Ptr(1337), Result: uint32Ptr(12)}}},
+		"mixed":    {val: Fw{ClassID: uint32Ptr(12), InDev: stringPtr("lo"), Actions: &actions}},
 	}
 
 	for name, testcase := range tests {

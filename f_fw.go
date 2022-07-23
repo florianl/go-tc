@@ -21,6 +21,7 @@ type Fw struct {
 	Police  *Police
 	InDev   *string
 	Mask    *uint32
+	Actions *[]*Action
 }
 
 // unmarshalFw parses the Fw-encoded data and stores the result in the value pointed to by info.
@@ -43,6 +44,11 @@ func unmarshalFw(data []byte, info *Fw) error {
 			err := unmarshalPolice(ad.Bytes(), pol)
 			concatError(multiError, err)
 			info.Police = pol
+		case tcaFwAct:
+			actions := &[]*Action{}
+			err := unmarshalActions(ad.Bytes(), actions)
+			concatError(multiError, err)
+			info.Actions = actions
 		default:
 			return fmt.Errorf("unmarshalFw()\t%d\n\t%v", ad.Type(), ad.Bytes())
 		}
@@ -73,6 +79,11 @@ func marshalFw(info *Fw) ([]byte, error) {
 		data, err := marshalPolice(info.Police)
 		concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaFwPolice, Data: data})
+	}
+	if info.Actions != nil {
+		data, err := marshalActions(*info.Actions)
+		concatError(multiError, err)
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaFwAct, Data: data})
 	}
 	if multiError != nil {
 		return []byte{}, multiError
