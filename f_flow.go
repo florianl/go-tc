@@ -34,6 +34,7 @@ type Flow struct {
 	Divisor   *uint32
 	PerTurb   *uint32
 	Ematch    *Ematch
+	Actions   *[]*Action
 }
 
 // unmarshalFlow parses the Flow-encoded data and stores the result in the value pointed to by info.
@@ -68,6 +69,11 @@ func unmarshalFlow(data []byte, info *Flow) error {
 			err := unmarshalEmatch(ad.Bytes(), ematch)
 			concatError(multiError, err)
 			info.Ematch = ematch
+		case tcaFlowAct:
+			actions := &[]*Action{}
+			err := unmarshalActions(ad.Bytes(), actions)
+			concatError(multiError, err)
+			info.Actions = actions
 		default:
 			return fmt.Errorf("unmarshalFlow()\t%d\n\t%v", ad.Type(), ad.Bytes())
 		}
@@ -83,6 +89,7 @@ func marshalFlow(info *Flow) ([]byte, error) {
 		return []byte{}, fmt.Errorf("Flow: %w", ErrNoArg)
 	}
 
+	var multiError error
 	// TODO: improve logic and check combinations
 	if info.Keys != nil {
 		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFlowKeys, Data: uint32Value(info.Keys)})
@@ -113,10 +120,16 @@ func marshalFlow(info *Flow) ([]byte, error) {
 	}
 	if info.Ematch != nil {
 		data, err := marshalEmatch(info.Ematch)
-		if err != nil {
-			return []byte{}, err
-		}
+		concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaFlowEMatches, Data: data})
+	}
+	if info.Actions != nil {
+		data, err := marshalActions(*info.Actions)
+		concatError(multiError, err)
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaFlowAct, Data: data})
+	}
+	if multiError != nil {
+		return []byte{}, multiError
 	}
 	return marshalAttributes(options)
 }
