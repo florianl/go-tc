@@ -8,6 +8,11 @@ import (
 )
 
 func TestFlow(t *testing.T) {
+	actions := []*Action{
+		{Kind: "mirred", Mirred: &Mirred{Parms: &MirredParam{Index: 0x1, Capab: 0x0, Action: 0x4,
+			RefCnt: 0x1, BindCnt: 0x1, Eaction: 0x1, IfIndex: 0x2}}},
+	}
+
 	tests := map[string]struct {
 		val  Flow
 		err1 error
@@ -16,6 +21,10 @@ func TestFlow(t *testing.T) {
 		"simple": {val: Flow{
 			Keys: uint32Ptr(12), Mode: uint32Ptr(34), BaseClass: uint32Ptr(56), RShift: uint32Ptr(78),
 			Addend: uint32Ptr(90), Mask: uint32Ptr(21), XOR: uint32Ptr(43), Divisor: uint32Ptr(65), PerTurb: uint32Ptr(87),
+		}},
+		"with Action": {val: Flow{
+			Keys: uint32Ptr(13), Mode: uint32Ptr(31),
+			Actions: &actions,
 		}},
 		"with ematch": {val: Flow{
 			Ematch: &Ematch{
