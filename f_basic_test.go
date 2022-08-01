@@ -8,12 +8,19 @@ import (
 )
 
 func TestBasic(t *testing.T) {
+	actions := []*Action{
+		{Kind: "csum", CSum: &Csum{Parms: &CsumParms{Index: 4, Capab: 5}}},
+	}
+
 	tests := map[string]struct {
 		val  Basic
 		err1 error
 		err2 error
 	}{
 		"simple": {val: Basic{ClassID: uint32Ptr(2)}},
+		"with Action": {
+			val: Basic{ClassID: uint32Ptr(73), Actions: &actions},
+		},
 		"with ematch & police": {
 			val: Basic{
 				ClassID: uint32Ptr(3),
