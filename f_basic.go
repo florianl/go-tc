@@ -19,6 +19,7 @@ type Basic struct {
 	ClassID *uint32
 	Police  *Police
 	Ematch  *Ematch
+	Actions *[]*Action
 }
 
 // unmarshalBasic parses the Basic-encoded data and stores the result in the value pointed to by info.
@@ -42,6 +43,11 @@ func unmarshalBasic(data []byte, info *Basic) error {
 			err := unmarshalEmatch(ad.Bytes(), ematch)
 			concatError(multiError, err)
 			info.Ematch = ematch
+		case tcaBasicAct:
+			actions := &[]*Action{}
+			err := unmarshalActions(ad.Bytes(), actions)
+			concatError(multiError, err)
+			info.Actions = actions
 		default:
 			return fmt.Errorf("unmarshalBasic()\t%d\n\t%v", ad.Type(), ad.Bytes())
 		}
@@ -71,6 +77,11 @@ func marshalBasic(info *Basic) ([]byte, error) {
 		data, err := marshalPolice(info.Police)
 		concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaBasicPolice, Data: data})
+	}
+	if info.Actions != nil {
+		data, err := marshalActions(*info.Actions)
+		concatError(multiError, err)
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaBasicAct, Data: data})
 	}
 	if multiError != nil {
 		return []byte{}, multiError
