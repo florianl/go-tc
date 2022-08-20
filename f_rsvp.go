@@ -23,6 +23,7 @@ type Rsvp struct {
 	Src     *[]byte
 	PInfo   *RsvpPInfo
 	Police  *Police
+	Actions *[]*Action
 }
 
 // unmarshalRsvp parses the Rsvp-encoded data and stores the result in the value pointed to by info.
@@ -50,6 +51,11 @@ func unmarshalRsvp(data []byte, info *Rsvp) error {
 			err := unmarshalPolice(ad.Bytes(), pol)
 			concatError(multiError, err)
 			info.Police = pol
+		case tcaRsvpAct:
+			actions := &[]*Action{}
+			err := unmarshalActions(ad.Bytes(), actions)
+			concatError(multiError, err)
+			info.Actions = actions
 		default:
 			return fmt.Errorf("unmarshalRsvp()\t%d\n\t%v", ad.Type(), ad.Bytes())
 		}
@@ -62,7 +68,7 @@ func marshalRsvp(info *Rsvp) ([]byte, error) {
 	options := []tcOption{}
 
 	if info == nil {
-		return []byte{}, fmt.Errorf("Ipt: %w", ErrNoArg)
+		return []byte{}, fmt.Errorf("Rsvp: %w", ErrNoArg)
 	}
 	var multiError error
 
@@ -85,6 +91,11 @@ func marshalRsvp(info *Rsvp) ([]byte, error) {
 		data, err := marshalPolice(info.Police)
 		concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaRsvpPolice, Data: data})
+	}
+	if info.Actions != nil {
+		data, err := marshalActions(*info.Actions)
+		concatError(multiError, err)
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaRsvpAct, Data: data})
 	}
 
 	if multiError != nil {
