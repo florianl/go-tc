@@ -8,13 +8,18 @@ import (
 )
 
 func TestRsvp(t *testing.T) {
+	actions := []*Action{
+		{Kind: "csum", CSum: &Csum{Parms: &CsumParms{Index: 4, Capab: 5}}},
+	}
+
 	tests := map[string]struct {
 		val  Rsvp
 		err1 error
 		err2 error
 	}{
-		"simple":   {val: Rsvp{ClassID: uint32Ptr(43), Src: bytesPtr([]byte{0xAA}), Dst: bytesPtr([]byte{0x55}), Police: &Police{AvRate: uint32Ptr(1337), Result: uint32Ptr(12)}}},
-		"extended": {val: Rsvp{ClassID: uint32Ptr(13), Src: bytesPtr([]byte{0xAA}), Dst: bytesPtr([]byte{0x55}), PInfo: &RsvpPInfo{Dpi: RsvpGpi{Mask: 1234, Key: 4321, Offset: 1}, Protocol: 42}}},
+		"simple":      {val: Rsvp{ClassID: uint32Ptr(43), Src: bytesPtr([]byte{0xAA}), Dst: bytesPtr([]byte{0x55}), Police: &Police{AvRate: uint32Ptr(1337), Result: uint32Ptr(12)}}},
+		"with Action": {val: Rsvp{ClassID: uint32Ptr(73), Actions: &actions}},
+		"extended":    {val: Rsvp{ClassID: uint32Ptr(13), Src: bytesPtr([]byte{0xAA}), Dst: bytesPtr([]byte{0x55}), PInfo: &RsvpPInfo{Dpi: RsvpGpi{Mask: 1234, Key: 4321, Offset: 1}, Protocol: 42}}},
 	}
 
 	for name, testcase := range tests {
