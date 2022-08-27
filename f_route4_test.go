@@ -8,12 +8,17 @@ import (
 )
 
 func TestRoute4(t *testing.T) {
+	actions := []*Action{
+		{Kind: "mirred", Mirred: &Mirred{Parms: &MirredParam{Index: 0x1, Capab: 0x0, Action: 0x4,
+			RefCnt: 0x1, BindCnt: 0x1, Eaction: 0x1, IfIndex: 0x2}}},
+	}
 	tests := map[string]struct {
 		val  Route4
 		err1 error
 		err2 error
 	}{
-		"simple": {val: Route4{ClassID: uint32Ptr(0xFFFF), To: uint32Ptr(2), From: uint32Ptr(3), IIf: uint32Ptr(4)}},
+		"simple":      {val: Route4{ClassID: uint32Ptr(0xFFFF), To: uint32Ptr(2), From: uint32Ptr(3), IIf: uint32Ptr(4)}},
+		"with Action": {val: Route4{ClassID: uint32Ptr(73), Actions: &actions}},
 	}
 
 	for name, testcase := range tests {

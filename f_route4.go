@@ -22,6 +22,7 @@ type Route4 struct {
 	To      *uint32
 	From    *uint32
 	IIf     *uint32
+	Actions *[]*Action
 }
 
 // unmarshalRoute4 parses the Route4-encoded data and stores the result in the value pointed to by info.
@@ -30,6 +31,7 @@ func unmarshalRoute4(data []byte, info *Route4) error {
 	if err != nil {
 		return err
 	}
+	var multiError error
 	for ad.Next() {
 		switch ad.Type() {
 		case tcaRoute4ClassID:
@@ -40,11 +42,16 @@ func unmarshalRoute4(data []byte, info *Route4) error {
 			info.From = uint32Ptr(ad.Uint32())
 		case tcaRoute4IIf:
 			info.IIf = uint32Ptr(ad.Uint32())
+		case tcaRoute4Act:
+			actions := &[]*Action{}
+			err := unmarshalActions(ad.Bytes(), actions)
+			concatError(multiError, err)
+			info.Actions = actions
 		default:
 			return fmt.Errorf("unmarshalRoute4()\t%d\n\t%v", ad.Type(), ad.Bytes())
 		}
 	}
-	return ad.Err()
+	return concatError(multiError, ad.Err())
 }
 
 // marshalRoute4 returns the binary encoding of Route4
@@ -68,6 +75,13 @@ func marshalRoute4(info *Route4) ([]byte, error) {
 	}
 	if info.IIf != nil {
 		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaRoute4IIf, Data: uint32Value(info.IIf)})
+	}
+	if info.Actions != nil {
+		data, err := marshalActions(*info.Actions)
+		if err != nil {
+			return []byte{}, err
+		}
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaRoute4Act, Data: data})
 	}
 
 	return marshalAttributes(options)
