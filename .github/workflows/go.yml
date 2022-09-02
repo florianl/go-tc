@@ -33,6 +33,9 @@ jobs:
     - name: Test with -race
       if: matrix.platform == 'ubuntu-latest'
       run: go test -race -count=3 ./...
+    - name: Test with -shuffle=on
+      if: matrix.platform == 'ubuntu-latest' && startsWith(matrix.go-version, '1.19')
+      run: go test -shuffle=on -count=3 ./...
     - name: Integrationtest for linux
       if: matrix.platform == 'ubuntu-latest'
       run: |
