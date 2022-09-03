@@ -8,12 +8,17 @@ import (
 )
 
 func TestTcIndex(t *testing.T) {
+	actions := []*Action{
+		{Kind: "csum", CSum: &Csum{Parms: &CsumParms{Index: 4, Capab: 5}}},
+	}
+
 	tests := map[string]struct {
 		val  TcIndex
 		err1 error
 		err2 error
 	}{
-		"empty": {},
+		"empty":       {},
+		"with Action": {val: TcIndex{Hash: uint32Ptr(0xAA55AA55), Actions: &actions}},
 		"simple": {val: TcIndex{
 			Hash: uint32Ptr(1), Mask: uint16Ptr(2), Shift: uint32Ptr(3),
 			FallThrough: uint32Ptr(4), ClassID: uint32Ptr(5),

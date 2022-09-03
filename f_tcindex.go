@@ -24,6 +24,7 @@ type TcIndex struct {
 	Shift       *uint32
 	FallThrough *uint32
 	ClassID     *uint32
+	Actions     *[]*Action
 }
 
 // marshalTcIndex returns the binary encoding of TcIndex
@@ -50,7 +51,13 @@ func marshalTcIndex(info *TcIndex) ([]byte, error) {
 	if info.ClassID != nil {
 		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaTcIndexClassID, Data: uint32Value(info.ClassID)})
 	}
-
+	if info.Actions != nil {
+		data, err := marshalActions(*info.Actions)
+		if err != nil {
+			return []byte{}, err
+		}
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaTcIndexAct, Data: data})
+	}
 	return marshalAttributes(options)
 }
 
@@ -60,6 +67,7 @@ func unmarshalTcIndex(data []byte, info *TcIndex) error {
 	if err != nil {
 		return err
 	}
+	var multiError error
 	for ad.Next() {
 		switch ad.Type() {
 		case tcaTcIndexHash:
@@ -72,9 +80,14 @@ func unmarshalTcIndex(data []byte, info *TcIndex) error {
 			info.FallThrough = uint32Ptr(ad.Uint32())
 		case tcaTcIndexClassID:
 			info.ClassID = uint32Ptr(ad.Uint32())
+		case tcaTcIndexAct:
+			actions := &[]*Action{}
+			err := unmarshalActions(ad.Bytes(), actions)
+			concatError(multiError, err)
+			info.Actions = actions
 		default:
 			return fmt.Errorf("unmarshalTcIndex()\t%d\n\t%v", ad.Type(), ad.Bytes())
 		}
 	}
-	return ad.Err()
+	return concatError(multiError, ad.Err())
 }
