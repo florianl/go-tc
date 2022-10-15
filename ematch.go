@@ -70,6 +70,7 @@ type EmatchMatch struct {
 	U32Match   *U32Match
 	CmpMatch   *CmpMatch
 	IPSetMatch *IPSetMatch
+	IptMatch   *IptMatch
 }
 
 // unmarshalEmatch parses the Ematch-encoded data and stores the result in the value pointed to by info.
@@ -151,6 +152,11 @@ func unmarshalEmatchTreeList(data []byte, info *[]EmatchMatch) error {
 			err := unmarshalIPSetMatch(tmp[8:], expr)
 			concatError(multiError, err)
 			match.IPSetMatch = expr
+		case EmatchIPT:
+			expr := &IptMatch{}
+			err := unmarshalIptMatch(tmp[8:], expr)
+			concatError(multiError, err)
+			match.IptMatch = expr
 		default:
 			return fmt.Errorf("unmarshalEmatchTreeList() kind %d is not yet implemented", match.Hdr.Kind)
 		}
@@ -175,6 +181,8 @@ func marshalEmatchTreeList(info *[]EmatchMatch) ([]byte, error) {
 			expr, err = marshalCmpMatch(m.CmpMatch)
 		case EmatchIPSet:
 			expr, err = marshalIPSetMatch(m.IPSetMatch)
+		case EmatchIPT:
+			expr, err = marshalIptMatch(m.IptMatch)
 		default:
 			return []byte{}, fmt.Errorf("marshalEmatchTreeList() kind %d is not yet implemented", m.Hdr.Kind)
 		}

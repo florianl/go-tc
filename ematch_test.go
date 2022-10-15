@@ -67,6 +67,20 @@ func TestEmatch(t *testing.T) {
 				},
 			},
 		},
+		"match 'ipt(-6 -m foobar)'": {
+			val: Ematch{
+				Hdr: &EmatchTreeHdr{NMatches: 1, ProgID: 42},
+				Matches: &[]EmatchMatch{
+					{
+						Hdr: EmatchHdr{MatchID: 0, Kind: 0x9, Flags: 0x0, Pad: 0x0},
+						IptMatch: &IptMatch{
+							MatchName: stringPtr("foobar"),
+							NFProto:   uint8Ptr(10),
+						},
+					},
+				},
+			},
+		},
 	}
 
 	for name, testcase := range tests {
