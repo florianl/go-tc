@@ -65,12 +65,12 @@ func unmarshalNat(data []byte, info *Nat) error {
 		case tcaNatParms:
 			parms := &NatParms{}
 			err = unmarshalStruct(ad.Bytes(), parms)
-			concatError(multiError, err)
+			multiError = concatError(multiError, err)
 			info.Parms = parms
 		case tcaNatTm:
 			tcft := &Tcft{}
 			err = unmarshalStruct(ad.Bytes(), tcft)
-			concatError(multiError, err)
+			multiError = concatError(multiError, err)
 			info.Tm = tcft
 		case tcaNatPad:
 			// padding does not contain data, we just skip it

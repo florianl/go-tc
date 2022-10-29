@@ -30,13 +30,13 @@ func marshalCgroup(info *Cgroup) ([]byte, error) {
 	// TODO: improve logic and check combinations
 	if info.Action != nil {
 		data, err := marshalAction(info.Action, tcaActOptions)
-		concatError(multiError, err)
+		multiError = concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaCgroupAct, Data: data})
 
 	}
 	if info.Ematch != nil {
 		data, err := marshalEmatch(info.Ematch)
-		concatError(multiError, err)
+		multiError = concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaCgroupEmatches, Data: data})
 	}
 
@@ -59,12 +59,12 @@ func unmarshalCgroup(data []byte, info *Cgroup) error {
 		case tcaCgroupAct:
 			act := &Action{}
 			err := unmarshalAction(ad.Bytes(), act)
-			concatError(multiError, err)
+			multiError = concatError(multiError, err)
 			info.Action = act
 		case tcaCgroupEmatches:
 			ematch := &Ematch{}
 			err := unmarshalEmatch(ad.Bytes(), ematch)
-			concatError(multiError, err)
+			multiError = concatError(multiError, err)
 			info.Ematch = ematch
 		default:
 			return fmt.Errorf("unmarshalCgroup()\t%d\n\t%v", ad.Type(), ad.Bytes())

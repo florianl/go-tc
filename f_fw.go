@@ -42,12 +42,12 @@ func unmarshalFw(data []byte, info *Fw) error {
 		case tcaFwPolice:
 			pol := &Police{}
 			err := unmarshalPolice(ad.Bytes(), pol)
-			concatError(multiError, err)
+			multiError = concatError(multiError, err)
 			info.Police = pol
 		case tcaFwAct:
 			actions := &[]*Action{}
 			err := unmarshalActions(ad.Bytes(), actions)
-			concatError(multiError, err)
+			multiError = concatError(multiError, err)
 			info.Actions = actions
 		default:
 			return fmt.Errorf("unmarshalFw()\t%d\n\t%v", ad.Type(), ad.Bytes())
@@ -77,12 +77,12 @@ func marshalFw(info *Fw) ([]byte, error) {
 	}
 	if info.Police != nil {
 		data, err := marshalPolice(info.Police)
-		concatError(multiError, err)
+		multiError = concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaFwPolice, Data: data})
 	}
 	if info.Actions != nil {
 		data, err := marshalActions(*info.Actions)
-		concatError(multiError, err)
+		multiError = concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaFwAct, Data: data})
 	}
 	if multiError != nil {

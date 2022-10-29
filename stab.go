@@ -42,7 +42,7 @@ func unmarshalStab(data []byte, stab *Stab) error {
 		case tcaStabBase:
 			base := &SizeSpec{}
 			err := unmarshalStruct(ad.Bytes(), base)
-			concatError(multiError, err)
+			multiError = concatError(multiError, err)
 			stab.Base = base
 		case tcaStabData:
 			tmp := ad.Bytes()
@@ -66,7 +66,7 @@ func marshalStab(info *Stab) ([]byte, error) {
 	// TODO: improve logic and check combination
 	if info.Base != nil {
 		data, err := marshalStruct(info.Base)
-		concatError(multiError, err)
+		multiError = concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaStabBase, Data: data})
 	}
 	if info.Data != nil {

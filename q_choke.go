@@ -31,7 +31,7 @@ func unmarshalChoke(data []byte, info *Choke) error {
 		case tcaChokeParms:
 			opt := &RedQOpt{}
 			err = unmarshalStruct(ad.Bytes(), opt)
-			concatError(multiError, err)
+			multiError = concatError(multiError, err)
 			info.Parms = opt
 		case tcaChokeMaxP:
 			info.MaxP = uint32Ptr(ad.Uint32())
@@ -49,17 +49,21 @@ func marshalChoke(info *Choke) ([]byte, error) {
 	if info == nil {
 		return []byte{}, fmt.Errorf("Choke: %w", ErrNoArg)
 	}
+
+	var multiError error
 	// TODO: improve logic and check combinations
 	if info.Parms != nil {
 		data, err := marshalStruct(info.Parms)
-		if err != nil {
-			return []byte{}, err
-		}
+		multiError = concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaChokeParms, Data: data})
 	}
 
 	if info.MaxP != nil {
 		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaChokeMaxP, Data: uint32Value(info.MaxP)})
+	}
+
+	if multiError != nil {
+		return []byte{}, multiError
 	}
 
 	return marshalAttributes(options)

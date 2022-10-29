@@ -45,7 +45,7 @@ func unmarshalRoute4(data []byte, info *Route4) error {
 		case tcaRoute4Act:
 			actions := &[]*Action{}
 			err := unmarshalActions(ad.Bytes(), actions)
-			concatError(multiError, err)
+			multiError = concatError(multiError, err)
 			info.Actions = actions
 		default:
 			return fmt.Errorf("unmarshalRoute4()\t%d\n\t%v", ad.Type(), ad.Bytes())

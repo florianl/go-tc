@@ -77,12 +77,12 @@ func unmarshalVLan(data []byte, info *VLan) error {
 		case tcaVLanParms:
 			parms := &VLanParms{}
 			err = unmarshalStruct(ad.Bytes(), parms)
-			concatError(multiError, err)
+			multiError = concatError(multiError, err)
 			info.Parms = parms
 		case tcaVLanTm:
 			tcft := &Tcft{}
 			err = unmarshalStruct(ad.Bytes(), tcft)
-			concatError(multiError, err)
+			multiError = concatError(multiError, err)
 			info.Tm = tcft
 		case tcaVLanPushVLanID:
 			tmp := ad.Uint16()

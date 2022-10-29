@@ -76,12 +76,12 @@ func unmarshalSample(data []byte, info *Sample) error {
 		case tcaSampleParms:
 			parms := &SampleParms{}
 			err = unmarshalStruct(ad.Bytes(), parms)
-			concatError(multiError, err)
+			multiError = concatError(multiError, err)
 			info.Parms = parms
 		case tcaSampleTm:
 			tcft := &Tcft{}
 			err = unmarshalStruct(ad.Bytes(), tcft)
-			concatError(multiError, err)
+			multiError = concatError(multiError, err)
 			info.Tm = tcft
 		case tcaSampleRate:
 			info.Rate = uint32Ptr(ad.Uint32())

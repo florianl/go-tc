@@ -66,12 +66,12 @@ func unmarshalDefact(data []byte, info *Defact) error {
 		case tcaDefParms:
 			parms := &DefactParms{}
 			err = unmarshalStruct(ad.Bytes(), parms)
-			concatError(multiError, err)
+			multiError = concatError(multiError, err)
 			info.Parms = parms
 		case tcaDefTm:
 			tcft := &Tcft{}
 			err = unmarshalStruct(ad.Bytes(), tcft)
-			concatError(multiError, err)
+			multiError = concatError(multiError, err)
 			info.Tm = tcft
 		case tcaDefData:
 			tmp := ad.String()

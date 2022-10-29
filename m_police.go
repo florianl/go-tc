@@ -55,17 +55,17 @@ func unmarshalPolice(data []byte, info *Police) error {
 		case tcaPoliceTbf:
 			policy := &Policy{}
 			err = unmarshalStruct(ad.Bytes(), policy)
-			concatError(multiError, err)
+			multiError = concatError(multiError, err)
 			info.Tbf = policy
 		case tcaPoliceRate:
 			rate := &RateSpec{}
 			err = unmarshalStruct(ad.Bytes(), rate)
-			concatError(multiError, err)
+			multiError = concatError(multiError, err)
 			info.Rate = rate
 		case tcaPolicePeakRate:
 			rate := &RateSpec{}
 			err = unmarshalStruct(ad.Bytes(), rate)
-			concatError(multiError, err)
+			multiError = concatError(multiError, err)
 			info.PeakRate = rate
 		case tcaPoliceAvRate:
 			info.AvRate = uint32Ptr(ad.Uint32())
@@ -74,7 +74,7 @@ func unmarshalPolice(data []byte, info *Police) error {
 		case tcaPoliceTm:
 			tm := &Tcft{}
 			err = unmarshalStruct(ad.Bytes(), tm)
-			concatError(multiError, err)
+			multiError = concatError(multiError, err)
 			info.Tm = tm
 		case tcaPolicePad:
 			// padding does not contain data, we just skip it
@@ -104,17 +104,17 @@ func marshalPolice(info *Police) ([]byte, error) {
 	// TODO: improve logic and check combinations
 	if info.Rate != nil {
 		data, err := marshalStruct(info.Rate)
-		concatError(multiError, err)
+		multiError = concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaPoliceRate, Data: data})
 	}
 	if info.PeakRate != nil {
 		data, err := marshalStruct(info.PeakRate)
-		concatError(multiError, err)
+		multiError = concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaPolicePeakRate, Data: data})
 	}
 	if info.Tbf != nil {
 		data, err := marshalStruct(info.Tbf)
-		concatError(multiError, err)
+		multiError = concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaPoliceTbf, Data: data})
 	}
 	if info.AvRate != nil {

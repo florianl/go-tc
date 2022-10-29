@@ -58,12 +58,12 @@ func unmarshalMPLS(data []byte, info *MPLS) error {
 		case tcaMPLSTm:
 			tm := &Tcft{}
 			err = unmarshalStruct(ad.Bytes(), tm)
-			concatError(multiError, err)
+			multiError = concatError(multiError, err)
 			info.Tm = tm
 		case tcaMPLSParms:
 			param := &MPLSParam{}
 			err = unmarshalStruct(ad.Bytes(), param)
-			concatError(multiError, err)
+			multiError = concatError(multiError, err)
 			info.Parms = param
 		case tcaMPLSPad:
 			// padding does not contain data, we just skip it

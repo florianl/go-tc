@@ -34,17 +34,17 @@ func unmarshalHfsc(data []byte, info *Hfsc) error {
 		case tcaHfscRsc:
 			curve := &ServiceCurve{}
 			err := unmarshalStruct(ad.Bytes(), curve)
-			concatError(multiError, err)
+			multiError = concatError(multiError, err)
 			info.Rsc = curve
 		case tcaHfscFsc:
 			curve := &ServiceCurve{}
 			err := unmarshalStruct(ad.Bytes(), curve)
-			concatError(multiError, err)
+			multiError = concatError(multiError, err)
 			info.Fsc = curve
 		case tcaHfscUsc:
 			curve := &ServiceCurve{}
 			err := unmarshalStruct(ad.Bytes(), curve)
-			concatError(multiError, err)
+			multiError = concatError(multiError, err)
 			info.Usc = curve
 		default:
 			return fmt.Errorf("unmarshalHfsc()\t%d\n\t%v", ad.Type(), ad.Bytes())
@@ -65,17 +65,17 @@ func marshalHfsc(info *Hfsc) ([]byte, error) {
 
 	if info.Rsc != nil {
 		data, err := marshalStruct(info.Rsc)
-		concatError(multiError, err)
+		multiError = concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaHfscRsc, Data: data})
 	}
 	if info.Fsc != nil {
 		data, err := marshalStruct(info.Fsc)
-		concatError(multiError, err)
+		multiError = concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaHfscFsc, Data: data})
 	}
 	if info.Usc != nil {
 		data, err := marshalStruct(info.Usc)
-		concatError(multiError, err)
+		multiError = concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaHfscUsc, Data: data})
 	}
 	if multiError != nil {

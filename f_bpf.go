@@ -53,12 +53,12 @@ func unmarshalBpf(data []byte, info *Bpf) error {
 		case tcaBpfAct:
 			actions := &[]*Action{}
 			err := unmarshalActions(ad.Bytes(), actions)
-			concatError(multiError, err)
+			multiError = concatError(multiError, err)
 			info.Action = (*actions)[0]
 		case tcaBpfPolice:
 			pol := &Police{}
 			err := unmarshalPolice(ad.Bytes(), pol)
-			concatError(multiError, err)
+			multiError = concatError(multiError, err)
 			info.Police = pol
 		case tcaBpfClassID:
 			info.ClassID = uint32Ptr(ad.Uint32())

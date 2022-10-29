@@ -79,7 +79,7 @@ func unmarshalIfe(data []byte, info *Ife) error {
 		case tcaIfeParms:
 			parms := &IfeParms{}
 			err = unmarshalStruct(ad.Bytes(), parms)
-			concatError(multiError, err)
+			multiError = concatError(multiError, err)
 			info.Parms = parms
 		case tcaIfeSMac:
 			tmp := net.HardwareAddr(ad.Bytes())
@@ -90,7 +90,7 @@ func unmarshalIfe(data []byte, info *Ife) error {
 		case tcaIfeTm:
 			tcft := &Tcft{}
 			err = unmarshalStruct(ad.Bytes(), tcft)
-			concatError(multiError, err)
+			multiError = concatError(multiError, err)
 			info.Tm = tcft
 		case tcaIfeType:
 			tmp := ad.Uint16()

@@ -40,12 +40,12 @@ func unmarshalConnmark(data []byte, info *Connmark) error {
 		case tcaConnmarkParms:
 			param := &ConnmarkParam{}
 			err = unmarshalStruct(ad.Bytes(), param)
-			concatError(multiError, err)
+			multiError = concatError(multiError, err)
 			info.Parms = param
 		case tcaConnmarkTm:
 			tm := &Tcft{}
 			err = unmarshalStruct(ad.Bytes(), tm)
-			concatError(multiError, err)
+			multiError = concatError(multiError, err)
 			info.Tm = tm
 		case tcaConnmarkPad:
 			// padding does not contain data, we just skip it

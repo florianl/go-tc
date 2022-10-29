@@ -106,29 +106,29 @@ func unmarshalNetem(data []byte, info *Netem) error {
 		case tcaNetemCorr:
 			tmp := &NetemCorr{}
 			err := unmarshalStruct(ad.Bytes(), tmp)
-			concatError(multiError, err)
+			multiError = concatError(multiError, err)
 			info.Corr = tmp
 		case tcaNetemDelayDist:
 			size := len(ad.Bytes()) / 2
 			dist := make([]int16, size)
 			reader := bytes.NewReader(ad.Bytes())
 			err := binary.Read(reader, nativeEndian, dist)
-			concatError(multiError, err)
+			multiError = concatError(multiError, err)
 			info.DelayDist = &dist
 		case tcaNetemReorder:
 			tmp := &NetemReorder{}
 			err := unmarshalStruct(ad.Bytes(), tmp)
-			concatError(multiError, err)
+			multiError = concatError(multiError, err)
 			info.Reorder = tmp
 		case tcaNetemCorrupt:
 			tmp := &NetemCorrupt{}
 			err := unmarshalStruct(ad.Bytes(), tmp)
-			concatError(multiError, err)
+			multiError = concatError(multiError, err)
 			info.Corrupt = tmp
 		case tcaNetemRate:
 			tmp := &NetemRate{}
 			err := unmarshalStruct(ad.Bytes(), tmp)
-			concatError(multiError, err)
+			multiError = concatError(multiError, err)
 			info.Rate = tmp
 		case tcaNetemEcn:
 			tmp := ad.Uint32()
@@ -139,17 +139,17 @@ func unmarshalNetem(data []byte, info *Netem) error {
 		case tcaNetemLatency64:
 			var val int64
 			err := unmarshalNetlinkAttribute(ad.Bytes(), &val)
-			concatError(multiError, err)
+			multiError = concatError(multiError, err)
 			info.Latency64 = &val
 		case tcaNetemJitter64:
 			var val int64
 			err := unmarshalNetlinkAttribute(ad.Bytes(), &val)
-			concatError(multiError, err)
+			multiError = concatError(multiError, err)
 			info.Jitter64 = &val
 		case tcaNetemSlot:
 			tmp := &NetemSlot{}
 			err := unmarshalStruct(ad.Bytes(), tmp)
-			concatError(multiError, err)
+			multiError = concatError(multiError, err)
 			info.Slot = tmp
 		case tcaNetemPad:
 			// padding does not contain data, we just skip it
@@ -170,28 +170,28 @@ func marshalNetem(info *Netem) ([]byte, error) {
 
 	if info.Corr != nil {
 		data, err := marshalStruct(info.Corr)
-		concatError(multiError, err)
+		multiError = concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaNetemCorr, Data: data})
 	}
 	if info.DelayDist != nil {
 		buf := new(bytes.Buffer)
 		err := binary.Write(buf, nativeEndian, *info.DelayDist)
-		concatError(multiError, err)
+		multiError = concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaNetemDelayDist, Data: buf.Bytes()})
 	}
 	if info.Reorder != nil {
 		data, err := marshalStruct(info.Reorder)
-		concatError(multiError, err)
+		multiError = concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaNetemReorder, Data: data})
 	}
 	if info.Corrupt != nil {
 		data, err := marshalStruct(info.Corrupt)
-		concatError(multiError, err)
+		multiError = concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaNetemCorrupt, Data: data})
 	}
 	if info.Rate != nil {
 		data, err := marshalStruct(info.Rate)
-		concatError(multiError, err)
+		multiError = concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaNetemRate, Data: data})
 	}
 	if info.Ecn != nil {
@@ -208,12 +208,12 @@ func marshalNetem(info *Netem) ([]byte, error) {
 	}
 	if info.Slot != nil {
 		data, err := marshalStruct(info.Slot)
-		concatError(multiError, err)
+		multiError = concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaNetemSlot, Data: data})
 	}
 
 	data, err := marshalAttributes(options)
-	concatError(multiError, err)
+	multiError = concatError(multiError, err)
 
 	var qoptErr error
 	var qoptData []byte

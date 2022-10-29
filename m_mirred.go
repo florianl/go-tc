@@ -41,12 +41,12 @@ func unmarshalMirred(data []byte, info *Mirred) error {
 		case tcaMirredParms:
 			param := &MirredParam{}
 			err = unmarshalStruct(ad.Bytes(), param)
-			concatError(multiError, err)
+			multiError = concatError(multiError, err)
 			info.Parms = param
 		case tcaMirredTm:
 			tm := &Tcft{}
 			err = unmarshalStruct(ad.Bytes(), tm)
-			concatError(multiError, err)
+			multiError = concatError(multiError, err)
 			info.Tm = tm
 		case tcaMirredPad:
 			// padding does not contain data, we just skip it

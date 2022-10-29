@@ -40,7 +40,7 @@ func unmarshalAtm(data []byte, info *Atm) error {
 		case tcaAtmAddr:
 			arg := &AtmPvc{}
 			err := unmarshalStruct(ad.Bytes(), arg)
-			concatError(multiError, err)
+			multiError = concatError(multiError, err)
 			info.Addr = arg
 		case tcaAtmState:
 			info.State = uint32Ptr(ad.Uint32())

@@ -187,7 +187,7 @@ func unmarshalFlower(data []byte, info *Flower) error {
 		case tcaFlowerAct:
 			actions := &[]*Action{}
 			err := unmarshalActions(ad.Bytes(), actions)
-			concatError(multiError, err)
+			multiError = concatError(multiError, err)
 			info.Actions = actions
 		case tcaFlowerKeyEthDst:
 			tmp := bytesToHardwareAddr(ad.Bytes())
@@ -408,7 +408,7 @@ func marshalFlower(info *Flower) ([]byte, error) {
 	}
 	if info.Actions != nil {
 		data, err := marshalActions(*info.Actions)
-		concatError(multiError, err)
+		multiError = concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaFlowerAct, Data: data})
 	}
 	if info.KeyEthDst != nil {
@@ -435,22 +435,22 @@ func marshalFlower(info *Flower) ([]byte, error) {
 	}
 	if info.KeyIPv4Src != nil {
 		tmp, err := ipToUint32(*info.KeyIPv4Src)
-		concatError(multiError, err)
+		multiError = concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFlowerKeyIPv4Src, Data: tmp})
 	}
 	if info.KeyIPv4SrcMask != nil {
 		tmp, err := ipToUint32(*info.KeyIPv4SrcMask)
-		concatError(multiError, err)
+		multiError = concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFlowerKeyIPv4SrcMask, Data: tmp})
 	}
 	if info.KeyIPv4Dst != nil {
 		tmp, err := ipToUint32(*info.KeyIPv4Dst)
-		concatError(multiError, err)
+		multiError = concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFlowerKeyIPv4Dst, Data: tmp})
 	}
 	if info.KeyIPv4DstMask != nil {
 		tmp, err := ipToUint32(*info.KeyIPv4DstMask)
-		concatError(multiError, err)
+		multiError = concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFlowerKeyIPv4DstMask, Data: tmp})
 	}
 	if info.KeyTCPSrc != nil {
@@ -482,22 +482,22 @@ func marshalFlower(info *Flower) ([]byte, error) {
 	}
 	if info.KeyEncIPv4Src != nil {
 		tmp, err := ipToUint32(*info.KeyEncIPv4Src)
-		concatError(multiError, err)
+		multiError = concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFlowerKeyEncIPv4Src, Data: tmp})
 	}
 	if info.KeyEncIPv4SrcMask != nil {
 		tmp, err := ipToUint32(*info.KeyEncIPv4SrcMask)
-		concatError(multiError, err)
+		multiError = concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFlowerKeyEncIPv4SrcMask, Data: tmp})
 	}
 	if info.KeyEncIPv4Dst != nil {
 		tmp, err := ipToUint32(*info.KeyEncIPv4Dst)
-		concatError(multiError, err)
+		multiError = concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFlowerKeyEncIPv4Dst, Data: tmp})
 	}
 	if info.KeyEncIPv4DstMask != nil {
 		tmp, err := ipToUint32(*info.KeyEncIPv4DstMask)
-		concatError(multiError, err)
+		multiError = concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFlowerKeyEncIPv4DstMask, Data: tmp})
 	}
 	if info.KeyTCPSrcMask != nil {

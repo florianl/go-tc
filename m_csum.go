@@ -52,12 +52,12 @@ func unmarshalCsum(data []byte, info *Csum) error {
 		case tcaCsumParms:
 			parms := &CsumParms{}
 			err = unmarshalStruct(ad.Bytes(), parms)
-			concatError(multiError, err)
+			multiError = concatError(multiError, err)
 			info.Parms = parms
 		case tcaCsumTm:
 			tcft := &Tcft{}
 			err = unmarshalStruct(ad.Bytes(), tcft)
-			concatError(multiError, err)
+			multiError = concatError(multiError, err)
 			info.Tm = tcft
 		case tcaCsumPad:
 			// padding does not contain data, we just skip it

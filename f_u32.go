@@ -52,7 +52,7 @@ func marshalU32(info *U32) ([]byte, error) {
 
 	if info.Sel != nil {
 		data, err := validateU32SelOptions(info.Sel)
-		concatError(multiError, err)
+		multiError = concatError(multiError, err)
 		// align returned data to 4 bytes
 		for len(data)%4 != 0 {
 			data = append(data, 0x0)
@@ -62,7 +62,7 @@ func marshalU32(info *U32) ([]byte, error) {
 
 	if info.Mark != nil {
 		data, err := marshalStruct(info.Mark)
-		concatError(multiError, err)
+		multiError = concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaU32Mark, Data: data})
 	}
 
@@ -71,7 +71,7 @@ func marshalU32(info *U32) ([]byte, error) {
 	}
 	if info.Police != nil {
 		data, err := marshalPolice(info.Police)
-		concatError(multiError, err)
+		multiError = concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaU32Police, Data: data})
 	}
 	if info.Flags != nil {
@@ -79,7 +79,7 @@ func marshalU32(info *U32) ([]byte, error) {
 	}
 	if info.Actions != nil {
 		data, err := marshalActions(*info.Actions)
-		concatError(multiError, err)
+		multiError = concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaU32Act, Data: data})
 	}
 	if info.Divisor != nil {
@@ -125,12 +125,12 @@ func unmarshalU32(data []byte, info *U32) error {
 		case tcaU32Sel:
 			arg := &U32Sel{}
 			err := extractU32Sel(ad.Bytes(), arg)
-			concatError(multiError, err)
+			multiError = concatError(multiError, err)
 			info.Sel = arg
 		case tcaU32Police:
 			pol := &Police{}
 			err := unmarshalPolice(ad.Bytes(), pol)
-			concatError(multiError, err)
+			multiError = concatError(multiError, err)
 			info.Police = pol
 		case tcaU32InDev:
 			info.InDev = stringPtr(ad.String())
@@ -139,14 +139,14 @@ func unmarshalU32(data []byte, info *U32) error {
 		case tcaU32Mark:
 			arg := &U32Mark{}
 			err := unmarshalStruct(ad.Bytes(), arg)
-			concatError(multiError, err)
+			multiError = concatError(multiError, err)
 			info.Mark = arg
 		case tcaU32Flags:
 			info.Flags = uint32Ptr(ad.Uint32())
 		case tcaU32Act:
 			actions := &[]*Action{}
 			err := unmarshalActions(ad.Bytes(), actions)
-			concatError(multiError, err)
+			multiError = concatError(multiError, err)
 			info.Actions = actions
 		case tcaU32Pad:
 			// padding does not contain data, we just skip it
