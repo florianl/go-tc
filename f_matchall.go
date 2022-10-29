@@ -35,7 +35,7 @@ func unmarshalMatchall(data []byte, info *Matchall) error {
 		case tcaMatchallAct:
 			actions := &[]*Action{}
 			err := unmarshalActions(ad.Bytes(), actions)
-			concatError(multiError, err)
+			multiError = concatError(multiError, err)
 			info.Actions = actions
 		case tcaMatchallFlags:
 			info.Flags = uint32Ptr(ad.Uint32())
@@ -64,7 +64,7 @@ func marshalMatchall(info *Matchall) ([]byte, error) {
 	}
 	if info.Actions != nil {
 		data, err := marshalActions(*info.Actions)
-		concatError(multiError, err)
+		multiError = concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaMatchallAct, Data: data})
 	}
 

@@ -116,12 +116,12 @@ func unmarshalTunnelKey(data []byte, info *TunnelKey) error {
 		case tcaTunnelKeyTm:
 			tm := &Tcft{}
 			err = unmarshalStruct(ad.Bytes(), tm)
-			concatError(multiError, err)
+			multiError = concatError(multiError, err)
 			info.Tm = tm
 		case tcaTunnelKeyParms:
 			parms := &TunnelParms{}
 			err = unmarshalStruct(ad.Bytes(), parms)
-			concatError(multiError, err)
+			multiError = concatError(multiError, err)
 			info.Parms = parms
 		case tcaTunnelKeyEncIPv4Src:
 			tmp := uint32ToIP(ad.Uint32())
@@ -131,11 +131,11 @@ func unmarshalTunnelKey(data []byte, info *TunnelKey) error {
 			info.KeyEncDst = &tmp
 		case tcaTunnelKeyEncIPv6Src:
 			tmp, err := bytesToIP(ad.Bytes())
-			concatError(multiError, err)
+			multiError = concatError(multiError, err)
 			info.KeyEncSrc = &tmp
 		case tcaTunnelKeyEncIPv6Dst:
 			tmp, err := bytesToIP(ad.Bytes())
-			concatError(multiError, err)
+			multiError = concatError(multiError, err)
 			info.KeyEncDst = &tmp
 		case tcaTunnelKeyEncKeyID:
 			tmp := ad.Uint32()

@@ -84,12 +84,12 @@ func unmarshalGate(data []byte, info *Gate) error {
 		case tcaGateParms:
 			parms := &GateParms{}
 			err = unmarshalStruct(ad.Bytes(), parms)
-			concatError(multiError, err)
+			multiError = concatError(multiError, err)
 			info.Parms = parms
 		case tcaGateTm:
 			tcft := &Tcft{}
 			err = unmarshalStruct(ad.Bytes(), tcft)
-			concatError(multiError, err)
+			multiError = concatError(multiError, err)
 			info.Tm = tcft
 		case tcaGatePad:
 			// padding does not contain data, we just skip it

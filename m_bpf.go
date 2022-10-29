@@ -43,12 +43,12 @@ func unmarshalActBpf(data []byte, info *ActBpf) error {
 		case tcaActBpfTm:
 			tm := &Tcft{}
 			err = unmarshalStruct(ad.Bytes(), tm)
-			concatError(multiError, err)
+			multiError = concatError(multiError, err)
 			info.Tm = tm
 		case tcaActBpfParms:
 			parms := &ActBpfParms{}
 			err = unmarshalStruct(ad.Bytes(), parms)
-			concatError(multiError, err)
+			multiError = concatError(multiError, err)
 			info.Parms = parms
 		case tcaActBpfOpsLen:
 			info.OpsLen = uint16Ptr(ad.Uint16())

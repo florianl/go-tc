@@ -83,7 +83,7 @@ func unmarshalTcIndex(data []byte, info *TcIndex) error {
 		case tcaTcIndexAct:
 			actions := &[]*Action{}
 			err := unmarshalActions(ad.Bytes(), actions)
-			concatError(multiError, err)
+			multiError = concatError(multiError, err)
 			info.Actions = actions
 		default:
 			return fmt.Errorf("unmarshalTcIndex()\t%d\n\t%v", ad.Type(), ad.Bytes())

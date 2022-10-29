@@ -44,7 +44,7 @@ func unmarshalIpt(data []byte, info *Ipt) error {
 		case tcaIptTm:
 			tcft := &Tcft{}
 			err = unmarshalStruct(ad.Bytes(), tcft)
-			concatError(multiError, err)
+			multiError = concatError(multiError, err)
 			info.Tm = tcft
 		case tcaIptTable:
 			info.Table = stringPtr(ad.String())
@@ -55,7 +55,7 @@ func unmarshalIpt(data []byte, info *Ipt) error {
 		case tcaIptCnt:
 			tmp := &IptCnt{}
 			err = unmarshalStruct(ad.Bytes(), tmp)
-			concatError(multiError, err)
+			multiError = concatError(multiError, err)
 			info.Cnt = tmp
 		case tcaIptPad:
 			// padding does not contain data, we just skip it

@@ -34,19 +34,19 @@ func unmarshalBasic(data []byte, info *Basic) error {
 		case tcaBasicPolice:
 			pol := &Police{}
 			err := unmarshalPolice(ad.Bytes(), pol)
-			concatError(multiError, err)
+			multiError = concatError(multiError, err)
 			info.Police = pol
 		case tcaBasicClassID:
 			info.ClassID = uint32Ptr(ad.Uint32())
 		case tcaBasicEmatches:
 			ematch := &Ematch{}
 			err := unmarshalEmatch(ad.Bytes(), ematch)
-			concatError(multiError, err)
+			multiError = concatError(multiError, err)
 			info.Ematch = ematch
 		case tcaBasicAct:
 			actions := &[]*Action{}
 			err := unmarshalActions(ad.Bytes(), actions)
-			concatError(multiError, err)
+			multiError = concatError(multiError, err)
 			info.Actions = actions
 		default:
 			return fmt.Errorf("unmarshalBasic()\t%d\n\t%v", ad.Type(), ad.Bytes())
@@ -70,17 +70,17 @@ func marshalBasic(info *Basic) ([]byte, error) {
 	}
 	if info.Ematch != nil {
 		data, err := marshalEmatch(info.Ematch)
-		concatError(multiError, err)
+		multiError = concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaBasicEmatches, Data: data})
 	}
 	if info.Police != nil {
 		data, err := marshalPolice(info.Police)
-		concatError(multiError, err)
+		multiError = concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaBasicPolice, Data: data})
 	}
 	if info.Actions != nil {
 		data, err := marshalActions(*info.Actions)
-		concatError(multiError, err)
+		multiError = concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaBasicAct, Data: data})
 	}
 	if multiError != nil {

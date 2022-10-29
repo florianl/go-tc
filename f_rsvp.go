@@ -44,17 +44,17 @@ func unmarshalRsvp(data []byte, info *Rsvp) error {
 		case tcaRsvpPInfo:
 			arg := &RsvpPInfo{}
 			err := unmarshalStruct(ad.Bytes(), arg)
-			concatError(multiError, err)
+			multiError = concatError(multiError, err)
 			info.PInfo = arg
 		case tcaRsvpPolice:
 			pol := &Police{}
 			err := unmarshalPolice(ad.Bytes(), pol)
-			concatError(multiError, err)
+			multiError = concatError(multiError, err)
 			info.Police = pol
 		case tcaRsvpAct:
 			actions := &[]*Action{}
 			err := unmarshalActions(ad.Bytes(), actions)
-			concatError(multiError, err)
+			multiError = concatError(multiError, err)
 			info.Actions = actions
 		default:
 			return fmt.Errorf("unmarshalRsvp()\t%d\n\t%v", ad.Type(), ad.Bytes())
@@ -78,7 +78,7 @@ func marshalRsvp(info *Rsvp) ([]byte, error) {
 	}
 	if info.PInfo != nil {
 		data, err := marshalStruct(info.PInfo)
-		concatError(multiError, err)
+		multiError = concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaRsvpPInfo, Data: data})
 	}
 	if info.Src != nil {
@@ -89,12 +89,12 @@ func marshalRsvp(info *Rsvp) ([]byte, error) {
 	}
 	if info.Police != nil {
 		data, err := marshalPolice(info.Police)
-		concatError(multiError, err)
+		multiError = concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaRsvpPolice, Data: data})
 	}
 	if info.Actions != nil {
 		data, err := marshalActions(*info.Actions)
-		concatError(multiError, err)
+		multiError = concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaRsvpAct, Data: data})
 	}
 

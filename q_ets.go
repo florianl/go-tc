@@ -107,12 +107,12 @@ func unmarshalEts(data []byte, info *Ets) error {
 		case tcaEtsQuanta:
 			var tmp []uint32
 			err := unmarshalEtsQuanta(ad.Bytes(), &tmp)
-			concatError(multiError, err)
+			multiError = concatError(multiError, err)
 			info.Quanta = &tmp
 		case tcaEtsPrioMap:
 			var tmp []uint8
 			err := unmarshalEtsPrioMap(ad.Bytes(), &tmp)
-			concatError(multiError, err)
+			multiError = concatError(multiError, err)
 			info.PrioMap = &tmp
 		default:
 			return fmt.Errorf("unmarshalEts()\t%d\n\t%v", ad.Type(), ad.Bytes())
@@ -138,12 +138,12 @@ func marshalEts(info *Ets) ([]byte, error) {
 	}
 	if info.Quanta != nil {
 		data, err := marshalEtsQuanta(info.Quanta)
-		concatError(multiError, err)
+		multiError = concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaEtsQuanta, Data: data})
 	}
 	if info.PrioMap != nil {
 		data, err := marshalEtsPrioMap(info.PrioMap)
-		concatError(multiError, err)
+		multiError = concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaEtsPrioMap, Data: data})
 	}
 

@@ -67,12 +67,12 @@ func unmarshalFlow(data []byte, info *Flow) error {
 		case tcaFlowEMatches:
 			ematch := &Ematch{}
 			err := unmarshalEmatch(ad.Bytes(), ematch)
-			concatError(multiError, err)
+			multiError = concatError(multiError, err)
 			info.Ematch = ematch
 		case tcaFlowAct:
 			actions := &[]*Action{}
 			err := unmarshalActions(ad.Bytes(), actions)
-			concatError(multiError, err)
+			multiError = concatError(multiError, err)
 			info.Actions = actions
 		default:
 			return fmt.Errorf("unmarshalFlow()\t%d\n\t%v", ad.Type(), ad.Bytes())
@@ -120,12 +120,12 @@ func marshalFlow(info *Flow) ([]byte, error) {
 	}
 	if info.Ematch != nil {
 		data, err := marshalEmatch(info.Ematch)
-		concatError(multiError, err)
+		multiError = concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaFlowEMatches, Data: data})
 	}
 	if info.Actions != nil {
 		data, err := marshalActions(*info.Actions)
-		concatError(multiError, err)
+		multiError = concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaFlowAct, Data: data})
 	}
 	if multiError != nil {

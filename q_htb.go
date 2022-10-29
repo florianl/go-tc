@@ -41,12 +41,12 @@ func unmarshalHtb(data []byte, info *Htb) error {
 		case tcaHtbParms:
 			opt := &HtbOpt{}
 			err := unmarshalStruct(ad.Bytes(), opt)
-			concatError(multiError, err)
+			multiError = concatError(multiError, err)
 			info.Parms = opt
 		case tcaHtbInit:
 			glob := &HtbGlob{}
 			err := unmarshalStruct(ad.Bytes(), glob)
-			concatError(multiError, err)
+			multiError = concatError(multiError, err)
 			info.Init = glob
 		case tcaHtbCtab:
 			info.Ctab = bytesPtr(ad.Bytes())
@@ -78,12 +78,12 @@ func marshalHtb(info *Htb) ([]byte, error) {
 	// TODO: improve logic and check combinations
 	if info.Parms != nil {
 		data, err := marshalStruct(info.Parms)
-		concatError(multiError, err)
+		multiError = concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaHtbParms, Data: data})
 	}
 	if info.Init != nil {
 		data, err := marshalStruct(info.Init)
-		concatError(multiError, err)
+		multiError = concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaHtbInit, Data: data})
 	}
 	if info.DirectQlen != nil {

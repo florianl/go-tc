@@ -37,7 +37,7 @@ func unmarshalTbf(data []byte, info *Tbf) error {
 		case tcaTbfParms:
 			qopt := &TbfQopt{}
 			err := unmarshalStruct(ad.Bytes(), qopt)
-			concatError(multiError, err)
+			multiError = concatError(multiError, err)
 			info.Parms = qopt
 		case tcaTbfBurst:
 			info.Burst = uint32Ptr(ad.Uint32())
@@ -69,7 +69,7 @@ func marshalTbf(info *Tbf) ([]byte, error) {
 		ratePolicy.Rate.Rate = info.Parms.Rate.Rate
 
 		rtab, err := generateRateTable(&ratePolicy)
-		concatError(multiError, err)
+		multiError = concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaTbfRtab, Data: rtab})
 	}
 	if info.Parms.PeakRate.Rate != 0 {
@@ -80,11 +80,11 @@ func marshalTbf(info *Tbf) ([]byte, error) {
 		ratePolicy.PeakRate.Rate = info.Parms.PeakRate.Rate
 
 		ptab, err := generateRateTable(&ratePolicy)
-		concatError(multiError, err)
+		multiError = concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaTbfPtab, Data: ptab})
 	}
 	data, err := marshalStruct(info.Parms)
-	concatError(multiError, err)
+	multiError = concatError(multiError, err)
 	options = append(options, tcOption{Interpretation: vtBytes, Type: tcaTbfParms, Data: data})
 
 	if info.Burst != nil {
