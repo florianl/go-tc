@@ -30,7 +30,7 @@ func TestEmatch(t *testing.T) {
 				Hdr: &EmatchTreeHdr{NMatches: 2},
 				Matches: &[]EmatchMatch{
 					{
-						Hdr: EmatchHdr{MatchID: 0x0, Kind: 0x3, Flags: 0x1, Pad: 0x0},
+						Hdr: EmatchHdr{MatchID: 0x0, Kind: EmatchU32, Flags: 0x1, Pad: 0x0},
 						U32Match: &U32Match{
 							Mask:    0xffff,
 							Value:   0x1122,
@@ -39,7 +39,7 @@ func TestEmatch(t *testing.T) {
 						},
 					},
 					{
-						Hdr: EmatchHdr{MatchID: 0x0, Kind: 0x1, Flags: 0x0, Pad: 0x0},
+						Hdr: EmatchHdr{MatchID: 0x0, Kind: EmatchCmp, Flags: 0x0, Pad: 0x0},
 						CmpMatch: &CmpMatch{
 							Val:   0x14,
 							Mask:  0xff00,
@@ -58,7 +58,7 @@ func TestEmatch(t *testing.T) {
 				Hdr: &EmatchTreeHdr{NMatches: 1, ProgID: 42},
 				Matches: &[]EmatchMatch{
 					{
-						Hdr: EmatchHdr{MatchID: 0, Kind: 0x8, Flags: 0x0, Pad: 0x0},
+						Hdr: EmatchHdr{MatchID: 0, Kind: EmatchIPSet, Flags: 0x0, Pad: 0x0},
 						IPSetMatch: &IPSetMatch{
 							IPSetID: 19,
 							Dir:     []IPSetDir{IPSetSrc, IPSetSrc},
@@ -111,6 +111,19 @@ func TestEmatch(t *testing.T) {
 		_, err := marshalEmatch(nil)
 		if !errors.Is(err, ErrNoArg) {
 			t.Fatalf("unexpected error: %v", err)
+		}
+	})
+	t.Run("marshal(invalid)", func(t *testing.T) {
+		_, err := marshalEmatch(&Ematch{
+			Hdr: &EmatchTreeHdr{NMatches: 1, ProgID: 73},
+			Matches: &[]EmatchMatch{
+				{
+					Hdr: EmatchHdr{MatchID: 0, Kind: ematchInvalid},
+				},
+			},
+		})
+		if err == nil {
+			t.Fatalf("expected error but got nil")
 		}
 	})
 	t.Run("unmarshal(0x0)", func(t *testing.T) {
