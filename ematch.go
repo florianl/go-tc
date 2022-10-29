@@ -32,16 +32,17 @@ type EmatchKind uint16
 
 // Various Ematch kinds
 const (
-	EmatchContainer = EmatchKind(0)
-	EmatchCmp       = EmatchKind(1)
-	EmatchNByte     = EmatchKind(2)
-	EmatchU32       = EmatchKind(3)
-	EmatchMeta      = EmatchKind(4)
-	EmatchText      = EmatchKind(5)
-	EmatchVLan      = EmatchKind(6)
-	EmatchCanID     = EmatchKind(7)
-	EmatchIPSet     = EmatchKind(8)
-	EmatchIPT       = EmatchKind(9)
+	EmatchContainer = EmatchKind(iota)
+	EmatchCmp
+	EmatchNByte
+	EmatchU32
+	EmatchMeta
+	EmatchText
+	EmatchVLan
+	EmatchCanID
+	EmatchIPSet
+	EmatchIPT
+	ematchInvalid
 )
 
 // Ematch contains attributes of the ematch discipline
@@ -85,12 +86,12 @@ func unmarshalEmatch(data []byte, info *Ematch) error {
 		case tcaEmatchTreeHdr:
 			hdr := &EmatchTreeHdr{}
 			err := unmarshalStruct(ad.Bytes(), hdr)
-			concatError(multiError, err)
+			multiError = concatError(multiError, err)
 			info.Hdr = hdr
 		case tcaEmatchTreeList:
 			list := []EmatchMatch{}
 			err := unmarshalEmatchTreeList(ad.Bytes(), &list)
-			concatError(multiError, err)
+			multiError = concatError(multiError, err)
 			info.Matches = &list
 		default:
 			return fmt.Errorf("UnmarshalEmatch()\t%d\n\t%v", ad.Type(), ad.Bytes())
@@ -110,12 +111,12 @@ func marshalEmatch(info *Ematch) ([]byte, error) {
 
 	if info.Hdr != nil {
 		data, err := marshalStruct(info.Hdr)
-		concatError(multiError, err)
+		multiError = concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaEmatchTreeHdr, Data: data})
 	}
 	if info.Matches != nil {
 		data, err := marshalEmatchTreeList(info.Matches)
-		concatError(multiError, err)
+		multiError = concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaEmatchTreeList | nlaFNnested, Data: data})
 	}
 	if multiError != nil {
@@ -140,22 +141,22 @@ func unmarshalEmatchTreeList(data []byte, info *[]EmatchMatch) error {
 		case EmatchU32:
 			expr := &U32Match{}
 			err := unmarshalU32Match(tmp[8:], expr)
-			concatError(multiError, err)
+			multiError = concatError(multiError, err)
 			match.U32Match = expr
 		case EmatchCmp:
 			expr := &CmpMatch{}
 			err := unmarshalCmpMatch(tmp[8:], expr)
-			concatError(multiError, err)
+			multiError = concatError(multiError, err)
 			match.CmpMatch = expr
 		case EmatchIPSet:
 			expr := &IPSetMatch{}
 			err := unmarshalIPSetMatch(tmp[8:], expr)
-			concatError(multiError, err)
+			multiError = concatError(multiError, err)
 			match.IPSetMatch = expr
 		case EmatchIPT:
 			expr := &IptMatch{}
 			err := unmarshalIptMatch(tmp[8:], expr)
-			concatError(multiError, err)
+			multiError = concatError(multiError, err)
 			match.IptMatch = expr
 		default:
 			return fmt.Errorf("unmarshalEmatchTreeList() kind %d is not yet implemented", match.Hdr.Kind)
