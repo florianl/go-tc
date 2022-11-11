@@ -80,12 +80,16 @@ func testConn(t *testing.T) (*Tc, func()) {
 	}
 }
 
-var _ netlink.Socket = &socket{}
+var _ tcConn = &fakeConn{}
 
-func (c *socket) Close() error                           { return nil }
-func (c *socket) SendMessages(m []netlink.Message) error { c.msgs = append(c.msgs, m...); return nil }
-func (c *socket) Send(m netlink.Message) error           { c.msgs = append(c.msgs, m); return nil }
-func (c *socket) Receive() ([]netlink.Message, error) {
+func (c *fakeConn) Close() error                           { return nil }
+func (c *fakeConn) SendMessages(m []netlink.Message) error { c.msgs = append(c.msgs, m...); return nil }
+func (c *fakeConn) Send(m netlink.Message) (netlink.Message, error) {
+	c.msgs = append(c.msgs, m)
+	return m, nil
+}
+
+func (c *fakeConn) Receive() ([]netlink.Message, error) {
 	if len(c.msgs) > 0 {
 		var resp []netlink.Message
 		for _, msg := range c.msgs {
@@ -113,19 +117,22 @@ func (c *socket) Receive() ([]netlink.Message, error) {
 	}
 	return []netlink.Message{}, nil
 }
-func (c *socket) JoinGroup(g uint32) error  { return nil }
-func (c *socket) LeaveGroup(g uint32) error { return nil }
 
-// A socket is a netlink.Socket used for testing.
-type socket struct {
+func (c *fakeConn) JoinGroup(uint32) error                   { return nil }
+func (c *fakeConn) LeaveGroup(uint32) error                  { return nil }
+func (c *fakeConn) SetOption(netlink.ConnOption, bool) error { return nil }
+func (c *fakeConn) SetReadDeadline(time.Time) error          { return nil }
+
+// fakeConn is a netlink.Conn used for testing.
+type fakeConn struct {
 	msgs []netlink.Message
 }
 
 func testHookConn(t *testing.T) (*Tc, func()) {
 	t.Helper()
 
-	hookSocket := &socket{}
-	c := &Tc{con: netlink.NewConn(hookSocket, 1)}
+	hookedConn := &fakeConn{}
+	c := &Tc{con: hookedConn}
 
 	return c, func() {
 		if err := c.Close(); err != nil {

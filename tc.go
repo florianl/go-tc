@@ -11,9 +11,22 @@ import (
 	"github.com/mdlayher/netlink"
 )
 
+// tcConn defines a subset of netlink.Conn.
+type tcConn interface {
+	Close() error
+	JoinGroup(group uint32) error
+	LeaveGroup(group uint32) error
+	Receive() ([]netlink.Message, error)
+	Send(m netlink.Message) (netlink.Message, error)
+	SetOption(option netlink.ConnOption, enable bool) error
+	SetReadDeadline(t time.Time) error
+}
+
+var _ tcConn = &netlink.Conn{}
+
 // Tc represents a RTNETLINK wrapper
 type Tc struct {
-	con *netlink.Conn
+	con tcConn
 
 	logger *log.Logger
 }
