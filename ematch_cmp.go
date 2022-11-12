@@ -1,19 +1,24 @@
 package tc
 
+// CmpMatchAlign defines byte alignments.
 type CmpMatchAlign uint8
 
+// Various byte alignments.
 const (
 	CmpMatchU8  = CmpMatchAlign(1)
 	CmpMatchU16 = CmpMatchAlign(2)
 	CmpMatchU32 = CmpMatchAlign(4)
 )
 
+// CmpMatchFlag defines available flags.
 type CmpMatchFlag uint8
 
+// Various flags.
 const (
 	CmpMatchTrans = CmpMatchFlag(1)
 )
 
+// CmpMatch contains attributes of the cmp match discipline
 type CmpMatch struct {
 	Val   uint32
 	Mask  uint32

@@ -16,6 +16,7 @@ const (
 	tcaActCookie
 )
 
+// Various action binding types.
 const (
 	ActBind      = 1
 	ActNoBind    = 0
@@ -25,6 +26,7 @@ const (
 	ActNoReplace = 0
 )
 
+// Various action returns.
 const (
 	ActOk         = 0
 	ActReclassify = 1

@@ -15,6 +15,7 @@ const (
 	tcaEmIptMatchData
 )
 
+// IptMatch contains attributes of the ipt match discipline
 type IptMatch struct {
 	Hook      *uint32
 	MatchName *string

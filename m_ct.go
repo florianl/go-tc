@@ -26,6 +26,7 @@ const (
 	tcaCtPad
 )
 
+// Ct contains attributes of the ct discipline
 type Ct struct {
 	Parms      *CtParms
 	Tm         *Tcft
@@ -39,6 +40,7 @@ type Ct struct {
 	NatPortMax *uint16
 }
 
+// CtParms contains further ct attributes.
 type CtParms struct {
 	Index   uint32
 	Capab   uint32

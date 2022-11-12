@@ -2,6 +2,10 @@ package tc
 
 import "fmt"
 
+// PlugAction defines actions for plug.
+type PlugAction int32
+
+// Various Plug actions.
 const (
 	PlugBuffer PlugAction = iota
 	PlugReleaseOne
@@ -9,12 +13,11 @@ const (
 	PlugLimit
 )
 
+// Plug contains attributes of the plug discipline
 type Plug struct {
 	Action PlugAction
 	Limit  uint32
 }
-
-type PlugAction int32
 
 func marshalPlug(info *Plug) ([]byte, error) {
 	if info == nil {
