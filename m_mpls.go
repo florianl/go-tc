@@ -18,8 +18,10 @@ const (
 	tcaMPLSBOS
 )
 
+// MPLSAction defines MPS actions.
 type MPLSAction int32
 
+// Various MPLS actions
 const (
 	MPLSActPop     = MPLSAction(1)
 	MPLSActPush    = MPLSAction(2)
@@ -28,6 +30,8 @@ const (
 	MPLSActMACPush = MPLSAction(5)
 )
 
+// MPLS contains attributes of the mpls discipline
+// https://man7.org/linux/man-pages/man8/tc-mpls.8.html
 type MPLS struct {
 	Parms *MPLSParam
 	Tm    *Tcft
@@ -38,6 +42,7 @@ type MPLS struct {
 	BOS   *uint8
 }
 
+// MPLSParam contains further MPLS attributes.
 type MPLSParam struct {
 	Index   uint32
 	Capab   uint32

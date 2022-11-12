@@ -4,6 +4,7 @@ import (
 	"fmt"
 )
 
+// SfqQopt contains SFQ attributes
 type SfqQopt struct {
 	Quantum       uint32 /* Bytes per round allocated to flow */
 	PerturbPeriod int32  /* Period of hash perturbation */
@@ -12,6 +13,8 @@ type SfqQopt struct {
 	Flows         uint32 /* Maximal number of flows  */
 }
 
+// Sfq contains attributes of the SFQ discipline
+// https://man7.org/linux/man-pages/man8/sfq.8.html
 type Sfq struct {
 	V0 SfqQopt
 

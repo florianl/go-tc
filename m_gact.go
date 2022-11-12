@@ -14,7 +14,7 @@ const (
 	tcaGactPad
 )
 
-// type Gact contains attributes of the gact discipline
+// Gact contains attributes of the gact discipline
 type Gact struct {
 	Tm    *Tcft
 	Parms *GactParms
@@ -28,7 +28,7 @@ type GactProb struct {
 	PAction uint32
 }
 
-// GactParm from include/uapi/linux/tc_act/tc_gact.h
+// GactParms from include/uapi/linux/tc_act/tc_gact.h
 type GactParms struct {
 	Index   uint32
 	Capab   uint32

@@ -4,6 +4,7 @@ import (
 	"fmt"
 )
 
+// U32Match contains attributes of the u32 match discipline
 type U32Match struct {
 	Mask    uint32 // big endian
 	Value   uint32 // big endian

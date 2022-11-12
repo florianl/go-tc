@@ -6,16 +6,20 @@ import (
 	"github.com/mdlayher/netlink"
 )
 
+// EmatchLayer defines the layer the match will be applied upon.
 type EmatchLayer uint8
 
+// Various Ematch network layers.
 const (
 	EmatchLayerLink      = EmatchLayer(0)
 	EmatchLayerNetwork   = EmatchLayer(1)
 	EmatchLayerTransport = EmatchLayer(2)
 )
 
+// EmatchOpnd defines how matches are concatenated.
 type EmatchOpnd uint8
 
+// Various Ematch operands
 const (
 	EmatchOpndEq = EmatchOpnd(0)
 	EmatchOpndGt = EmatchOpnd(1)
@@ -28,6 +32,7 @@ const (
 	tcaEmatchTreeList
 )
 
+// EmatchKind defines the matching module.
 type EmatchKind uint16
 
 // Various Ematch kinds
@@ -52,13 +57,13 @@ type Ematch struct {
 	Matches *[]EmatchMatch
 }
 
-// tcf_ematch_tree_hdr from include/uapi/linux/pkt_cls.h
+// EmatchTreeHdr from tcf_ematch_tree_hdr in include/uapi/linux/pkt_cls.h
 type EmatchTreeHdr struct {
 	NMatches uint16
 	ProgID   uint16
 }
 
-// tcf_ematch_hdr from include/uapi/linux/pkt_cls.h
+// EmatchHdr from tcf_ematch_hdr in include/uapi/linux/pkt_cls.h
 type EmatchHdr struct {
 	MatchID uint16
 	Kind    EmatchKind
@@ -66,6 +71,7 @@ type EmatchHdr struct {
 	Pad     uint16
 }
 
+// EmatchMatch contains attributes of the ematch discipline
 type EmatchMatch struct {
 	Hdr        EmatchHdr
 	U32Match   *U32Match
