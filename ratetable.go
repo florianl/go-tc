@@ -16,7 +16,7 @@ func generateRateTable(pol *Policy) ([]byte, error) {
 	if pol == nil {
 		return []byte{}, fmt.Errorf("generateRateTable: %w", ErrNoArg)
 	}
-	var mtu uint32 = pol.Mtu
+	mtu := pol.Mtu
 
 	var cellLog int = -1
 	if mtu == 0 {

@@ -8,7 +8,7 @@ import (
 )
 
 func TestDefact(t *testing.T) {
-	var example string = "example"
+	defactData := "example"
 	tests := map[string]struct {
 		val  Defact
 		err1 error
@@ -16,7 +16,7 @@ func TestDefact(t *testing.T) {
 	}{
 		"simple":          {val: Defact{Parms: &DefactParms{Index: 42, Action: 1}}},
 		"invalidArgument": {val: Defact{Tm: &Tcft{Install: 1}}, err1: ErrNoArgAlter},
-		"data":            {val: Defact{Data: &example}},
+		"data":            {val: Defact{Data: &defactData}},
 	}
 	for name, testcase := range tests {
 		t.Run(name, func(t *testing.T) {
