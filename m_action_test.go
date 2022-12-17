@@ -91,6 +91,10 @@ func TestAction(t *testing.T) {
 			Kind: "mpls",
 			MPLS: &MPLS{TC: uint8Ptr(73)},
 		}},
+		"skbedit": {val: Action{
+			Kind:    "skbedit",
+			SkbEdit: &SkbEdit{Priority: uint32Ptr(42)},
+		}},
 	}
 
 	for name, testcase := range tests {

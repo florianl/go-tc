@@ -25,13 +25,14 @@ func TestSkbEdit(t *testing.T) {
 			if !errors.Is(err1, testcase.err1) {
 				t.Fatalf("Unexpected error: %v", err1)
 			}
-
+			newData, tm := injectTcft(t, data, tcaSkbEditTm)
+			newData = injectAttribute(t, newData, []byte{}, tcaSkbEditPad)
 			val := SkbEdit{}
-			err2 := unmarshalSkbEdit(data, &val)
+			err2 := unmarshalSkbEdit(newData, &val)
 			if !errors.Is(err2, testcase.err2) {
 				t.Fatalf("Unexpected error: %v", err2)
 			}
-
+			testcase.val.Tm = tm
 			if diff := cmp.Diff(val, testcase.val); diff != "" {
 				t.Fatalf("SkbEdit missmatch (want +got):\n%s", diff)
 			}

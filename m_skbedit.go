@@ -20,6 +20,7 @@ const (
 	tcaSkbEditQueueMappingMax
 )
 
+// SkbEdit  contains attribute of the SkbEdit discipline
 type SkbEdit struct {
 	Tm              *Tcft
 	Parms           *SkbEditParms
@@ -32,6 +33,7 @@ type SkbEdit struct {
 	QueueMappingMax *uint16
 }
 
+// SkbEditParms from include/uapi/linux/tc_act/tc_skbedit.h
 type SkbEditParms struct {
 	Index   uint32
 	Capab   uint32
