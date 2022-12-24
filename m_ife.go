@@ -27,7 +27,7 @@ type Ife struct {
 	Tm    *Tcft
 }
 
-// IfeParms from from include/uapi/linux/tc_act/tc_ife.h
+// IfeParms from include/uapi/linux/tc_act/tc_ife.h
 type IfeParms struct {
 	Index   uint32
 	Capab   uint32

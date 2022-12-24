@@ -19,7 +19,7 @@ type Nat struct {
 	Tm    *Tcft
 }
 
-// NatParms from from include/uapi/linux/tc_act/tc_nat.h
+// NatParms from include/uapi/linux/tc_act/tc_nat.h
 type NatParms struct {
 	Index   uint32
 	Capab   uint32

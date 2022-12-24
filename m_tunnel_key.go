@@ -37,7 +37,7 @@ type TunnelKey struct {
 	KeyEncTTL     *uint8
 }
 
-// TunnelParms from from include/uapi/linux/tc_act/tc_tunnel_key.h
+// TunnelParms from include/uapi/linux/tc_act/tc_tunnel_key.h
 type TunnelParms struct {
 	Index           uint32
 	Capab           uint32
