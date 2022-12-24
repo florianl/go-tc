@@ -25,7 +25,7 @@ type Sample struct {
 	SampleGroup *uint32
 }
 
-// SampleParms from from include/uapi/linux/tc_act/tc_sample.h
+// SampleParms from include/uapi/linux/tc_act/tc_sample.h
 type SampleParms struct {
 	Index   uint32
 	Capab   uint32

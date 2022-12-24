@@ -25,7 +25,7 @@ type VLan struct {
 	PushPriority *uint32
 }
 
-// VLanParms from from include/uapi/linux/tc_act/tc_vlan.h
+// VLanParms from include/uapi/linux/tc_act/tc_vlan.h
 type VLanParms struct {
 	Index      uint32
 	Capab      uint32
