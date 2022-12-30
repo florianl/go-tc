@@ -32,11 +32,10 @@ func TestFqCodelXStats(t *testing.T) {
 			val := FqCodelXStats{}
 			err2 := unmarshalFqCodelXStats(data, &val)
 			if err2 != nil {
-				if testcase.err2 != nil && testcase.err2.Error() == err2.Error() {
+				if errors.Is(err2, testcase.err2) {
 					return
 				}
 				t.Fatalf("Unexpected error: %v", err2)
-
 			}
 			if diff := cmp.Diff(val, testcase.val); diff != "" {
 				t.Fatalf("FqCodelXStats missmatch (want +got):\n%s", diff)
