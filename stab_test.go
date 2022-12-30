@@ -21,20 +21,13 @@ func TestStab(t *testing.T) {
 	for name, testcase := range tests {
 		t.Run(name, func(t *testing.T) {
 			data, err1 := marshalStab(&testcase.val)
-			if err1 != nil {
-				if testcase.err1 != nil && testcase.err1.Error() == err1.Error() {
-					return
-				}
+			if !errors.Is(err1, testcase.err1) {
 				t.Fatalf("Unexpected error: %v", err1)
 			}
 			val := Stab{}
 			err2 := unmarshalStab(data, &val)
-			if err2 != nil {
-				if testcase.err2 != nil && testcase.err2.Error() == err2.Error() {
-					return
-				}
+			if !errors.Is(err2, testcase.err2) {
 				t.Fatalf("Unexpected error: %v", err2)
-
 			}
 			if diff := cmp.Diff(val, testcase.val); diff != "" {
 				t.Fatalf("Stab missmatch (-want +got):\n%s", diff)
