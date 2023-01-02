@@ -11,7 +11,9 @@ import (
 func init() {
 	fd, err := os.Open("/proc/net/psched")
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "could not open /proc/net/psched: %v\n", err)
+		fmt.Fprintf(os.Stderr, "using default values for clock. could not open /proc/net/psched: %v\n", err)
+		clockFactor = 1.0
+		tickInUSec = 1.0
 		return
 	}
 	defer fd.Close()
