@@ -46,7 +46,7 @@ func TestFilter(t *testing.T) {
 		errAdd     error
 		errReplace error
 	}{
-		"unknown":         {kind: "unknown", errAdd: ErrNotImplemented},
+		"unknown":         {kind: "unknown", errAdd: ErrNoArg},
 		"missingArgument": {kind: "bpf", errAdd: ErrNoArg},
 		"u32-exactMatch":  {kind: "u32", u32: &U32{ClassID: uint32Ptr(13)}},
 		"flower":          {kind: "flower", flower: &Flower{ClassID: uint32Ptr(13)}},
@@ -73,11 +73,10 @@ func TestFilter(t *testing.T) {
 			}
 
 			if err := tcSocket.Filter().Add(&testFilter); err != nil {
-				if testcase.errAdd == nil {
-					t.Fatalf("could not add new filter: %v", err)
+				if errors.Is(err, testcase.errAdd) {
+					return
 				}
-				// TODO: compare the returned error with the expected one
-				return
+				t.Fatalf("could not add new filter: %v", err)
 			}
 
 			filters, err := tcSocket.Filter().Get(&tcMsg)
@@ -89,10 +88,10 @@ func TestFilter(t *testing.T) {
 			}
 
 			if err := tcSocket.Filter().Replace(&testFilter); err != nil {
-				if testcase.errReplace == nil {
-					t.Fatalf("could not replace filter: %v", err)
+				if errors.Is(err, testcase.errReplace) {
+					return
 				}
-				// TODO: compare the returned error with the expected one
+				t.Fatalf("could not replace filter: %v", err)
 				return
 			}
 
