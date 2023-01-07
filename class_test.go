@@ -103,7 +103,7 @@ func TestClass(t *testing.T) {
 			}
 
 			if err := tcSocket.Class().Add(&testClass); err != nil {
-				if testcase.err != nil && errors.Is(err, testcase.err) {
+				if errors.Is(err, testcase.err) {
 					t.Log("received expected error")
 					return
 				}
