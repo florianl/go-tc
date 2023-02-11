@@ -1,4 +1,4 @@
-name: 'per kernel integration test'
+name: 'per arm64 kernel integration test'
 
 on:
   schedule:
