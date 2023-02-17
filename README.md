@@ -18,6 +18,17 @@ func main() {
 		}
 	}()
 
+	// For enhanced error messages from the kernel, it is recommended to set
+	// option `NETLINK_EXT_ACK`, which is supported since 4.12 kernel.
+	//
+	// If not supported, `unix.ENOPROTOOPT` is returned.
+
+	err = rtnl.SetOption(netlink.ExtendedAcknowledge, true)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "could not set option ExtendedAcknowledge: %v\n", err)
+		return
+	}
+
     // get all the qdiscs from all interfaces
 	qdiscs, err := rtnl.Qdisc().Get()
 	if err != nil {
