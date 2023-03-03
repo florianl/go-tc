@@ -25,7 +25,7 @@ func TestSample(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			data, err1 := marshalSample(&testcase.val)
 			if err1 != nil {
-				if testcase.err1 != nil && testcase.err1.Error() == err1.Error() {
+				if errors.Is(err1, testcase.err1) {
 					return
 				}
 				t.Fatalf("Unexpected error: %v", err1)
@@ -35,7 +35,7 @@ func TestSample(t *testing.T) {
 			val := Sample{}
 			err2 := unmarshalSample(newData, &val)
 			if err2 != nil {
-				if testcase.err2 != nil && testcase.err2.Error() == err2.Error() {
+				if errors.Is(err2, testcase.err2) {
 					return
 				}
 				t.Fatalf("Unexpected error: %v", err2)

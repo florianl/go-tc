@@ -21,7 +21,7 @@ func TestGact(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			data, err1 := marshalGact(&testcase.val)
 			if err1 != nil {
-				if testcase.err1 != nil && errors.Is(testcase.err1, err1) {
+				if errors.Is(testcase.err1, err1) {
 					return
 				}
 				t.Fatalf("Unexpected error: %v", err1)
@@ -31,7 +31,7 @@ func TestGact(t *testing.T) {
 			val := Gact{}
 			err2 := unmarshalGact(newData, &val)
 			if err2 != nil {
-				if testcase.err2 != nil && errors.Is(testcase.err2, err2) {
+				if errors.Is(testcase.err2, err2) {
 					return
 				}
 				t.Fatalf("Unexpected error: %v", err2)
