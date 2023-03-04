@@ -23,7 +23,7 @@ func TestPrio(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			data, err1 := marshalPrio(&testcase.val)
 			if err1 != nil {
-				if testcase.err1 != nil && errors.Is(err1, testcase.err1) {
+				if errors.Is(err1, testcase.err1) {
 					return
 				}
 				t.Fatalf("Unexpected error: %v", err1)
@@ -31,7 +31,7 @@ func TestPrio(t *testing.T) {
 			val := Prio{}
 			err2 := unmarshalPrio(data, &val)
 			if err2 != nil {
-				if testcase.err2 != nil && errors.Is(err2, testcase.err2) {
+				if errors.Is(err2, testcase.err2) {
 					return
 				}
 				t.Fatalf("Unexpected error: %v", err2)
