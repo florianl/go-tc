@@ -14,6 +14,7 @@ import (
 	"github.com/florianl/go-tc/core"
 	"github.com/florianl/go-tc/internal/unix"
 	"github.com/jsimonetti/rtnetlink"
+	"github.com/mdlayher/netlink"
 )
 
 // This example demonstrate how to attach an eBPF program with TC to an interface.
@@ -52,6 +53,15 @@ func Example_eBPF() {
 			fmt.Fprintf(os.Stderr, "could not close rtnetlink socket: %v\n", err)
 		}
 	}()
+
+	// For enhanced error messages from the kernel, it is recommended to set
+	// option `NETLINK_EXT_ACK`, which is supported since 4.12 kernel.
+	//
+	// If not supported, `unix.ENOPROTOOPT` is returned.
+	if err := tcnl.SetOption(netlink.ExtendedAcknowledge, true); err != nil {
+		fmt.Fprintf(os.Stderr, "could not set option ExtendedAcknowledge: %v\n", err)
+		return
+	}
 
 	// Create a qdisc/clsact object that will be attached to the ingress part
 	// of the networking interface.
