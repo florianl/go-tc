@@ -23,7 +23,7 @@ jobs:
           sudo apt --yes install qemu-system-aarch64 curl
 
       - name: set up Go
-        uses: actions/setup-go@v3
+        uses: actions/setup-go@v4
         with:
           go-version: 1.19
         id: go
