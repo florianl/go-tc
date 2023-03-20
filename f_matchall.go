@@ -20,6 +20,7 @@ type Matchall struct {
 	ClassID *uint32
 	Actions *[]*Action
 	Flags   *uint32
+	Pcnt    *uint64
 }
 
 func unmarshalMatchall(data []byte, info *Matchall) error {
@@ -39,6 +40,8 @@ func unmarshalMatchall(data []byte, info *Matchall) error {
 			info.Actions = actions
 		case tcaMatchallFlags:
 			info.Flags = uint32Ptr(ad.Uint32())
+		case tcaMatchallPcnt:
+			info.Pcnt = uint64Ptr(ad.Uint64())
 		case tcaMatchallPad:
 			// padding does not contain data, we just skip it
 		default:
