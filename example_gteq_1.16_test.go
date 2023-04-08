@@ -29,6 +29,8 @@ func Example_eBPF() {
 	}
 	defer rtnl.Close()
 
+	// Get the net.Interface by its name to which the tc/qdisc and tc/filter with
+	// the eBPF program will be attached on.
 	devID, err := net.InterfaceByName(tcIface)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "could not get interface ID: %v\n", err)
@@ -42,7 +44,9 @@ func Example_eBPF() {
 		}
 	}(uint32(devID.Index), rtnl)
 
-	// Open a netlink/tc connection to the Linux kernel.
+	// Open a netlink/tc connection to the Linux kernel. This connection is
+	// used to manage the tc/qdisc and tc/filter to which
+	// the eBPF program will be attached
 	tcnl, err := tc.Open(&tc.Config{})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "could not open rtnetlink socket: %v\n", err)
