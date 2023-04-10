@@ -328,10 +328,12 @@ func (tc *Tc) monitor(ctx context.Context, deadline time.Duration,
 
 	verify, err := tc.con.Send(req)
 	if err != nil {
+		tc.con.LeaveGroup(unix.RTNLGRP_TC)
 		return err
 	}
-	_ = verify
+
 	if err := netlink.Validate(req, []netlink.Message{verify}); err != nil {
+		tc.con.LeaveGroup(unix.RTNLGRP_TC)
 		return err
 	}
 
