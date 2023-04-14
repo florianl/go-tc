@@ -350,6 +350,9 @@ func (tc *Tc) monitor(ctx context.Context, deadline time.Duration,
 				if ret := errfn(err); ret != 0 {
 					return
 				}
+				if ctx.Err() != nil {
+					return
+				}
 				continue
 			}
 			for _, msg := range msgs {
