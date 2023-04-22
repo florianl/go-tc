@@ -5,6 +5,18 @@ This is a work in progress version of `tc`.  It provides a [C](https://en.wikipe
 ## Example
 
 ```golang
+package main
+
+import (
+	"fmt"
+	"net"
+	"os"
+
+	"github.com/mdlayher/netlink"
+
+	"github.com/florianl/go-tc"
+)
+
 func main() {
 	// open a rtnetlink socket
 	rtnl, err := tc.Open(&tc.Config{})
@@ -29,7 +41,7 @@ func main() {
 		return
 	}
 
-    // get all the qdiscs from all interfaces
+	// get all the qdiscs from all interfaces
 	qdiscs, err := rtnl.Qdisc().Get()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "could not get qdiscs: %v\n", err)
@@ -54,6 +66,7 @@ func main() {
 ## Privileges
 
 This package processes information directly from the kernel and therefore it requires special privileges. You can provide this privileges by adjusting the `CAP_NET_ADMIN` capabilities.
+
 ```
 	setcap 'cap_net_admin=+ep' /your/executable
 ```
