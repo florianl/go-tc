@@ -81,6 +81,53 @@ func TestEmatch(t *testing.T) {
 				},
 			},
 		},
+
+		// A AND (B1 OR B2) AND NOT C
+		// EmatchHMatch:
+		//   ----------------------------
+		//   |  A | (  | C  | B1  | B2)  |
+		//   -----------------------------
+		"match 'ipset(A src,src)' and  (ipset(B1 dst,dst) or ipset(B2 src,dst,dst)) and not ipset(C src,dst)) ": {
+			val: Ematch{
+				Hdr: &EmatchTreeHdr{NMatches: 5},
+				Matches: &[]EmatchMatch{
+					{
+						Hdr: EmatchHdr{MatchID: 0, Kind: EmatchIPSet, Flags: TCF_EM_REL_AND, Pad: 0x0},
+						IPSetMatch: &IPSetMatch{
+							IPSetID: 10, // IpsetName : A
+							Dir:     []IPSetDir{IPSetSrc, IPSetSrc},
+						},
+					},
+					{
+						Hdr: EmatchHdr{MatchID: 0, Kind: EmatchContainer, Flags: TCF_EM_REL_AND, Pad: 0x0},
+						ContainerMatch: &ContainerMatch{
+							Pos: 3,
+						},
+					},
+					{
+						Hdr: EmatchHdr{MatchID: 0, Kind: EmatchIPSet, Flags: TCF_EM_INVERT, Pad: 0x0},
+						IPSetMatch: &IPSetMatch{
+							IPSetID: 13, // IpsetName : C
+							Dir:     []IPSetDir{IPSetSrc, IPSetDst},
+						},
+					},
+					{
+						Hdr: EmatchHdr{MatchID: 0, Kind: EmatchIPSet, Flags: TCF_EM_REL_OR, Pad: 0x0},
+						IPSetMatch: &IPSetMatch{
+							IPSetID: 11, // IpsetName : B1
+							Dir:     []IPSetDir{IPSetDst, IPSetDst},
+						},
+					},
+					{
+						Hdr: EmatchHdr{MatchID: 0, Kind: EmatchIPSet, Flags: TCF_EM_REL_END, Pad: 0x0},
+						IPSetMatch: &IPSetMatch{
+							IPSetID: 12, // IpsetName : B2
+							Dir:     []IPSetDir{IPSetSrc, IPSetDst, IPSetDst},
+						},
+					},
+				},
+			},
+		},
 	}
 
 	for name, testcase := range tests {

@@ -50,6 +50,13 @@ const (
 	ematchInvalid
 )
 
+const (
+	TCF_EM_REL_END uint16 = 0
+	TCF_EM_REL_AND uint16 = 0x0001
+	TCF_EM_REL_OR  uint16 = 0x0002
+	TCF_EM_INVERT  uint16 = 0x0004
+)
+
 // Ematch contains attributes of the ematch discipline
 // https://man7.org/linux/man-pages/man8/tc-ematch.8.html
 type Ematch struct {
@@ -73,11 +80,12 @@ type EmatchHdr struct {
 
 // EmatchMatch contains attributes of the ematch discipline
 type EmatchMatch struct {
-	Hdr        EmatchHdr
-	U32Match   *U32Match
-	CmpMatch   *CmpMatch
-	IPSetMatch *IPSetMatch
-	IptMatch   *IptMatch
+	Hdr            EmatchHdr
+	U32Match       *U32Match
+	CmpMatch       *CmpMatch
+	IPSetMatch     *IPSetMatch
+	IptMatch       *IptMatch
+	ContainerMatch *ContainerMatch
 }
 
 // unmarshalEmatch parses the Ematch-encoded data and stores the result in the value pointed to by info.
@@ -164,6 +172,11 @@ func unmarshalEmatchTreeList(data []byte, info *[]EmatchMatch) error {
 			err := unmarshalIptMatch(tmp[8:], expr)
 			multiError = concatError(multiError, err)
 			match.IptMatch = expr
+		case EmatchContainer:
+			expr := &ContainerMatch{}
+			err := unmarshalContainerMatch(tmp[8:], expr)
+			multiError = concatError(multiError, err)
+			match.ContainerMatch = expr
 		default:
 			return fmt.Errorf("unmarshalEmatchTreeList() kind %d is not yet implemented", match.Hdr.Kind)
 		}
@@ -190,6 +203,8 @@ func marshalEmatchTreeList(info *[]EmatchMatch) ([]byte, error) {
 			expr, err = marshalIPSetMatch(m.IPSetMatch)
 		case EmatchIPT:
 			expr, err = marshalIptMatch(m.IptMatch)
+		case EmatchContainer:
+			expr, err = marshalContainerMatch(m.ContainerMatch)
 		default:
 			return []byte{}, fmt.Errorf("marshalEmatchTreeList() kind %d is not yet implemented", m.Hdr.Kind)
 		}
