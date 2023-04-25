@@ -1,3 +1,46 @@
+// The userspace part transforms the logic expressions into an array
+// consisting of multiple sequences of interconnected ematches separated
+// by markers. Precedence is implemented by a special ematch kind
+// referencing a sequence beyond the marker of the current sequence
+// causing the current position in the sequence to be pushed onto a stack
+// to allow the current position to be overwritten by the position referenced
+// in the special ematch. Matching continues in the new sequence until a
+// marker is reached causing the position to be restored from the stack.
+//
+// Example:
+//          A AND (B1 OR B2) AND C AND D
+//
+//              ------->-PUSH-------
+//    -->--    /         -->--      \   -->--
+//   /     \  /         /     \      \ /     \
+// +-------+-------+-------+-------+-------+--------+
+// | A AND | B AND | C AND | D END | B1 OR | B2 END |
+// +-------+-------+-------+-------+-------+--------+
+//                    \                      /
+//                     --------<-POP---------
+//
+// where B is a virtual ematch referencing to sequence starting with B1. and B
+// implemented with Container.
+//
+// When the skb input ematch module is used, the ematch match logic operates on
+// the entire array. If the kernel finds the kind to be a container, it goes back
+// to B until it reaches the end. This is implemented using recursive functions.
+//
+// The above is kernel logic.
+//
+// In userspace, the ematch array needs to be encapsulated. Logical combinations
+// need to update flags and use containers. The updated ematch array would look like this:
+// -------------------------------------------------------------------------------------------------
+// index |      0       |        1        |      2       |     3        |     4       |     5      |
+// ematch|      A       |        B        |      C       |     D        |     B1      |     B2     |
+// kind  | EmatchIPSet  | EmatchContainer | EmatchIPT    | EmatchNByte  | EmatchCmp   | EmatchU32  |
+// flags | EmatchRelAnd | EmatchRelAnd    | EmatchRelAnd | EmatchRelEND | EmatchRelOr |EmatchRelEnd|
+// extend|      ...     |    Pos=4        |      ...     |    ...       |     ...     |     ...    |
+// --------------------------------------------------------------------------------------------------
+//
+// last match order is：
+// index： 0 --> 1 --> 4 --> 5 --> 2 --> 3
+
 package tc
 
 import (
@@ -51,10 +94,11 @@ const (
 )
 
 const (
-	TCF_EM_REL_END uint16 = 0
-	TCF_EM_REL_AND uint16 = 0x0001
-	TCF_EM_REL_OR  uint16 = 0x0002
-	TCF_EM_INVERT  uint16 = 0x0004
+	EmatchRelEnd uint16 = 0
+	EmatchRelAnd uint16 = 1 << (iota - 1)
+	EmatchRelOr
+	EmatchInvert
+	EmatchSimple
 )
 
 // Ematch contains attributes of the ematch discipline
