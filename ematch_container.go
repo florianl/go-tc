@@ -1,5 +1,6 @@
 package tc
 
+// ContainerMatch contains attributes of the container match discipline
 type ContainerMatch struct {
 	Pos uint32
 }
