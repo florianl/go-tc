@@ -47,7 +47,7 @@ func marshalIPSetMatch(info *IPSetMatch) ([]byte, error) {
 		ID: info.IPSetID,
 	}
 
-	if len(info.Dir) == 0 || len(info.Dir) > 2 {
+	if len(info.Dir) == 0 || len(info.Dir) > 3 {
 		return nil, ErrInvalidArg
 	}
 

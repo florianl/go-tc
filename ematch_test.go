@@ -30,7 +30,7 @@ func TestEmatch(t *testing.T) {
 				Hdr: &EmatchTreeHdr{NMatches: 2},
 				Matches: &[]EmatchMatch{
 					{
-						Hdr: EmatchHdr{MatchID: 0x0, Kind: EmatchU32, Flags: 0x1, Pad: 0x0},
+						Hdr: EmatchHdr{MatchID: 0x0, Kind: EmatchU32, Flags: EmatchRelAnd, Pad: 0x0},
 						U32Match: &U32Match{
 							Mask:    0xffff,
 							Value:   0x1122,
@@ -39,7 +39,7 @@ func TestEmatch(t *testing.T) {
 						},
 					},
 					{
-						Hdr: EmatchHdr{MatchID: 0x0, Kind: EmatchCmp, Flags: 0x0, Pad: 0x0},
+						Hdr: EmatchHdr{MatchID: 0x0, Kind: EmatchCmp, Flags: EmatchRelEnd, Pad: 0x0},
 						CmpMatch: &CmpMatch{
 							Val:   0x14,
 							Mask:  0xff00,
@@ -58,7 +58,7 @@ func TestEmatch(t *testing.T) {
 				Hdr: &EmatchTreeHdr{NMatches: 1, ProgID: 42},
 				Matches: &[]EmatchMatch{
 					{
-						Hdr: EmatchHdr{MatchID: 0, Kind: EmatchIPSet, Flags: 0x0, Pad: 0x0},
+						Hdr: EmatchHdr{MatchID: 0, Kind: EmatchIPSet, Flags: EmatchRelEnd, Pad: 0x0},
 						IPSetMatch: &IPSetMatch{
 							IPSetID: 19,
 							Dir:     []IPSetDir{IPSetSrc, IPSetSrc},
@@ -72,10 +72,57 @@ func TestEmatch(t *testing.T) {
 				Hdr: &EmatchTreeHdr{NMatches: 1, ProgID: 42},
 				Matches: &[]EmatchMatch{
 					{
-						Hdr: EmatchHdr{MatchID: 0, Kind: 0x9, Flags: 0x0, Pad: 0x0},
+						Hdr: EmatchHdr{MatchID: 0, Kind: 0x9, Flags: EmatchRelEnd, Pad: 0x0},
 						IptMatch: &IptMatch{
 							MatchName: stringPtr("foobar"),
 							NFProto:   uint8Ptr(10),
+						},
+					},
+				},
+			},
+		},
+
+		// A AND (B1 OR B2) AND NOT C
+		// EmatchHMatch:
+		//   ----------------------------
+		//   |  A | (  | C  | B1  | B2)  |
+		//   -----------------------------
+		"match 'ipset(A src,src)' and  (ipset(B1 dst,dst) or ipset(B2 src,dst,dst)) and not ipset(C src,dst)) ": {
+			val: Ematch{
+				Hdr: &EmatchTreeHdr{NMatches: 5},
+				Matches: &[]EmatchMatch{
+					{
+						Hdr: EmatchHdr{MatchID: 0, Kind: EmatchIPSet, Flags: EmatchRelAnd, Pad: 0x0},
+						IPSetMatch: &IPSetMatch{
+							IPSetID: 10, // IpsetName : A
+							Dir:     []IPSetDir{IPSetSrc, IPSetSrc},
+						},
+					},
+					{
+						Hdr: EmatchHdr{MatchID: 0, Kind: EmatchContainer, Flags: EmatchRelAnd, Pad: 0x0},
+						ContainerMatch: &ContainerMatch{
+							Pos: 3,
+						},
+					},
+					{
+						Hdr: EmatchHdr{MatchID: 0, Kind: EmatchIPSet, Flags: EmatchInvert, Pad: 0x0},
+						IPSetMatch: &IPSetMatch{
+							IPSetID: 13, // IpsetName : C
+							Dir:     []IPSetDir{IPSetSrc, IPSetDst},
+						},
+					},
+					{
+						Hdr: EmatchHdr{MatchID: 0, Kind: EmatchIPSet, Flags: EmatchRelOr, Pad: 0x0},
+						IPSetMatch: &IPSetMatch{
+							IPSetID: 11, // IpsetName : B1
+							Dir:     []IPSetDir{IPSetDst, IPSetDst},
+						},
+					},
+					{
+						Hdr: EmatchHdr{MatchID: 0, Kind: EmatchIPSet, Flags: EmatchRelEnd, Pad: 0x0},
+						IPSetMatch: &IPSetMatch{
+							IPSetID: 12, // IpsetName : B2
+							Dir:     []IPSetDir{IPSetSrc, IPSetDst, IPSetDst},
 						},
 					},
 				},
