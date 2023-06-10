@@ -100,6 +100,10 @@ func validateFilterObject(action int, info *Object) ([]tcOption, error) {
 		return options, ErrInvalidDev
 	}
 
+	if !isFilter(info.Kind) && !isChainAction(action) {
+		return options, ErrInvalidArg
+	}
+
 	if info.Stats != nil || info.XStats != nil || info.Stats2 != nil {
 		return options, ErrInvalidArg
 	}
@@ -117,29 +121,24 @@ func validateFilterObject(action int, info *Object) ([]tcOption, error) {
 		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaChain, Data: uint32Value(info.Chain)})
 	}
 
-	var data []byte
-	var err error
 	options = append(options, tcOption{Interpretation: vtString, Type: tcaKind, Data: info.Kind})
 
-	if isFilter(info.Kind) {
+	var data []byte
+	var err error
+	if !isChainAction(action) {
 		data, err = marshalFilterOptions(info.Kind, info)
-		if err != nil {
-			return nil, err
-		}
 	}
 	if err != nil {
-		if errors.Is(err, ErrNoArg) && action == unix.RTM_DELTFILTER {
-			return options, nil
+		if !errors.Is(err, ErrNoArg) && action != unix.RTM_DELTFILTER {
+			return options, err
 		}
-		return options, err
 	}
-	if len(data) < 1 {
-		if action == unix.RTM_NEWTFILTER {
-			return options, ErrNoArg
-		}
-	} else {
-		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaOptions, Data: data})
+
+	if len(data) < 1 && !isDelAction(action) && !isChainAction(action) {
+		return options, ErrNoArg
 	}
+
+	options = append(options, tcOption{Interpretation: vtBytes, Type: tcaOptions, Data: data})
 
 	return options, nil
 }
@@ -151,4 +150,15 @@ func isFilter(f string) bool {
 		}
 	}
 	return false
+}
+
+func isChainAction(action int) bool {
+	return action == unix.RTM_NEWCHAIN ||
+		action == unix.RTM_GETCHAIN ||
+		action == unix.RTM_DELCHAIN
+}
+
+func isDelAction(action int) bool {
+	return action == unix.RTM_DELTFILTER ||
+		action == unix.RTM_DELTCLASS
 }
