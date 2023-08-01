@@ -141,6 +141,12 @@ func TestQdisc(t *testing.T) {
 				}
 			})
 
+			t.Run("Replace", func(t *testing.T) {
+				if err := tcSocket.Qdisc().Replace(&testQdisc); err != nil {
+					t.Fatalf("could not replace qdisc: %v", err)
+				}
+			})
+
 			t.Run("Link", func(t *testing.T) {
 				if err := tcSocket.Qdisc().Link(&testQdisc); err != nil {
 					t.Fatalf("could not change qdisc: %v", err)
@@ -175,6 +181,22 @@ func TestQdisc(t *testing.T) {
 	})
 	t.Run("change nil", func(t *testing.T) {
 		if err := tcSocket.Qdisc().Change(nil); !errors.Is(err, ErrNoArg) {
+			t.Fatalf("unexpected error: %v", err)
+		}
+	})
+
+	t.Run("general qdisc attributes", func(t *testing.T) {
+		testQdisc := Object{
+			tcMsg,
+			Attribute{
+				Kind:         "qfq",
+				EgressBlock:  uint32Ptr(0xA5a5),
+				IngressBlock: uint32Ptr(0x73),
+				HwOffload:    uint8Ptr(3),
+				Chain:        uint32Ptr(42),
+			},
+		}
+		if err := tcSocket.Qdisc().Add(&testQdisc); err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
 	})
