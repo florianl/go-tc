@@ -32,7 +32,9 @@ func TestCt(t *testing.T) {
 				t.Fatalf("Unexpected error: %v", err1)
 			}
 
-			newData := changeEndianess(t, data, endianessMix)
+			tmp := changeEndianess(t, data, endianessMix)
+			newData, tm := injectTcft(t, tmp, tcaCtTm)
+			newData = injectAttribute(t, newData, []byte{}, tcaCtPad)
 
 			val := Ct{}
 			err2 := unmarshalCt(newData, &val)
@@ -40,6 +42,8 @@ func TestCt(t *testing.T) {
 				t.Fatalf("Unexpected error: %v", err2)
 			}
 
+			// Reinject value to expected values
+			testcase.val.Tm = tm
 			if diff := cmp.Diff(val, testcase.val); diff != "" {
 				t.Fatalf("Ct missmatch (want +got):\n%s", diff)
 			}
