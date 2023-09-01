@@ -213,6 +213,7 @@ type Attribute struct {
 	Plug    *Plug
 
 	// Classful qdiscs
+	Cbs      *Cbs
 	Htb      *Htb
 	Hfsc     *Hfsc
 	HfscQOpt *HfscQOpt
@@ -222,6 +223,7 @@ type Attribute struct {
 	Atm      *Atm
 	Qfq      *Qfq
 	Prio     *Prio
+	TaPrio   *TaPrio
 }
 
 // XStats contains further statistics to the TCA_KIND

@@ -92,6 +92,8 @@ func validateQdiscObject(action int, info *Object) ([]tcOption, error) {
 	var data []byte
 	var err error
 	switch info.Kind {
+	case "cbs":
+		data, err = marshalCbs(info.Cbs)
 	case "cake":
 		data, err = marshalCake(info.Cake)
 	case "choke":
@@ -141,6 +143,8 @@ func validateQdiscObject(action int, info *Object) ([]tcOption, error) {
 		data, err = marshalPrio(info.Prio)
 	case "plug":
 		data, err = marshalPlug(info.Plug)
+	case "taprio":
+		data, err = marshalTaPrio(info.TaPrio)
 	case "clsact":
 		// clsact is parameterless
 	case "ingress":

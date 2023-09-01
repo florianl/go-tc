@@ -299,6 +299,16 @@ func extractTCAOptions(data []byte, tc *Attribute, kind string) error {
 		err := unmarshalTcIndex(data, info)
 		multiError = concatError(multiError, err)
 		tc.TcIndex = info
+	case "cbs":
+		info := &Cbs{}
+		err := unmarshalCbs(data, info)
+		multiError = concatError(multiError, err)
+		tc.Cbs = info
+	case "taprio":
+		info := &TaPrio{}
+		err := unmarshalTaPrio(data, info)
+		multiError = concatError(multiError, err)
+		tc.TaPrio = info
 	default:
 		return fmt.Errorf("extractTCAOptions(): unsupported kind %s: %w", kind, ErrUnknownKind)
 	}
