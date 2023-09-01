@@ -38,6 +38,7 @@ func TestQdisc(t *testing.T) {
 		sfb     *Sfb
 		sfq     *Sfq
 		cbq     *Cbq
+		cbs     *Cbs
 		codel   *Codel
 		hhf     *Hhf
 		pie     *Pie
@@ -47,6 +48,7 @@ func TestQdisc(t *testing.T) {
 		htb     *Htb
 		prio    *Prio
 		plug    *Plug
+		taPrio  *TaPrio
 	}{
 		"clsact":   {kind: "clsact"},
 		"emptyHtb": {kind: "htb", err: ErrNoArg},
@@ -85,6 +87,10 @@ func TestQdisc(t *testing.T) {
 			Bands:   3,
 			PrioMap: [16]uint8{1, 2, 2, 2, 1, 2, 9, 9, 1, 1, 1, 1, 1, 1, 1, 1},
 		}},
+		"cbs": {kind: "cbs",
+			cbs: &Cbs{Parms: &CbsOpt{Offload: 73}}},
+		"taprio": {kind: "taprio",
+			taPrio: &TaPrio{SchedClockID: int32Ptr(73)}},
 		// TODO(flo): reenable this test.
 		//"plug": {kind: "plug", plug: &Plug{Action: PlugReleaseIndefinite}},
 	}
@@ -102,6 +108,7 @@ func TestQdisc(t *testing.T) {
 				tcMsg,
 				Attribute{
 					Kind:    testcase.kind,
+					Cbs:     testcase.cbs,
 					FqCodel: testcase.fqCodel,
 					Red:     testcase.red,
 					Sfb:     testcase.sfb,
@@ -116,6 +123,7 @@ func TestQdisc(t *testing.T) {
 					Htb:     testcase.htb,
 					Prio:    testcase.prio,
 					Plug:    testcase.plug,
+					TaPrio:  testcase.taPrio,
 				},
 			}
 
