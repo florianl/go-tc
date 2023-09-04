@@ -23,7 +23,7 @@ jobs:
           sudo apt --yes install qemu-system-aarch64 curl
 
       - name: checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: set up Go
         uses: actions/setup-go@v4
