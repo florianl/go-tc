@@ -48,7 +48,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        kernel-version: ["4.19", "5.10", "5.15"]
+        kernel-version: ["4.9", "4.14", "4.19", "5.4", "5.10", "5.15", "6.1"]
     steps:
       - name: install qemu && curl
         # Make sure required software packages are available.
@@ -65,10 +65,11 @@ jobs:
       - name: get kernel
         # Fetch the public kernel image that will be used in this test run.
         run: |
-          curl -s -L -O --fail https://github.com/cilium/ci-kernels/raw/master/linux-${{ matrix.kernel-version }}.bz
-      
+          curl -s -L -O --fail https://github.com/cilium/ci-kernels/raw/master/linux-${{ matrix.kernel-version }}-amd64.tgz
+          tar xvf linux-${{ matrix.kernel-version }}-amd64.tgz
+
       - name: run tests on kernel
         # Run the tests.
         run: |
-          qemu-system-x86_64  -nographic  -append "console=ttyS0" -m 2G -kernel linux-${{ matrix.kernel-version }}.bz -initrd initramfs.cpio | tee log.txt
+          qemu-system-x86_64  -nographic  -append "console=ttyS0" -m 2G -kernel boot/vmlinuz -initrd initramfs.cpio | tee log.txt
           grep PASS log.txt
