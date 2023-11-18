@@ -1,6 +1,7 @@
 package tc
 
 import (
+	"encoding/binary"
 	"errors"
 	"testing"
 
@@ -30,7 +31,11 @@ func TestMatchall(t *testing.T) {
 				}
 				t.Fatalf("Unexpected error: %v", err1)
 			}
-			newData := injectAttribute(t, data, []byte{}, tcaMatchallPad)
+			pcnt := uint64(1337)
+			pcntBytes := make([]byte, 8)
+			binary.LittleEndian.PutUint64(pcntBytes, pcnt)
+			tmp := injectAttribute(t, data, pcntBytes, tcaMatchallPcnt)
+			newData := injectAttribute(t, tmp, []byte{}, tcaMatchallPad)
 			val := Matchall{}
 			err2 := unmarshalMatchall(newData, &val)
 			if err2 != nil {
@@ -40,6 +45,9 @@ func TestMatchall(t *testing.T) {
 				t.Fatalf("Unexpected error: %v", err2)
 
 			}
+
+			// Reinject pcnt
+			testcase.val.Pcnt = uint64Ptr(pcnt)
 			if diff := cmp.Diff(val, testcase.val); diff != "" {
 				t.Fatalf("Matchall missmatch (want +got):\n%s", diff)
 			}
