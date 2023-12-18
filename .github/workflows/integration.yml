@@ -37,7 +37,7 @@ jobs:
 
       - name: upload initramfs for tests
         # Upload the generated initramfs.cpio and make it available for the parallel per-kernel tests.
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: initramfs
           path: |
