@@ -50,6 +50,22 @@ jobs:
       matrix:
         kernel-version: ["4.9", "4.14", "4.19", "5.4", "5.10", "5.15", "6.1", "6.6", "6.7"]
     steps:
+      - name: add Docker repo
+        run: |
+          # From https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository
+          # Add Docker's official GPG key:
+          sudo apt-get update
+          sudo apt-get install ca-certificates curl
+          sudo install -m 0755 -d /etc/apt/keyrings
+          sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+          sudo chmod a+r /etc/apt/keyrings/docker.asc
+
+          # Add the repository to Apt sources:
+          echo \
+            "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+            $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+            sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+          sudo apt-get update
       - name: install dependencies
         # Make sure required software packages are available.
         run: |
