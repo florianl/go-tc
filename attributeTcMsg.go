@@ -1,6 +1,7 @@
 package tc
 
 import (
+	"encoding/binary"
 	"fmt"
 
 	"github.com/mdlayher/netlink"
@@ -369,6 +370,15 @@ func extractXStats(data []byte, tc *XStats, kind string) error {
 		err := unmarshalFqCodelXStats(data, info)
 		multiError = concatError(multiError, err)
 		tc.FqCodel = info
+	case "fq":
+		info := &FqQdStats{}
+		// Pad out data to size of our FqQdStats struct to handle
+		// unmarshalling data from older kernel versions with smaller structs
+		qd := make([]byte, binary.Size(info))
+		copy(qd, data)
+		err := unmarshalStruct(qd, info)
+		multiError = concatError(multiError, err)
+		tc.Fq = info
 	case "hfsc":
 		info := &HfscXStats{}
 		err := unmarshalStruct(data, info)
