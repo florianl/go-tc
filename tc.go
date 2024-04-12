@@ -238,6 +238,7 @@ type XStats struct {
 	Hhf     *HhfXStats
 	Pie     *PieXStats
 	FqCodel *FqCodelXStats
+	Fq      *FqQdStats
 	Hfsc    *HfscXStats
 }
 
