@@ -28,7 +28,7 @@ jobs:
       - name: set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: 1.21
+          go-version: 1.22
         id: go
 
       - name: cross-compile tests
@@ -54,3 +54,4 @@ jobs:
         run: |
           qemu-system-aarch64 -nographic  -append "console=ttyAMA0"  -M virt -cpu cortex-a57 -m 4G -kernel linux-${{ matrix.kernel-version }}.arm64  -initrd initramfs.cpio | tee log.txt
           grep PASS log.txt
+
