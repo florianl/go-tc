@@ -13,7 +13,7 @@ jobs:
   go-test:
     strategy:
       matrix:
-        go-version: [1.13.x, 1.19.x, 1.20.x, 1.21.x]
+        go-version: [1.13.x, 1.20.x, 1.21.x, 1.22.x]
         platform: [ubuntu-latest, macos-latest, windows-latest]
     runs-on: ${{ matrix.platform }}
     steps:
@@ -34,14 +34,14 @@ jobs:
       if: matrix.platform == 'ubuntu-latest'
       run: go test -race -count=3 ./...
     - name: Test with -shuffle=on
-      if: matrix.platform == 'ubuntu-latest' && startsWith(matrix.go-version, '1.21')
+      if: matrix.platform == 'ubuntu-latest' && startsWith(matrix.go-version, '1.22')
       run: go test -shuffle=on -count=3 ./...
     - name: Integrationtest for linux
       if: matrix.platform == 'ubuntu-latest'
       run: |
         go test -race -v -exec=sudo -tags integration -covermode=atomic -coverprofile=profile.cov ./...
     - name: coveralls.io
-      if: matrix.platform == 'ubuntu-latest' && startsWith(matrix.go-version, '1.21')
+      if: matrix.platform == 'ubuntu-latest' && startsWith(matrix.go-version, '1.22')
       env:
         COVERALLS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
@@ -68,7 +68,7 @@ jobs:
         go install golang.org/x/lint/golint@latest
         $(go env GOPATH)/bin/golint $(go list ./... | grep -v internal/unix)
     - name: staticcheck.io
-      if: startsWith(matrix.go-version, '1.21')
+      if: startsWith(matrix.go-version, '1.22')
       uses: dominikh/staticcheck-action@v1.3.1
       with:
         version: "2023.1.7"
