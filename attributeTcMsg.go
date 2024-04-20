@@ -52,6 +52,10 @@ func extractTcmsgAttributes(action int, data []byte, info *Attribute) error {
 			err := unmarshalStab(ad.Bytes(), stab)
 			multiError = concatError(multiError, err)
 			info.Stab = stab
+		case tcaPad:
+			// padding does not contain data, we just skip it
+		case tcaExtWarnMsg:
+			info.ExtWarnMsg = ad.String()
 		default:
 			return fmt.Errorf("extractTcmsgAttributes()\t%d\n\t%v", ad.Type(), ad.Bytes())
 
@@ -422,4 +426,6 @@ const (
 	tcaHwOffload
 	tcaIngressBlock
 	tcaEgressBlock
+	tcaDumpFlags
+	tcaExtWarnMsg
 )
