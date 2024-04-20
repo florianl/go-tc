@@ -180,6 +180,7 @@ type Attribute struct {
 	XStats       *XStats
 	Stats2       *Stats2
 	Stab         *Stab
+	ExtWarnMsg   string
 
 	// Filters
 	Basic    *Basic
@@ -364,7 +365,8 @@ func (tc *Tc) monitor(ctx context.Context, deadline time.Duration,
 					tc.logger.Printf("could not extract tc.Msg from %v\n", msg.Data[:20])
 					continue
 				}
-				if err := extractTcmsgAttributes(int(msg.Header.Type), msg.Data[20:], &monitored.Attribute); err != nil {
+				if err := extractTcmsgAttributes(int(msg.Header.Type), msg.Data[20:],
+					&monitored.Attribute); err != nil {
 					tc.logger.Printf("could not extract attributes from %v\n", msg.Data[20:36])
 					continue
 				}
