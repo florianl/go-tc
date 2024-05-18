@@ -51,9 +51,9 @@ type Action struct {
 	Index       uint32
 	Stats       *GenStats
 	Cookie      *[]byte
-	Flags       *uint32 // 32-bit bitfield
-	HwStats     *uint32 // 32-bit bitfield
-	UsedHwStats *uint32 // 32-bit bitfield
+	Flags       *uint64 // 32-bit bitfield value; 32-bit bitfield selector
+	HwStats     *uint64 // 32-bit bitfield value; 32-bit bitfield selector
+	UsedHwStats *uint64 // 32-bit bitfield value; 32-bit bitfield selector
 	InHwCount   *uint32
 
 	Bpf       *ActBpf
@@ -115,13 +115,13 @@ func unmarshalAction(data []byte, info *Action) error {
 			}
 			info.Stats = stats
 		case tcaActFlags:
-			flags := ad.Uint32()
+			flags := ad.Uint64()
 			info.Flags = &flags
 		case tcaActHwStats:
-			hwStats := ad.Uint32()
+			hwStats := ad.Uint64()
 			info.HwStats = &hwStats
 		case tcaActUsedHwStats:
-			usedHwStats := ad.Uint32()
+			usedHwStats := ad.Uint64()
 			info.UsedHwStats = &usedHwStats
 		case tcaActInHwCount:
 			inHwCount := ad.Uint32()
