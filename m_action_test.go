@@ -99,7 +99,7 @@ func TestAction(t *testing.T) {
 
 	for name, testcase := range tests {
 		t.Run(name, func(t *testing.T) {
-			data, err1 := marshalActions([]*Action{&testcase.val})
+			data, err1 := marshalActions(0, []*Action{&testcase.val})
 			if err1 != nil {
 				if !errors.Is(testcase.err1, err1) {
 					return
@@ -122,7 +122,7 @@ func TestAction(t *testing.T) {
 		})
 	}
 	t.Run("nil", func(t *testing.T) {
-		_, err := marshalAction(nil, tcaActOptions)
+		_, err := marshalAction(0, nil, tcaActOptions)
 		if !errors.Is(err, ErrNoArg) {
 			t.Fatalf("unexpected error: %v", err)
 		}
