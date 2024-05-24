@@ -4,6 +4,7 @@ import (
 	"fmt"
 )
 
+// NByteMatch contains attributes of the Nbyte match discipline
 type NByteMatch struct {
 	Offset uint16
 	Layer  uint8

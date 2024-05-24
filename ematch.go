@@ -93,6 +93,7 @@ const (
 	ematchInvalid
 )
 
+// Various Ematch flags
 const (
 	EmatchRelEnd uint16 = 0
 	EmatchRelAnd uint16 = 1 << (iota - 1)
