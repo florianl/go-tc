@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	rate_1kbit_burst_40_mtu_9k = []uint32{
+	rate1kbitBurst40Mtu9k = []uint32{
 		0x00127a00, 0x0024f400, 0x00366e01, 0x0048e801, 0x005a6202,
 		0x006cdc02, 0x007e5603, 0x0090d003, 0x00a24a04, 0x00b4c404, 0x00c63e05,
 		0x00d8b805, 0x00ea3206, 0x00fcac06, 0x000e2707, 0x0020a107, 0x00321b08,
@@ -56,7 +56,7 @@ var (
 		0x004c4d75, 0x005ec775, 0x00704176, 0x0082bb76, 0x00943577, 0x00a6af77,
 		0x00b82978, 0x00caa378, 0x00dc1d79, 0x00ee9779, 0x0000127a,
 	}
-	rate_1mbit_burst_100k = []uint32{
+	rate1mbitBurst100k = []uint32{
 		0xe8030000, 0xd0070000, 0xb80b0000, 0xa00f0000, 0x88130000,
 		0x70170000, 0x581b0000, 0x401f0000, 0x28230000, 0x10270000, 0xf82a0000,
 		0xe02e0000, 0xc8320000, 0xb0360000, 0x983a0000, 0x803e0000, 0x68420000,
@@ -101,7 +101,7 @@ var (
 		0xf0c00300, 0xd8c40300, 0xc0c80300, 0x98cc0300, 0x90d00300, 0x68d40300,
 		0x60d80300, 0x48dc0300, 0x30e00300, 0x18e40300, 0x00e80300,
 	}
-	rate_8kbit_burst_5kb_peakrate_12kbit_mpu_64_mtu_1464_drop = []uint32{
+	rate8kbitBurst5kbPeakrate12kbitMpu64Mtu1464Drop = []uint32{
 		0x40420f00, 0x40420f00, 0x40420f00, 0x40420f00, 0x40420f00,
 		0x40420f00, 0x40420f00, 0x40420f00, 0x882a1100, 0xd0121300, 0x18fb1400,
 		0x60e31600, 0xa8cb1800, 0xf0b31a00, 0x389c1c00, 0x80841e00, 0xc86c2000,
@@ -161,7 +161,7 @@ func TestGenerateRateTable(t *testing.T) {
 					Linklayer: unix.LINKLAYER_ETHERNET,
 				},
 			},
-			expect: rate_1kbit_burst_40_mtu_9k,
+			expect: rate1kbitBurst40Mtu9k,
 		},
 		"police rate 1mbit burst 100k": {
 			pol: &Policy{
@@ -170,7 +170,7 @@ func TestGenerateRateTable(t *testing.T) {
 					Linklayer: unix.LINKLAYER_ETHERNET,
 				},
 			},
-			expect: rate_1mbit_burst_100k,
+			expect: rate1mbitBurst100k,
 		},
 		"police rate 8kbit burst 5kb peakrate 12kbit mpu 64 mtu 1464 drop": {
 			pol: &Policy{
@@ -181,7 +181,7 @@ func TestGenerateRateTable(t *testing.T) {
 					Linklayer: unix.LINKLAYER_ETHERNET,
 				},
 			},
-			expect: rate_8kbit_burst_5kb_peakrate_12kbit_mpu_64_mtu_1464_drop,
+			expect: rate8kbitBurst5kbPeakrate12kbitMpu64Mtu1464Drop,
 		},
 	}
 
