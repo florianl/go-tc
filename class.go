@@ -77,6 +77,8 @@ func validateClassObject(action int, info *Object) ([]tcOption, error) {
 		data, err = marshalQfq(info.Qfq)
 	case "htb":
 		data, err = marshalHtb(info.Htb)
+	case "dsmark":
+		data, err = marshalDsmark(info.Dsmark)
 	default:
 		return options, fmt.Errorf("%s: %w", info.Kind, ErrNotImplemented)
 	}
