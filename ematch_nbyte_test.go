@@ -8,7 +8,6 @@ import (
 )
 
 func TestNByteMatch(t *testing.T) {
-	t.Skip()
 	tests := map[string]struct {
 		val  NByteMatch
 		err1 error
