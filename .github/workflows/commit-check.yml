@@ -1,0 +1,37 @@
+name: commit checks
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ '**' ]
+
+permissions: read-all
+
+jobs:
+  check-commits:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Check if commits are signed
+        env:
+          FROM_REF: ${{ github.event.pull_request.base.sha }}
+          TO_REF: ${{ github.event.pull_request.head.sha }}
+        run: |
+          unsigned_commits=0
+          for commit in $(git rev-list $FROM_REF...$TO_REF); do
+            # Get the commit message
+            commit_msg=$(git log -1 --pretty=format:"%h - %s" $commit)
+    
+            # Check if the commit has a "Signed-off-by" line
+            if git log -1 --pretty=format:"%B" $commit | grep -q "Signed-off-by:"; then
+              echo "✅ Signed-off: $commit_msg"
+            else
+              echo "❌ Unsigned:   $commit_msg"
+              unsigned_commits=$((unsigned_commits + 1))
+            fi
+          done
+          exit $unsigned_commits
