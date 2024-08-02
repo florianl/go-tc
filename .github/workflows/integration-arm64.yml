@@ -9,6 +9,9 @@ on:
   pull_request:
     branches: [ '**' ]
 
+# Set default permissions as read only.
+permissions: read-all
+
 jobs:
   arm64_integration_test:
     runs-on: ubuntu-latest

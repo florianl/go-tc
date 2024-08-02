@@ -9,6 +9,9 @@ on:
   pull_request:
     branches: [ '**' ]
 
+# Set default permissions as read only.
+permissions: read-all
+
 jobs:
   build-initramfs:
     runs-on: ubuntu-latest

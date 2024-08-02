@@ -6,6 +6,7 @@ on:
   pull_request:
     branches: [ '**' ]
 
+# Set default permissions as read only.
 permissions: read-all
 
 jobs:
