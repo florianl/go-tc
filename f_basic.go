@@ -12,6 +12,7 @@ const (
 	tcaBasicEmatches
 	tcaBasicAct
 	tcaBasicPolice
+	tcaBasicPCNT
 )
 
 // Basic contains attributes of the basic discipline
@@ -48,6 +49,8 @@ func unmarshalBasic(data []byte, info *Basic) error {
 			err := unmarshalActions(ad.Bytes(), actions)
 			multiError = concatError(multiError, err)
 			info.Actions = actions
+		case tcaBasicPCNT:
+			continue
 		default:
 			return fmt.Errorf("unmarshalBasic()\t%d\n\t%v", ad.Type(), ad.Bytes())
 		}
