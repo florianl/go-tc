@@ -20,7 +20,8 @@ type tcfEmNByte struct {
 
 func unmarshalNByteMatch(data []byte, info *NByteMatch) error {
 	if len(data) < 8 {
-		return fmt.Errorf("unmarshalNByteMatch: incomplete data")
+		return fmt.Errorf("unmarshalNByteMatch: incomplete data: %w",
+			ErrInvalidArg)
 	}
 
 	// We can not unmarshal elements of a non-public struct.
@@ -29,7 +30,8 @@ func unmarshalNByteMatch(data []byte, info *NByteMatch) error {
 	needleLen := binary.LittleEndian.Uint16(data[2:4])
 	info.Layer = uint8(data[4])
 	if len(data) < (8 + int(needleLen)) {
-		return fmt.Errorf("unmarshalNByteMatch: incomplete needle")
+		return fmt.Errorf("unmarshalNByteMatch: invalid needle: %w",
+			ErrInvalidArg)
 	}
 	info.Needle = data[8 : 8+needleLen]
 

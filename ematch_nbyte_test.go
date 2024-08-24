@@ -43,3 +43,37 @@ func TestNByteMatch(t *testing.T) {
 		}
 	})
 }
+
+func TestUnmarshalNByteMatch(t *testing.T) {
+	tests := map[string]struct {
+		data      []byte
+		needleLen uint16
+		err       error
+	}{
+		"invalid lenght": {
+			data: []byte{0x0, 0x1, 0x2, 0x3},
+			err:  ErrInvalidArg,
+		},
+		"invalid needle": {
+			data: []byte{0x00, 0x00,
+				0xaa, 0xaa,
+				0x01,
+				0x00, 0x00, 0x00,
+				0x0a, 0x0b, 0x0c},
+			err: ErrInvalidArg,
+		},
+	}
+
+	for name, testcase := range tests {
+		name := name
+		testcase := testcase
+		t.Run(name, func(t *testing.T) {
+			info := NByteMatch{}
+			if err := unmarshalNByteMatch(testcase.data, &info); err != nil {
+				if !errors.Is(err, ErrInvalidArg) {
+					t.Fatalf("Unexpected error: %v", err)
+				}
+			}
+		})
+	}
+}
