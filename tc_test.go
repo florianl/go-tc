@@ -35,12 +35,16 @@ func testConn(t *testing.T) (*Tc, func()) {
 			case unix.RTM_NEWTFILTER:
 				fallthrough
 			case unix.RTM_NEWQDISC:
+				fallthrough
+			case unix.RTM_NEWACTION:
 				reqCache = req
 			case unix.RTM_GETTFILTER:
 				fallthrough
 			case unix.RTM_GETQDISC:
 				altered = alterResponses(t, &reqCache)
 			case unix.RTM_DELTFILTER:
+				fallthrough
+			case unix.RTM_DELACTION:
 				fallthrough
 			case unix.RTM_DELQDISC:
 				reqCache = []netlink.Message{}
