@@ -53,8 +53,9 @@ func TestBasic(t *testing.T) {
 				}
 				t.Fatalf("Unexpected error: %v", err1)
 			}
+			newData := injectAttribute(t, data, []byte{}, tcaBasicPCNT)
 			val := Basic{}
-			err2 := unmarshalBasic(data, &val)
+			err2 := unmarshalBasic(newData, &val)
 			if err2 != nil {
 				if errors.Is(err2, testcase.err2) {
 					return
