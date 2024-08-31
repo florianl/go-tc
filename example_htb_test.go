@@ -47,7 +47,7 @@ func ExampleHtb() {
 	}()
 
 	qdisc := tc.Object{
-		tc.Msg{
+		Msg: tc.Msg{
 			Family:  unix.AF_UNSPEC,
 			Ifindex: uint32(devID.Index),
 			Handle:  core.BuildHandle(0x1, 0x0),
@@ -55,7 +55,7 @@ func ExampleHtb() {
 			Info:    0,
 		},
 		// configure a very basic hierarchy token bucket (htb) qdisc
-		tc.Attribute{
+		Attribute: tc.Attribute{
 			Kind: "htb",
 			Htb: &tc.Htb{
 				Init: &tc.HtbGlob{
