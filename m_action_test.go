@@ -29,6 +29,14 @@ func TestAction(t *testing.T) {
 			Kind: "csum",
 			CSum: &Csum{Parms: &CsumParms{Index: 1, Capab: 2}},
 		}},
+		"ct": {val: Action{
+			Kind: "ct",
+			Ct:   &Ct{Zone: uint16Ptr(42)},
+		}},
+		"ctinfo": {val: Action{
+			Kind:   "ctinfo",
+			CtInfo: &CtInfo{Zone: uint16Ptr(1337)},
+		}},
 		"defact": {val: Action{
 			Kind:   "defact",
 			Defact: &Defact{Parms: &DefactParms{Index: 42, Action: 1}},
@@ -147,4 +155,26 @@ func generateActUnknown(t *testing.T) []byte {
 		t.Fatalf("could not generate test data: %v", err)
 	}
 	return data
+}
+
+func Test_extractActOptions(t *testing.T) {
+	type args struct {
+		data []byte
+		act  *Action
+		kind string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := extractActOptions(tt.args.data, tt.args.act, tt.args.kind); (err != nil) != tt.wantErr {
+				t.Errorf("extractActOptions() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
 }
