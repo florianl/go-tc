@@ -60,6 +60,7 @@ type Action struct {
 	ConnMark  *Connmark
 	CSum      *Csum
 	Ct        *Ct
+	CtInfo    *CtInfo
 	Defact    *Defact
 	Gact      *Gact
 	Gate      *Gate
@@ -186,6 +187,10 @@ func marshalAction(cmd int, info *Action, actOption uint16) ([]byte, error) {
 		data, err := marshalCt(info.Ct)
 		multiError = concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtBytes, Type: actOption, Data: data})
+	case "ctinfo":
+		data, err := marshalCtInfo(info.CtInfo)
+		multiError = concatError(multiError, err)
+		options = append(options, tcOption{Interpretation: vtBytes, Type: actOption, Data: data})
 	case "defact":
 		data, err := marshalDefact(info.Defact)
 		multiError = concatError(multiError, err)
@@ -287,6 +292,11 @@ func extractActOptions(data []byte, act *Action, kind string) error {
 		err = unmarshalCt(data, info)
 		multiError = concatError(multiError, err)
 		act.Ct = info
+	case "ctinfo":
+		info := &CtInfo{}
+		err = unmarshalCtInfo(data, info)
+		multiError = concatError(multiError, err)
+		act.CtInfo = info
 	case "defact":
 		info := &Defact{}
 		err = unmarshalDefact(data, info)
