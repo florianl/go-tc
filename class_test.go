@@ -81,13 +81,15 @@ func TestClass(t *testing.T) {
 	tcMsg.Handle = core.BuildHandle(0x1, 0x1)
 
 	tests := map[string]struct {
-		kind string
-		err  error
-		hfsc *Hfsc
-		htb  *Htb
+		kind   string
+		err    error
+		hfsc   *Hfsc
+		htb    *Htb
+		dsmark *Dsmark
 	}{
 		"hfsc":    {kind: "hfsc", hfsc: &Hfsc{Rsc: &ServiceCurve{M1: 12, D: 34, M2: 56}}},
 		"htb":     {kind: "htb", htb: &Htb{DirectQlen: uint32Ptr(4455)}},
+		"dsmark":  {kind: "dsmark", dsmark: &Dsmark{DefaultIndex: uint16Ptr(42)}},
 		"unknown": {kind: "unknown", err: ErrNotImplemented},
 	}
 
@@ -96,9 +98,10 @@ func TestClass(t *testing.T) {
 			testClass := Object{
 				tcMsg,
 				Attribute{
-					Kind: testcase.kind,
-					Hfsc: testcase.hfsc,
-					Htb:  testcase.htb,
+					Kind:   testcase.kind,
+					Hfsc:   testcase.hfsc,
+					Htb:    testcase.htb,
+					Dsmark: testcase.dsmark,
 				},
 			}
 
