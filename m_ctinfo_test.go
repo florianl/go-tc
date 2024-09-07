@@ -28,11 +28,12 @@ func TestCtInfo(t *testing.T) {
 			}
 
 			val := CtInfo{}
-			err2 := unmarshalCtInfo(data, &val)
+			newData, tm := injectTcft(t, data, tcaCtInfoTm)
+			err2 := unmarshalCtInfo(newData, &val)
 			if !errors.Is(err2, testcase.err2) {
 				t.Fatalf("Unexpected error: %v", err2)
 			}
-
+			testcase.val.Tm = tm
 			if diff := cmp.Diff(val, testcase.val); diff != "" {
 				t.Fatalf("CtInfo missmatch (want +got):\n%s", diff)
 			}

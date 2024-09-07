@@ -72,10 +72,25 @@ func TestEmatch(t *testing.T) {
 				Hdr: &EmatchTreeHdr{NMatches: 1, ProgID: 42},
 				Matches: &[]EmatchMatch{
 					{
-						Hdr: EmatchHdr{MatchID: 0, Kind: 0x9, Flags: EmatchRelEnd, Pad: 0x0},
+						Hdr: EmatchHdr{MatchID: 0, Kind: EmatchIPT, Flags: EmatchRelEnd, Pad: 0x0},
 						IptMatch: &IptMatch{
 							MatchName: stringPtr("foobar"),
 							NFProto:   uint8Ptr(10),
+						},
+					},
+				},
+			},
+		},
+		"match nbyte(\"ababa\" at 12 layer 1)": {
+			val: Ematch{
+				Hdr: &EmatchTreeHdr{NMatches: 1, ProgID: 42},
+				Matches: &[]EmatchMatch{
+					{
+						Hdr: EmatchHdr{MatchID: 0, Kind: EmatchNByte},
+						NByteMatch: &NByteMatch{
+							Layer:  1,
+							Offset: 12,
+							Needle: []byte("ababa"),
 						},
 					},
 				},
