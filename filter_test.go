@@ -187,6 +187,39 @@ func TestValidateFilterObject(t *testing.T) {
 				},
 			},
 		},
+		"invalid stats arg": {
+			action: unix.RTM_NEWTFILTER,
+			info: Object{
+				Msg: Msg{
+					Ifindex: 42,
+				},
+				Attribute: Attribute{
+					Kind: "basic",
+					Stats: &Stats{
+						Qlen: 3,
+					},
+				},
+			},
+			err: ErrInvalidArg,
+		},
+		"optional arguments": {
+			action: unix.RTM_NEWTFILTER,
+			info: Object{
+				Msg: Msg{
+					Ifindex: 42,
+				},
+				Attribute: Attribute{
+					Kind: "basic",
+					Basic: &Basic{
+						ClassID: uint32Ptr(42),
+					},
+					EgressBlock:  uint32Ptr(2),
+					IngressBlock: uint32Ptr(3),
+					HwOffload:    uint8Ptr(5),
+					Chain:        uint32Ptr(7),
+				},
+			},
+		},
 	}
 	for name, test := range tests {
 		name := name
