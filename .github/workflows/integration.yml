@@ -51,7 +51,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        kernel-version: ["4.9", "4.14", "4.19", "5.4", "5.10", "5.15", "6.1", "6.6", "6.7", "6.8", "6.9"]
+        kernel-version: ["4.9", "4.14", "4.19", "5.4", "5.10", "5.15", "6.1", "6.6", "6.7", "6.8", "6.9", "6.10", "6.11"]
     steps:
       - name: add Docker repo
         run: |
