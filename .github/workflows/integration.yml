@@ -15,6 +15,9 @@ permissions: read-all
 jobs:
   build-initramfs:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        target_arch: ["amd64", "arm64"]
     steps:
       - name: checkout
         uses: actions/checkout@v4
@@ -29,20 +32,20 @@ jobs:
         # bluebox works best with statically linked binaries. So we compile all the tests in this
         # code base into a statically linked executable.
         run: |
-          go test -ldflags='-extldflags=-static' -trimpath -tags 'osusergo netgo static_build linux integration' -c
+          GOARCH=${{ matrix.target_arch }} go test -ldflags='-extldflags=-static' -trimpath -tags 'osusergo netgo static_build linux integration' -c
 
       - name: build initramfs
         # Install bluebox and generate a initramfs.cpio with the previously created statically linked
         # tests embedded.
         run: |
           go install github.com/florianl/bluebox@latest
-          bluebox -e go-tc.test
+          bluebox  -a=${{ matrix.target_arch }} -e go-tc.test
 
       - name: upload initramfs for tests
         # Upload the generated initramfs.cpio and make it available for the parallel per-kernel tests.
         uses: actions/upload-artifact@v4
         with:
-          name: initramfs
+          name: initramfs-${{ matrix.target_arch }}
           path: |
             initramfs.cpio
 
@@ -51,7 +54,17 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
+        target_arch: ["amd64"]
         kernel-version: ["4.9", "4.14", "4.19", "5.4", "5.10", "5.15", "6.1", "6.6", "6.7", "6.8", "6.9", "6.10", "6.11"]
+        include:
+          - target_arch: "arm64"
+            kernel-version: "6.6"
+          - target_arch: "arm64"
+            kernel-version: "6.7"
+          - target_arch: "arm64"
+            kernel-version: "6.9"
+          - target_arch: "arm64"
+            kernel-version: "6.11"
     steps:
       - name: add Docker repo
         run: |
@@ -73,23 +86,31 @@ jobs:
         # Make sure required software packages are available.
         run: |
           sudo apt --yes update
-          sudo apt --yes install --no-install-recommends qemu-system-x86 docker-buildx-plugin
+          sudo apt --yes install --no-install-recommends qemu-system-aarch64 qemu-system-x86 docker-buildx-plugin
 
       - name: get initramfs
         # Fetch the initramfs.cpio that was created in the previous step.
         uses: actions/download-artifact@v4
         with:
-          name: initramfs
+          name: initramfs-${{ matrix.target_arch }}
 
       - name: fetch and unpack Linux kernel
         # Fetch the public kernel image that will be used in this test run.
         # Inspired by extract_oci_image from cilium/ebpf.
         run: |
           mkdir /tmp/ci-kernel
-          echo "FROM ghcr.io/cilium/ci-kernels:${{ matrix.kernel-version }}" | docker buildx build --quiet --pull --output="/tmp/ci-kernel" -     
+          echo "FROM ghcr.io/cilium/ci-kernels:${{ matrix.kernel-version }}" | docker buildx build --platform linux/${{ matrix.target_arch }} --quiet --pull --output="/tmp/ci-kernel/${{ matrix.target_arch }}/${{ matrix.kernel-version }}/" -     
 
-      - name: run tests on kernel
+      - name: run tests on kernel x86
+        if: matrix.target_arch == 'amd64'
         # Run the tests.
         run: |
-          qemu-system-x86_64  -nographic  -append "console=ttyS0" -m 2G -kernel /tmp/ci-kernel/boot/vmlinuz -initrd initramfs.cpio | tee log.txt
+          qemu-system-x86_64  -nographic  -append "console=ttyS0" -m 2G -kernel /tmp/ci-kernel/${{ matrix.target_arch }}/${{ matrix.kernel-version }}/boot/vmlinuz -initrd initramfs.cpio | tee log.txt
+          grep PASS log.txt
+
+      - name: run tests on kernel arm64
+        if: matrix.target_arch == 'arm64'
+        # Run the tests.
+        run: |
+          qemu-system-aarch64 -nographic  -append "console=ttyAMA0"  -M virt -cpu cortex-a57 -m 4G -kernel /tmp/ci-kernel/${{ matrix.target_arch }}/${{ matrix.kernel-version }}/boot/vmlinuz  -initrd initramfs.cpio | tee log.txt
           grep PASS log.txt
