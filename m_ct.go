@@ -83,9 +83,11 @@ func unmarshalCt(data []byte, info *Ct) error {
 			tmp := uint32ToIP(ad.Uint32())
 			info.NatIPv4Max = &tmp
 		case tcaCtNatPortMin:
-			info.NatPortMin = uint16Ptr(ad.Uint16())
+			tmp := endianSwapUint16(ad.Uint16())
+			info.NatPortMin = &tmp
 		case tcaCtNatPortMax:
-			info.NatPortMax = uint16Ptr(ad.Uint16())
+			tmp := endianSwapUint16(ad.Uint16())
+			info.NatPortMax = &tmp
 		case tcaCtPad:
 			// padding does not contain data, we just skip it
 		default:

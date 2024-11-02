@@ -42,10 +42,6 @@ func TestTunnelKey(t *testing.T) {
 		},
 	}
 
-	endianessMix := make(map[uint16]valueType)
-	endianessMix[tcaTunnelKeyEncKeyID] = vtUint32Be
-	endianessMix[tcaTunnelKeyEncDstPort] = vtUint16Be
-
 	for name, testcase := range tests {
 		t.Run(name, func(t *testing.T) {
 			data, err1 := marshalTunnelKey(&testcase.val)
@@ -57,7 +53,6 @@ func TestTunnelKey(t *testing.T) {
 			}
 			newData, tm := injectTcft(t, data, tcaTunnelKeyTm)
 			newData = injectAttribute(t, newData, []byte{}, tcaTunnelKeyPad)
-			newData = changeEndianess(t, newData, endianessMix)
 			val := TunnelKey{}
 			err2 := unmarshalTunnelKey(newData, &val)
 			if err2 != nil {
