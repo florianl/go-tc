@@ -88,39 +88,29 @@ func TestFlower(t *testing.T) {
 			KeyEncIPTTLMask:      uint8Ptr(52),
 			InHwCount:            uint32Ptr(53),
 			Flags:                uint32Ptr(54),
+			KeyPortSrcMin:        uint16Ptr(55),
+			KeyPortSrcMax:        uint16Ptr(56),
+			KeyPortDstMin:        uint16Ptr(57),
+			KeyPortDstMax:        uint16Ptr(58),
+			KeyCtState:           uint16Ptr(59),
+			KeyCtStateMask:       uint16Ptr(60),
+			KeyCtZone:            uint16Ptr(61),
+			KeyCtZoneMask:        uint16Ptr(62),
+			KeyCtMark:            uint32Ptr(63),
+			KeyCtMarkMask:        uint32Ptr(64),
+			KeyHash:              uint32Ptr(65),
+			KeyHashMask:          uint32Ptr(66),
+			KeyNumOfVLANS:        uint8Ptr(67),
+			KeyPppoeSID:          uint16Ptr(68),
+			KeyPppProto:          uint16Ptr(69),
+			KeyL2TPV3SID:         uint32Ptr(70),
+			L2Miss:               uint8Ptr(71),
+			KeySpi:               uint32Ptr(72),
+			KeySpiMask:           uint32Ptr(73),
+			KeyEncFlags:          uint32Ptr(74),
+			KeyEncFlagsMask:      uint32Ptr(75),
 		}},
 	}
-
-	endianessMix := make(map[uint16]valueType)
-	endianessMix[tcaFlowerKeyEthType] = vtUint16Be
-	endianessMix[tcaFlowerKeyTCPSrc] = vtUint16Be
-	endianessMix[tcaFlowerKeyTCPDst] = vtUint16Be
-	endianessMix[tcaFlowerKeyUDPSrc] = vtUint16Be
-	endianessMix[tcaFlowerKeyUDPDst] = vtUint16Be
-	endianessMix[tcaFlowerKeyVlanEthType] = vtUint16Be
-	endianessMix[tcaFlowerKeyEncKeyID] = vtUint32Be
-	endianessMix[tcaFlowerKeyTCPSrcMask] = vtUint16Be
-	endianessMix[tcaFlowerKeyTCPDstMask] = vtUint16Be
-	endianessMix[tcaFlowerKeyUDPSrcMask] = vtUint16Be
-	endianessMix[tcaFlowerKeyUDPDstMask] = vtUint16Be
-	endianessMix[tcaFlowerKeySCTPSrcMask] = vtUint16Be
-	endianessMix[tcaFlowerKeySCTPDstMask] = vtUint16Be
-	endianessMix[tcaFlowerKeySCTPSrc] = vtUint16Be
-	endianessMix[tcaFlowerKeySCTPDst] = vtUint16Be
-	endianessMix[tcaFlowerKeyEncUDPSrcPort] = vtUint16Be
-	endianessMix[tcaFlowerKeyEncUDPSrcPortMask] = vtUint16Be
-	endianessMix[tcaFlowerKeyEncUDPDstPort] = vtUint16Be
-	endianessMix[tcaFlowerKeyEncUDPDstPortMask] = vtUint16Be
-	endianessMix[tcaFlowerKeyFlags] = vtUint32Be
-	endianessMix[tcaFlowerKeyFlagsMask] = vtUint32Be
-	endianessMix[tcaFlowerKeyArpSIP] = vtUint32Be
-	endianessMix[tcaFlowerKeyArpSIPMask] = vtUint32Be
-	endianessMix[tcaFlowerKeyArpTIP] = vtUint32Be
-	endianessMix[tcaFlowerKeyArpTIPMask] = vtUint32Be
-	endianessMix[tcaFlowerKeyTCPFlags] = vtUint16Be
-	endianessMix[tcaFlowerKeyTCPFlagsMask] = vtUint16Be
-	endianessMix[tcaFlowerKeyCVlanEthType] = vtUint16Be
-
 	for name, testcase := range tests {
 		t.Run(name, func(t *testing.T) {
 			data, err1 := marshalFlower(&testcase.val)
@@ -131,10 +121,8 @@ func TestFlower(t *testing.T) {
 				t.Fatalf("Unexpected error: %v", err1)
 			}
 
-			newData := changeEndianess(t, data, endianessMix)
-
 			val := Flower{}
-			err2 := unmarshalFlower(newData, &val)
+			err2 := unmarshalFlower(data, &val)
 			if err2 != nil {
 				if errors.Is(err2, testcase.err2) {
 					return
