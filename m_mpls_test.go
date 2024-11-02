@@ -35,9 +35,6 @@ func TestMPLS(t *testing.T) {
 		},
 	}
 
-	endianessMix := make(map[uint16]valueType)
-	endianessMix[tcaMPLSProto] = vtInt16Be
-
 	for name, testcase := range tests {
 		t.Run(name, func(t *testing.T) {
 			data, err1 := marshalMPLS(&testcase.val)
@@ -45,7 +42,6 @@ func TestMPLS(t *testing.T) {
 				t.Fatalf("Unexpected error: %v", err1)
 			}
 			newData, tm := injectTcft(t, data, tcaMPLSTm)
-			newData = changeEndianess(t, newData, endianessMix)
 			val := MPLS{}
 			err2 := unmarshalMPLS(newData, &val)
 			if !errors.Is(err2, testcase.err2) {

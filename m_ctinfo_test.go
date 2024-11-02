@@ -28,7 +28,8 @@ func TestCtInfo(t *testing.T) {
 			}
 
 			val := CtInfo{}
-			newData, tm := injectTcft(t, data, tcaCtInfoTm)
+			tmp, tm := injectTcft(t, data, tcaCtInfoTm)
+			newData := injectAttribute(t, tmp, []byte{}, tcaCtInfoPad)
 			err2 := unmarshalCtInfo(newData, &val)
 			if !errors.Is(err2, testcase.err2) {
 				t.Fatalf("Unexpected error: %v", err2)

@@ -21,10 +21,6 @@ func TestCt(t *testing.T) {
 			NatPortMin: uint16Ptr(42), NatPortMax: uint16Ptr(73)}},
 	}
 
-	endianessMix := make(map[uint16]valueType)
-	endianessMix[tcaCtNatPortMin] = vtUint16Be
-	endianessMix[tcaCtNatPortMax] = vtUint16Be
-
 	for name, testcase := range tests {
 		t.Run(name, func(t *testing.T) {
 			data, err1 := marshalCt(&testcase.val)
@@ -32,8 +28,7 @@ func TestCt(t *testing.T) {
 				t.Fatalf("Unexpected error: %v", err1)
 			}
 
-			tmp := changeEndianess(t, data, endianessMix)
-			newData, tm := injectTcft(t, tmp, tcaCtTm)
+			newData, tm := injectTcft(t, data, tcaCtTm)
 			newData = injectAttribute(t, newData, []byte{}, tcaCtPad)
 
 			val := Ct{}

@@ -15,9 +15,9 @@ const (
 	tcaTunnelKeyEncIPv4Dst
 	tcaTunnelKeyEncIPv6Src
 	tcaTunnelKeyEncIPv6Dst
-	tcaTunnelKeyEncKeyID
+	tcaTunnelKeyEncKeyID /* be32 */
 	tcaTunnelKeyPad
-	tcaTunnelKeyEncDstPort
+	tcaTunnelKeyEncDstPort /* be16 */
 	tcaTunnelKeyNoCSUM
 	tcaTunnelKeyEncOpts
 	tcaTunnelKeyEncTOS
@@ -138,10 +138,10 @@ func unmarshalTunnelKey(data []byte, info *TunnelKey) error {
 			multiError = concatError(multiError, err)
 			info.KeyEncDst = &tmp
 		case tcaTunnelKeyEncKeyID:
-			tmp := ad.Uint32()
+			tmp := endianSwapUint32(ad.Uint32())
 			info.KeyEncKeyID = &tmp
 		case tcaTunnelKeyEncDstPort:
-			tmp := ad.Uint16()
+			tmp := endianSwapUint16(ad.Uint16())
 			info.KeyEncDstPort = &tmp
 		case tcaTunnelKeyNoCSUM:
 			tmp := ad.Uint8()
