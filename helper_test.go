@@ -120,3 +120,23 @@ func TestMacHelper(t *testing.T) {
 		})
 	}
 }
+
+func TestEndianSwapUint16(t *testing.T) {
+	for _, in := range []uint16{2, 32, 96, 254, 65534} {
+		tmp := endianSwapUint16(in)
+		out := endianSwapUint16(tmp)
+		if in != out {
+			t.Fatalf("%d != %d", in, out)
+		}
+	}
+}
+
+func TestEndianSwapUint32(t *testing.T) {
+	for _, in := range []uint32{2, 32, 96, 254, 65534, 65535, 4294967294} {
+		tmp := endianSwapUint32(in)
+		out := endianSwapUint32(tmp)
+		if in != out {
+			t.Fatalf("%d != %d", in, out)
+		}
+	}
+}
