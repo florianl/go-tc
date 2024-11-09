@@ -214,6 +214,7 @@ func alterResponses(t *testing.T, cache *[]netlink.Message) []byte {
 	// Alter and marshal data
 	for _, obj := range tmp {
 		var data []byte
+		var err error
 		var attrs []tcOption
 		attrs = append(attrs, tcOption{Interpretation: vtString, Type: tcaKind, Data: obj.Kind})
 		attrs = append(attrs, tcOption{Interpretation: vtBytes, Type: tcaStats2, Data: stats2.Bytes()})
@@ -223,65 +224,36 @@ func alterResponses(t *testing.T, cache *[]netlink.Message) []byte {
 		// add XStats
 		switch obj.Kind {
 		case "fq_codel":
-			data, err := marshalXStats(XStats{FqCodel: &FqCodelXStats{Type: 0, Qd: &FqCodelQdStats{}}})
-			if err != nil {
-				t.Fatalf("could not marshal Xstats struct: %v", err)
-			}
-			attrs = append(attrs, tcOption{Interpretation: vtBytes, Type: tcaXstats, Data: data})
+			data, err = marshalXStats(XStats{FqCodel: &FqCodelXStats{Type: 0, Qd: &FqCodelQdStats{}}})
 		case "sfb":
-			data, err := marshalXStats(XStats{Sfb: &SfbXStats{EarlyDrop: 1, PenaltyDrop: 2, AvgProb: 42}})
-			if err != nil {
-				t.Fatalf("could not marshal Xstats struct: %v", err)
-			}
-			attrs = append(attrs, tcOption{Interpretation: vtBytes, Type: tcaXstats, Data: data})
+			data, err = marshalXStats(XStats{Sfb: &SfbXStats{EarlyDrop: 1, PenaltyDrop: 2, AvgProb: 42}})
 		case "sfq":
-			data, err := marshalXStats(XStats{Sfq: &SfqXStats{Allot: 42}})
-			if err != nil {
-				t.Fatalf("could not marshal Xstats struct: %v", err)
-			}
-			attrs = append(attrs, tcOption{Interpretation: vtBytes, Type: tcaXstats, Data: data})
+			data, err = marshalXStats(XStats{Sfq: &SfqXStats{Allot: 42}})
 		case "red":
-			data, err := marshalXStats(XStats{Red: &RedXStats{Early: 1, PDrop: 2, Other: 3, Marked: 4}})
-			if err != nil {
-				t.Fatalf("could not marshal Xstats struct: %v", err)
-			}
-			attrs = append(attrs, tcOption{Interpretation: vtBytes, Type: tcaXstats, Data: data})
+			data, err = marshalXStats(XStats{Red: &RedXStats{Early: 1, PDrop: 2, Other: 3, Marked: 4}})
 		case "choke":
-			data, err := marshalXStats(XStats{Choke: &ChokeXStats{Early: 1, PDrop: 2, Other: 3, Marked: 4, Matched: 5}})
-			if err != nil {
-				t.Fatalf("could not marshal Xstats struct: %v", err)
-			}
-			attrs = append(attrs, tcOption{Interpretation: vtBytes, Type: tcaXstats, Data: data})
+			data, err = marshalXStats(XStats{Choke: &ChokeXStats{Early: 1, PDrop: 2, Other: 3, Marked: 4, Matched: 5}})
 		case "htb":
-			data, err := marshalXStats(XStats{Htb: &HtbXStats{Lends: 1, Borrows: 2, Giants: 3}})
-			if err != nil {
-				t.Fatalf("could not marshal Xstats struct: %v", err)
-			}
-			attrs = append(attrs, tcOption{Interpretation: vtBytes, Type: tcaXstats, Data: data})
+			data, err = marshalXStats(XStats{Htb: &HtbXStats{Lends: 1, Borrows: 2, Giants: 3}})
 		case "cbq":
-			data, err := marshalXStats(XStats{Cbq: &CbqXStats{Borrows: 2}})
-			if err != nil {
-				t.Fatalf("could not marshal Xstats struct: %v", err)
-			}
-			attrs = append(attrs, tcOption{Interpretation: vtBytes, Type: tcaXstats, Data: data})
+			data, err = marshalXStats(XStats{Cbq: &CbqXStats{Borrows: 2}})
 		case "codel":
-			data, err := marshalXStats(XStats{Codel: &CodelXStats{MaxPacket: 3, LDelay: 5}})
-			if err != nil {
-				t.Fatalf("could not marshal Xstats struct: %v", err)
-			}
-			attrs = append(attrs, tcOption{Interpretation: vtBytes, Type: tcaXstats, Data: data})
+			data, err = marshalXStats(XStats{Codel: &CodelXStats{MaxPacket: 3, LDelay: 5}})
 		case "hhf":
-			data, err := marshalXStats(XStats{Hhf: &HhfXStats{DropOverlimit: 42}})
-			if err != nil {
-				t.Fatalf("could not marshal Xstats struct: %v", err)
-			}
-			attrs = append(attrs, tcOption{Interpretation: vtBytes, Type: tcaXstats, Data: data})
+			data, err = marshalXStats(XStats{Hhf: &HhfXStats{DropOverlimit: 42}})
 		case "pie":
-			data, err := marshalXStats(XStats{Pie: &PieXStats{Prob: 2, Delay: 4, Dropped: 5}})
-			if err != nil {
-				t.Fatalf("could not marshal Xstats struct: %v", err)
-			}
+			data, err = marshalXStats(XStats{Pie: &PieXStats{Prob: 2, Delay: 4, Dropped: 5}})
+		case "hfsc":
+			data, err = marshalXStats(XStats{Hfsc: &HfscXStats{Work: 42}})
+		case "fq":
+			data, err = marshalXStats(XStats{Fq: &FqQdStats{GcFlows: 73}})
+		}
+		if err != nil {
+			t.Fatalf("could not marshal Xstats struct for %v: %v", obj.Kind, err)
+		}
+		if len(data) > 0 {
 			attrs = append(attrs, tcOption{Interpretation: vtBytes, Type: tcaXstats, Data: data})
+			data = data[:0]
 		}
 
 		if isFilter(obj.Kind) {
