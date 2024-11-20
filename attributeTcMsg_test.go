@@ -213,7 +213,7 @@ func TestExtractTcmsgAttributes(t *testing.T) {
 	for name, testcase := range tests {
 		t.Run(name, func(t *testing.T) {
 			value := &Attribute{}
-			if err := extractTcmsgAttributes(0xCAFE, testcase.input, value); err != nil {
+			if err := extractTcmsgAttributes(actionQdisc, testcase.input, value); err != nil {
 				if errors.Is(err, testcase.err) {
 					// we received the expected error. everything is fine
 					return
@@ -241,6 +241,7 @@ func TestExtractTCAOptions(t *testing.T) {
 		"clsactWithData": {kind: "clsact", data: []byte{0xde, 0xad, 0xc0, 0xde}, err: ErrInvalidArg},
 		"ingress":        {kind: "ingress", expected: &Attribute{}},
 		"unknown":        {kind: "unknown", err: ErrUnknownKind},
+		"tbf":            {kind: "tbf", expected: &Attribute{Tbf: &Tbf{}}},
 		"pfifo_fast": {
 			kind: "pfifo_fast",
 			data: []byte{0x03, 0x00, 0x00, 0x00, 0x01, 0x02, 0x02, 0x02, 0x01, 0x02, 0x00, 0x00, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01},
@@ -305,7 +306,8 @@ func TestFilterAttribute(t *testing.T) {
 				t.Fatalf("Unexpected error: %v", err)
 			}
 			info := &Attribute{}
-			err2 := extractTcmsgAttributes(0xCAFE, data, info)
+			newData := injectAttribute(t, data, []byte{}, tcaPad)
+			err2 := extractTcmsgAttributes(0xCAFE, newData, info)
 			if err2 != nil {
 				if errors.Is(err2, testcase.err2) {
 					return
@@ -317,6 +319,28 @@ func TestFilterAttribute(t *testing.T) {
 			}
 		})
 	}
+
+	t.Run("extWarnMsg", func(t *testing.T) {
+		value := "extWarnMsgValue"
+		data, err := marshalAttributes([]tcOption{
+			{
+				Interpretation: vtString,
+				Type:           tcaExtWarnMsg,
+				Data:           value,
+			},
+		})
+		if err != nil {
+			t.Fatalf("Unexpected error: %v", err)
+		}
+		info := &Attribute{}
+		err2 := extractTcmsgAttributes(0xCAFE, data, info)
+		if err2 != nil {
+			t.Fatalf("Unexpected error: %v", err2)
+		}
+		if info.ExtWarnMsg != value {
+			t.Fatalf("Expected: '%s' but got '%s'", value, info.ExtWarnMsg)
+		}
+	})
 }
 
 func TestQdiscAttribute(t *testing.T) {
