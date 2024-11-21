@@ -35,7 +35,8 @@ func TestTaPrio(t *testing.T) {
 				t.Fatalf("Unexpected error: %v", err1)
 			}
 			val := TaPrio{}
-			err2 := unmarshalTaPrio(data, &val)
+			newData := injectAttribute(t, data, []byte{}, tcaTaPrioPad)
+			err2 := unmarshalTaPrio(newData, &val)
 			if err2 != nil {
 				if errors.Is(err2, testcase.err2) {
 					return
