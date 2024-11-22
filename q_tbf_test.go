@@ -45,7 +45,8 @@ func TestTbf(t *testing.T) {
 			if altered, err = stripRateTable(t, data, []uint16{tcaTbfRtab, tcaTbfPtab}); err != nil {
 				t.Fatalf("Failed to strip rate table: %v", err)
 			}
-			err2 := unmarshalTbf(altered, &val)
+			newData := injectAttribute(t, altered, []byte{}, tcaTbfPad)
+			err2 := unmarshalTbf(newData, &val)
 			if err2 != nil {
 				if testcase.err2 != nil && errors.Is(err2, testcase.err2) {
 					return
