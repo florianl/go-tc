@@ -13,8 +13,9 @@ func TestHtb(t *testing.T) {
 		err1 error
 		err2 error
 	}{
-		"simple":   {val: Htb{Rate64: uint64Ptr(123), Parms: &HtbOpt{Buffer: 0xFFFF}}},
-		"extended": {val: Htb{Rate64: uint64Ptr(123), Parms: &HtbOpt{Buffer: 0xFFFF}, Init: &HtbGlob{DirectPkts: 6789}}},
+		"simple": {val: Htb{Rate64: uint64Ptr(123), Parms: &HtbOpt{Buffer: 0xFFFF}}},
+		"extended": {val: Htb{Rate64: uint64Ptr(123), Ceil64: uint64Ptr(321), Parms: &HtbOpt{Buffer: 0xFFFF},
+			Offload: boolPtr(true), DirectQlen: uint32Ptr(74), Init: &HtbGlob{DirectPkts: 6789}}},
 	}
 
 	for name, testcase := range tests {
