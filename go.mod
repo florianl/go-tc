@@ -8,5 +8,7 @@ require (
 	github.com/josharian/native v1.1.0
 	github.com/jsimonetti/rtnetlink v0.0.0-20211022192332-93da33804786
 	github.com/mdlayher/netlink v1.6.0
-	golang.org/x/sys v0.0.0-20220128215802-99c3d69c2c27
+	github.com/sirupsen/logrus v1.9.3
+	go.uber.org/zap v1.27.0
+	golang.org/x/sys v0.0.0-20220715151400-c0bba94af5f8
 )

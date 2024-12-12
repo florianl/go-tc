@@ -11,6 +11,8 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/mdlayher/netlink"
 	"github.com/mdlayher/netlink/nltest"
+	"github.com/sirupsen/logrus"
+	"go.uber.org/zap"
 )
 
 func testConn(t *testing.T) (*Tc, func()) {
@@ -303,4 +305,39 @@ func alterResponses(t *testing.T, cache *[]netlink.Message) []byte {
 
 	}
 	return dataStream
+}
+
+func TestLogger(t *testing.T) {
+	// test default logger
+	tc, err := Open(&Config{Logger: nil})
+	if err != nil {
+		t.Fatalf("could not open tc: %v", err)
+	}
+	if tc.logger == nil {
+		t.Fatalf("expected default logger to be set")
+	}
+	tc.logger.Printf("test default logger")
+	tc.Close()
+
+	// test zap logger
+	tc, err = Open(&Config{Logger: zap.NewStdLog(zap.L())})
+	if err != nil {
+		t.Fatalf("could not open tc: %v", err)
+	}
+	if tc.logger == nil {
+		t.Fatalf("expected zap logger to be set")
+	}
+	tc.logger.Printf("test zap logger")
+	tc.Close()
+
+	// test logrus logger
+	tc, err = Open(&Config{Logger: logrus.New()})
+	if err != nil {
+		t.Fatalf("could not open tc: %v", err)
+	}
+	if tc.logger == nil {
+		t.Fatalf("expected logrus logger to be set")
+	}
+	tc.logger.Printf("test logrus logger")
+	tc.Close()
 }
