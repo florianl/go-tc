@@ -53,7 +53,7 @@ func TestBasic(t *testing.T) {
 				}
 				t.Fatalf("Unexpected error: %v", err1)
 			}
-			newData := injectAttribute(t, data, []byte{}, tcaBasicPCNT)
+			newData := injectAttribute(t, data, []byte{}, tcaBasicPad)
 			val := Basic{}
 			err2 := unmarshalBasic(newData, &val)
 			if err2 != nil {
@@ -78,6 +78,12 @@ func TestBasic(t *testing.T) {
 		val := Basic{}
 		if err := unmarshalBasic([]byte{0x00}, &val); err == nil {
 			t.Fatalf("expected error but got nil")
+		}
+	})
+	t.Run("pcnt", func(t *testing.T) {
+		_, err := marshalBasic(&Basic{Pcnt: uint64Ptr(42)})
+		if !errors.Is(err, ErrNoArgAlter) {
+			t.Fatalf("expected '%v' but got '%v'", ErrNoArgAlter, err)
 		}
 	})
 }
