@@ -4,10 +4,10 @@
 package tc
 
 import (
-	"io/ioutil"
+	"io"
 	"log"
 )
 
 func setDummyLogger() *log.Logger {
-	return log.New(ioutil.Discard, "", 0)
+	return log.New(io.Discard, "", 0)
 }

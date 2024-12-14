@@ -3,7 +3,6 @@ package tc
 import (
 	"context"
 	"fmt"
-	"log"
 	"time"
 
 	"github.com/florianl/go-tc/internal/unix"
@@ -28,7 +27,7 @@ var _ tcConn = &netlink.Conn{}
 type Tc struct {
 	con tcConn
 
-	logger *log.Logger
+	logger Logger
 }
 
 var nativeEndian = native.Endian
