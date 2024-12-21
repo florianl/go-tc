@@ -140,3 +140,21 @@ func TestEndianSwapUint32(t *testing.T) {
 		}
 	}
 }
+
+func TestBytesToInt32(t *testing.T) {
+	tests := []struct {
+		in  []byte
+		out int32
+	}{
+		{in: []byte{0x1}, out: 0},
+		{in: []byte{0x0, 0x0, 0x0, 0x2a}, out: 42},
+	}
+
+	for _, test := range tests {
+		test := test
+		out := bytesToInt32(test.in)
+		if test.out != out {
+			t.Fatalf("%d != %d", test.out, out)
+		}
+	}
+}

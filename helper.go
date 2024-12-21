@@ -54,3 +54,11 @@ func endianSwapUint32(in uint32) uint32 {
 		((in & 0x00FF0000) >> 8) |
 		((in & 0xFF000000) >> 24)
 }
+
+// bytesToInt32 converts an array for four bytes in big endian format to an integer.
+func bytesToInt32(b []byte) int32 {
+	if len(b) != 4 {
+		return 0
+	}
+	return int32(b[0])<<24 | int32(b[1])<<16 | int32(b[2])<<8 | int32(b[3])
+}
