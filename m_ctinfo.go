@@ -20,6 +20,7 @@ const (
 	tcaCtInfoStatsCpMarkSet
 )
 
+// CtInfo contains attributes of the ctinfo discipline
 type CtInfo struct {
 	Tm                 *Tcft
 	Act                *CtInfoAct
@@ -32,6 +33,7 @@ type CtInfo struct {
 	StatsCpMarkSet     *uint64
 }
 
+// CtInfoAct as tc_ctinfo from include/uapi/linux/tc_act/tc_ctinfo.h
 type CtInfoAct struct {
 	Index   uint32
 	Capab   uint32
