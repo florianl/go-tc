@@ -47,4 +47,14 @@ func TestCtInfo(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 	})
+
+	t.Run("alter Tm", func(t *testing.T) {
+		_, err := marshalCtInfo(&CtInfo{
+			Tm: &Tcft{Install: 73},
+		})
+		if !errors.Is(err, ErrNoArgAlter) {
+			t.Fatalf("expected '%v' but got '%v'",
+				ErrNoArgAlter, err)
+		}
+	})
 }

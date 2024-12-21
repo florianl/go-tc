@@ -18,7 +18,8 @@ func TestCt(t *testing.T) {
 		"all arguments": {val: Ct{Parms: &CtParms{Capab: 4}, Action: uint16Ptr(5),
 			Zone: uint16Ptr(5), Mark: uint32Ptr(0xAA55AA55), MarkMask: uint32Ptr(0x55AA55AA),
 			NatIPv4Min: netIPPtr(net.ParseIP("1.2.3.4")), NatIPv4Max: netIPPtr(net.ParseIP("8.8.4.4")),
-			NatPortMin: uint16Ptr(42), NatPortMax: uint16Ptr(73)}},
+			NatPortMin: uint16Ptr(42), NatPortMax: uint16Ptr(73),
+			HelperName: stringPtr("test"), HelperFamily: uint8Ptr(13), HelperProto: uint8Ptr(14)}},
 	}
 
 	for name, testcase := range tests {
