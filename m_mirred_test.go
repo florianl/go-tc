@@ -13,7 +13,7 @@ func TestMirred(t *testing.T) {
 		err1 error
 		err2 error
 	}{
-		"simple":          {val: Mirred{Parms: &MirredParam{Index: 42, Action: 1}}},
+		"all":             {val: Mirred{Parms: &MirredParam{Index: 42, Action: 1}, BlockID: uint32Ptr(73)}},
 		"invalidArgument": {val: Mirred{Tm: &Tcft{Install: 1}}, err1: ErrNoArgAlter},
 	}
 	for name, testcase := range tests {
