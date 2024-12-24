@@ -26,6 +26,7 @@ func TestTunnelKey(t *testing.T) {
 			},
 			KeyEncSrc: &IPv4,
 			KeyEncDst: &IPv4,
+			KeyNoFrag: boolPtr(true),
 		}},
 		"IPv6": {val: TunnelKey{
 			Parms:     &TunnelParms{Index: 42},
