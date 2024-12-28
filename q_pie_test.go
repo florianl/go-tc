@@ -13,7 +13,15 @@ func TestPie(t *testing.T) {
 		err1 error
 		err2 error
 	}{
-		"simple": {val: Pie{Target: uint32Ptr(1), Limit: uint32Ptr(2), TUpdate: uint32Ptr(3), Alpha: uint32Ptr(4), Beta: uint32Ptr(5), ECN: uint32Ptr(6), Bytemode: uint32Ptr(7)}},
+		"simple": {val: Pie{
+			Target:          uint32Ptr(1),
+			Limit:           uint32Ptr(2),
+			TUpdate:         uint32Ptr(3),
+			Alpha:           uint32Ptr(4),
+			Beta:            uint32Ptr(5),
+			ECN:             uint32Ptr(6),
+			Bytemode:        uint32Ptr(7),
+			DqRateEstimator: uint32Ptr(8)}},
 	}
 
 	for name, testcase := range tests {
@@ -43,6 +51,11 @@ func TestPie(t *testing.T) {
 		_, err := marshalPie(nil)
 		if !errors.Is(err, ErrNoArg) {
 			t.Fatalf("unexpected error: %v", err)
+		}
+	})
+	t.Run("unmarshal(nil)", func(t *testing.T) {
+		if err := unmarshalPie([]byte{0x0}, nil); err == nil {
+			t.Fatal("expectec error but got none")
 		}
 	})
 }
