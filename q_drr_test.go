@@ -45,4 +45,9 @@ func TestDrr(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 	})
+	t.Run("unmarshalDrr(]byte{0x0})", func(t *testing.T) {
+		if err := unmarshalDrr([]byte{0x0}, nil); err == nil {
+			t.Fatal("expected an error but got nil")
+		}
+	})
 }
