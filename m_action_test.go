@@ -103,6 +103,10 @@ func TestAction(t *testing.T) {
 			Kind:    "skbedit",
 			SkbEdit: &SkbEdit{Priority: uint32Ptr(42)},
 		}},
+		"skbmod": {val: Action{
+			Kind:   "skbmod",
+			SkbMod: &SkbMod{EType: uint16Ptr(73)},
+		}},
 	}
 
 	for name, testcase := range tests {
