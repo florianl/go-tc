@@ -74,6 +74,7 @@ type Action struct {
 	TunnelKey *TunnelKey
 	MPLS      *MPLS
 	SkbEdit   *SkbEdit
+	SkbMod    *SkbMod
 }
 
 func unmarshalActions(data []byte, actions *[]*Action) error {
@@ -243,6 +244,10 @@ func marshalAction(cmd int, info *Action, actOption uint16) ([]byte, error) {
 		data, err := marshalSkbEdit(info.SkbEdit)
 		multiError = concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtBytes, Type: actOption, Data: data})
+	case "skbmod":
+		data, err := marshalSkbMod(info.SkbMod)
+		multiError = concatError(multiError, err)
+		options = append(options, tcOption{Interpretation: vtBytes, Type: actOption, Data: data})
 	default:
 		return []byte{}, fmt.Errorf("unknown kind '%s'", info.Kind)
 	}
@@ -362,6 +367,11 @@ func extractActOptions(data []byte, act *Action, kind string) error {
 		err = unmarshalSkbEdit(data, info)
 		multiError = concatError(multiError, err)
 		act.SkbEdit = info
+	case "skbmod":
+		info := &SkbMod{}
+		err = unmarshalSkbMod(data, info)
+		multiError = concatError(multiError, err)
+		act.SkbMod = info
 	default:
 		return fmt.Errorf("extractActOptions(): unsupported kind: %s", kind)
 
