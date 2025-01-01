@@ -18,8 +18,9 @@ func TestAction(t *testing.T) {
 		"unknown Kind":        {val: Action{Kind: "test"}, err1: fmt.Errorf("unknown kind 'test'")},
 		"bpf Without Options": {val: Action{Kind: "bpf", Index: 123}, err1: ErrNoArg},
 		"simple Bpf": {val: Action{
-			Kind: "bpf",
-			Bpf:  &ActBpf{FD: uint32Ptr(12), Name: stringPtr("simpleTest"), Parms: &ActBpfParms{Action: 2, Index: 4}},
+			Kind:  "bpf",
+			Bpf:   &ActBpf{FD: uint32Ptr(12), Name: stringPtr("simpleTest"), Parms: &ActBpfParms{Action: 2, Index: 4}},
+			Flags: uint64Ptr(73),
 		}},
 		"connmark": {val: Action{
 			Kind:     "connmark",
