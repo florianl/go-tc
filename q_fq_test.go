@@ -50,7 +50,8 @@ func TestFq(t *testing.T) {
 					Bands:   3,
 					PrioMap: [16]uint8{1, 2, 2, 2, 1, 2, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1},
 				},
-				Weights: &weights,
+				Weights:        &weights,
+				OffloadHorizon: uint32Ptr(73),
 			},
 		},
 	}
@@ -82,6 +83,12 @@ func TestFq(t *testing.T) {
 		_, err := marshalFq(nil)
 		if !errors.Is(err, ErrNoArg) {
 			t.Fatalf("unexpected error: %v", err)
+		}
+	})
+	t.Run("unmarshalFq(0x0)", func(t *testing.T) {
+		err := unmarshalFq([]byte{0x0}, nil)
+		if err == nil {
+			t.Fatalf("expected error but got none")
 		}
 	})
 }
