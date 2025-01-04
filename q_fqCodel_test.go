@@ -13,7 +13,18 @@ func TestFqCodel(t *testing.T) {
 		err1 error
 		err2 error
 	}{
-		"simple": {val: FqCodel{Target: uint32Ptr(1), Limit: uint32Ptr(2), Interval: uint32Ptr(3), ECN: uint32Ptr(4), Flows: uint32Ptr(5), Quantum: uint32Ptr(6), CEThreshold: uint32Ptr(7), DropBatchSize: uint32Ptr(8), MemoryLimit: uint32Ptr(9)}},
+		"simple": {val: FqCodel{
+			Target:              uint32Ptr(1),
+			Limit:               uint32Ptr(2),
+			Interval:            uint32Ptr(3),
+			ECN:                 uint32Ptr(4),
+			Flows:               uint32Ptr(5),
+			Quantum:             uint32Ptr(6),
+			CEThreshold:         uint32Ptr(7),
+			DropBatchSize:       uint32Ptr(8),
+			MemoryLimit:         uint32Ptr(9),
+			CeThresholdSelector: uint8Ptr(10),
+			CeThresholdMask:     uint8Ptr(11)}},
 	}
 
 	for name, testcase := range tests {
@@ -43,6 +54,12 @@ func TestFqCodel(t *testing.T) {
 		_, err := marshalFqCodel(nil)
 		if !errors.Is(err, ErrNoArg) {
 			t.Fatalf("unexpected error: %v", err)
+		}
+	})
+	t.Run("nil", func(t *testing.T) {
+		err := unmarshalFqCodel([]byte{0x0}, nil)
+		if err == nil {
+			t.Fatalf("expected error but got none")
 		}
 	})
 }
