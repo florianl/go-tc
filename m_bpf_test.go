@@ -70,4 +70,11 @@ func TestActBpft(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 	})
+
+	t.Run("unmarshalActBpf()", func(t *testing.T) {
+		err := unmarshalActBpf([]byte{0x0}, nil)
+		if err == nil {
+			t.Fatalf("expected error but got none")
+		}
+	})
 }

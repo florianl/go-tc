@@ -143,4 +143,11 @@ func TestFlower(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 	})
+
+	t.Run("unmarshalFlower()", func(t *testing.T) {
+		err := unmarshalFlower([]byte{0x0}, nil)
+		if err == nil {
+			t.Fatalf("expected error but got none")
+		}
+	})
 }

@@ -92,4 +92,11 @@ func TestU32(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 	})
+
+	t.Run("unmarshalU32()", func(t *testing.T) {
+		err := unmarshalU32([]byte{0x0}, nil)
+		if err == nil {
+			t.Fatalf("expected error but got none")
+		}
+	})
 }

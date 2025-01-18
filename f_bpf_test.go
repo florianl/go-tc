@@ -78,4 +78,10 @@ func TestBpf(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 	})
+	t.Run("unmarshalBpf()", func(t *testing.T) {
+		err := unmarshalBpf([]byte{0x0}, nil)
+		if err == nil {
+			t.Fatalf("expected error but got none")
+		}
+	})
 }
