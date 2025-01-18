@@ -51,4 +51,11 @@ func TestRsvp(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 	})
+
+	t.Run("unmarshalRsvp()", func(t *testing.T) {
+		err := unmarshalRsvp([]byte{0x0}, nil)
+		if err == nil {
+			t.Fatalf("expected error but got none")
+		}
+	})
 }

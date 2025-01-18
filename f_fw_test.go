@@ -55,4 +55,11 @@ func TestFw(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 	})
+
+	t.Run("unmarshalFw()", func(t *testing.T) {
+		err := unmarshalFw([]byte{0x0}, nil)
+		if err == nil {
+			t.Fatalf("expected error but got none")
+		}
+	})
 }

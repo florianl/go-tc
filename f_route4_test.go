@@ -50,4 +50,11 @@ func TestRoute4(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 	})
+
+	t.Run("unmarshalRoute4()", func(t *testing.T) {
+		err := unmarshalRoute4([]byte{0x0}, nil)
+		if err == nil {
+			t.Fatalf("expected error but got none")
+		}
+	})
 }

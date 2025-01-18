@@ -75,4 +75,10 @@ func TestFlow(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 	})
+	t.Run("unmarshalFlow()", func(t *testing.T) {
+		err := unmarshalFlow([]byte{0x0}, nil)
+		if err == nil {
+			t.Fatalf("expected error but got none")
+		}
+	})
 }
