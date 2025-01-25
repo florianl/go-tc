@@ -147,6 +147,20 @@ func TestAction(t *testing.T) {
 			t.Fatal("Expected error but got none")
 		}
 	})
+
+	t.Run("unmarshalActions()", func(t *testing.T) {
+		err := unmarshalActions([]byte{0x0}, nil)
+		if err == nil {
+			t.Fatalf("expected error but got none")
+		}
+	})
+
+	t.Run("unmarshalAction()", func(t *testing.T) {
+		err := unmarshalAction([]byte{0x0}, nil)
+		if err == nil {
+			t.Fatalf("expected error but got none")
+		}
+	})
 }
 
 func generateActUnknown(t *testing.T) []byte {

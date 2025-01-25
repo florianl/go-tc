@@ -57,4 +57,11 @@ func TestCtInfo(t *testing.T) {
 				ErrNoArgAlter, err)
 		}
 	})
+
+	t.Run("unmarshalCtInfo()", func(t *testing.T) {
+		err := unmarshalCtInfo([]byte{0x0}, nil)
+		if err == nil {
+			t.Fatalf("expected error but got none")
+		}
+	})
 }

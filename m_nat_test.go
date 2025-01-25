@@ -49,4 +49,11 @@ func TestNat(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 	})
+
+	t.Run("unmarshalNat()", func(t *testing.T) {
+		err := unmarshalNat([]byte{0x0}, nil)
+		if err == nil {
+			t.Fatalf("expected error but got none")
+		}
+	})
 }

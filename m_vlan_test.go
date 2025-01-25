@@ -48,4 +48,11 @@ func TestVLan(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 	})
+
+	t.Run("unmarshalVLan()", func(t *testing.T) {
+		err := unmarshalVLan([]byte{0x0}, nil)
+		if err == nil {
+			t.Fatalf("expected error but got none")
+		}
+	})
 }

@@ -49,4 +49,11 @@ func TestConnmark(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 	})
+
+	t.Run("unmarshalConnmark()", func(t *testing.T) {
+		err := unmarshalConnmark([]byte{0x0}, nil)
+		if err == nil {
+			t.Fatalf("expected error but got none")
+		}
+	})
 }

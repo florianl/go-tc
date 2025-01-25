@@ -52,4 +52,11 @@ func TestCt(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 	})
+
+	t.Run("unmarshalCt()", func(t *testing.T) {
+		err := unmarshalCt([]byte{0x0}, nil)
+		if err == nil {
+			t.Fatalf("expected error but got none")
+		}
+	})
 }

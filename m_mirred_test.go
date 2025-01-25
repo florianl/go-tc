@@ -48,4 +48,11 @@ func TestMirred(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 	})
+
+	t.Run("unmarshalMirred()", func(t *testing.T) {
+		err := unmarshalMirred([]byte{0x0}, nil)
+		if err == nil {
+			t.Fatalf("expected error but got none")
+		}
+	})
 }
