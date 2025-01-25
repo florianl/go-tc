@@ -55,4 +55,11 @@ func TestSkbEdit(t *testing.T) {
 				ErrNoArgAlter, err)
 		}
 	})
+
+	t.Run("unmarshalSkbEdit()", func(t *testing.T) {
+		err := unmarshalSkbEdit([]byte{0x0}, nil)
+		if err == nil {
+			t.Fatalf("expected error but got none")
+		}
+	})
 }

@@ -50,4 +50,11 @@ func TestCsum(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 	})
+
+	t.Run("unmarshalCsum()", func(t *testing.T) {
+		err := unmarshalCsum([]byte{0x0}, nil)
+		if err == nil {
+			t.Fatalf("expected error but got none")
+		}
+	})
 }

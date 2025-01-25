@@ -74,4 +74,11 @@ func TestTunnelKey(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 	})
+
+	t.Run("unmarshalTunnelKey()", func(t *testing.T) {
+		err := unmarshalTunnelKey([]byte{0x0}, nil)
+		if err == nil {
+			t.Fatalf("expected error but got none")
+		}
+	})
 }

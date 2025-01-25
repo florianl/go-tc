@@ -53,4 +53,11 @@ func TestSample(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 	})
+
+	t.Run("unmarshalSample()", func(t *testing.T) {
+		err := unmarshalSample([]byte{0x0}, nil)
+		if err == nil {
+			t.Fatalf("expected error but got none")
+		}
+	})
 }

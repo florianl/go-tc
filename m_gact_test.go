@@ -50,4 +50,11 @@ func TestGact(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 	})
+
+	t.Run("unmarshalGact()", func(t *testing.T) {
+		err := unmarshalGact([]byte{0x0}, nil)
+		if err == nil {
+			t.Fatalf("expected error but got none")
+		}
+	})
 }

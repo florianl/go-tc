@@ -50,4 +50,11 @@ func TestDefact(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 	})
+
+	t.Run("unmarshalDefact()", func(t *testing.T) {
+		err := unmarshalDefact([]byte{0x0}, nil)
+		if err == nil {
+			t.Fatalf("expected error but got none")
+		}
+	})
 }

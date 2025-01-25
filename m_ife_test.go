@@ -56,4 +56,11 @@ func TestIfe(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 	})
+
+	t.Run("unmarshalIfe()", func(t *testing.T) {
+		err := unmarshalIfe([]byte{0x0}, nil)
+		if err == nil {
+			t.Fatalf("expected error but got none")
+		}
+	})
 }
