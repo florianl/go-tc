@@ -40,4 +40,10 @@ func TestStab(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 	})
+	t.Run("unmarshalStab()", func(t *testing.T) {
+		err := unmarshalStab([]byte{0x0}, nil)
+		if err == nil {
+			t.Fatalf("expected error but got none")
+		}
+	})
 }
