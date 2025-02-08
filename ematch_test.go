@@ -194,4 +194,10 @@ func TestEmatch(t *testing.T) {
 			t.Fatalf("expected error but got nil")
 		}
 	})
+	t.Run("unmarshalEmatchTreeList(0x0)", func(t *testing.T) {
+		err := unmarshalEmatchTreeList([]byte{0x0}, nil)
+		if err == nil {
+			t.Fatal("expected error but got nil")
+		}
+	})
 }
