@@ -94,7 +94,7 @@ func ExampleNetem() {
 	}
 }
 
-func ExampleNetemDelay() {
+func ExampleNetem_with_delay() {
 	tcIface := "ExampleNetemDelay"
 
 	rtnl, err := setupDummyInterface(tcIface)

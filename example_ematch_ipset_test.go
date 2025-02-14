@@ -13,7 +13,7 @@ import (
 	"github.com/jsimonetti/rtnetlink"
 )
 
-func ExampleEmatch_IPSetMatch() {
+func ExampleEmatch() {
 	tcIface := "ExampleEmatchIpset"
 
 	rtnl, err := setupDummyInterface(tcIface)
