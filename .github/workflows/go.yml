@@ -13,7 +13,7 @@ jobs:
   go-test:
     strategy:
       matrix:
-        go-version: [1.13.x, 1.21.x, 1.22.x, 1.23.x]
+        go-version: [1.13.x, 1.22.x, 1.23.x, 1.24.x]
         platform: [ubuntu-latest, ubuntu-24.04-arm, macos-latest, windows-latest]
         exclude:
             # There is no arm64 version of Go for darwin.
@@ -47,7 +47,7 @@ jobs:
       run: |
         go test -race -v -exec=sudo -tags integration -covermode=atomic -coverprofile=profile.cov ./...
     - name: coveralls.io
-      if: matrix.platform == 'ubuntu-latest' && startsWith(matrix.go-version, '1.23')
+      if: matrix.platform == 'ubuntu-latest' && startsWith(matrix.go-version, '1.24')
       env:
         COVERALLS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
@@ -56,7 +56,7 @@ jobs:
   code-check:
     strategy:
       matrix:
-        go-version: [1.23.x]
+        go-version: [1.24.x]
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
@@ -76,6 +76,6 @@ jobs:
     - name: staticcheck.io
       uses: dominikh/staticcheck-action@v1.3.1
       with:
-        version: "2024.1.1"
+        version: "2025.1"
         install-go: false
         cache-key: ${{ matrix.go }}
