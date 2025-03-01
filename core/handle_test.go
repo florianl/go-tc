@@ -1,6 +1,10 @@
 package core
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/florianl/go-tc/internal/unix"
+)
 
 // Tests out the HandleStr function
 func TestSplitHandle(t *testing.T) {
@@ -39,6 +43,33 @@ func TestBuildHandle(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			if got := BuildHandle(tt.major, tt.minor); got != tt.want {
 				t.Errorf("BuildHandle() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestFilterInfo(t *testing.T) {
+	tests := map[string]struct {
+		prio  uint16
+		proto uint16
+		info  uint32
+	}{
+		"protocol ip prio 73": {
+			prio:  73,
+			proto: unix.ETH_P_IP,
+			info:  0x490008,
+		},
+		"protocol all prio 0": {
+			prio:  0,
+			proto: unix.ETH_P_ALL,
+			info:  768,
+		},
+	}
+	for name, tt := range tests {
+		t.Run(name, func(t *testing.T) {
+			info := FilterInfo(tt.prio, tt.proto)
+			if info != tt.info {
+				t.Errorf("Expected 0x%x but got 0x%x", tt.info, info)
 			}
 		})
 	}

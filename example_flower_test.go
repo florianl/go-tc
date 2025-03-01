@@ -89,7 +89,7 @@ func ExampleFlower() {
 			Ifindex: uint32(devID.Index),
 			Handle:  0,
 			Parent:  tc.HandleIngress + 1,
-			Info:    768,
+			Info:    core.FilterInfo(0, unix.ETH_P_ALL),
 		},
 		tc.Attribute{
 			Kind: "flower",

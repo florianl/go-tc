@@ -164,7 +164,7 @@ func Example_cBPF() {
 			Ifindex: uint32(devID.Index),
 			Handle:  0,
 			Parent:  tc.HandleIngress,
-			Info:    0x300,
+			Info:    core.FilterInfo(0, unix.ETH_P_ALL),
 		},
 		tc.Attribute{
 			Kind: "bpf",
@@ -270,7 +270,7 @@ func ExampleU32() {
 			Ifindex: uint32(devID.Index),
 			Handle:  0,
 			Parent:  tc.HandleIngress,
-			Info:    0x300,
+			Info:    core.FilterInfo(0, unix.ETH_P_ALL),
 		},
 		tc.Attribute{
 			Kind: "bpf",
