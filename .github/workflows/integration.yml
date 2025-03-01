@@ -20,10 +20,10 @@ jobs:
         target_arch: ["amd64", "arm64"]
     steps:
       - name: checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: set up Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@f111f3307d8850f501ac008e886eec1fd1932a34 # v5.3.0
         with:
           go-version: 1.23
         id: go
@@ -43,7 +43,7 @@ jobs:
 
       - name: upload initramfs for tests
         # Upload the generated initramfs.cpio and make it available for the parallel per-kernel tests.
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4.6.1
         with:
           name: initramfs-${{ matrix.target_arch }}
           path: |
@@ -90,7 +90,7 @@ jobs:
 
       - name: get initramfs
         # Fetch the initramfs.cpio that was created in the previous step.
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@cc203385981b70ca67e1cc392babf9cc229d5806 # v4.1.9
         with:
           name: initramfs-${{ matrix.target_arch }}
 
