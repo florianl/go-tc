@@ -102,6 +102,7 @@ jobs:
           echo "FROM ghcr.io/cilium/ci-kernels:${{ matrix.kernel-version }}" | docker buildx build --platform linux/${{ matrix.target_arch }} --quiet --pull --output="/tmp/ci-kernel/${{ matrix.target_arch }}/${{ matrix.kernel-version }}/" -     
 
       - name: run tests on kernel x86
+        timeout-minutes: 30
         if: matrix.target_arch == 'amd64'
         # Run the tests.
         run: |
@@ -109,6 +110,7 @@ jobs:
           grep PASS log.txt
 
       - name: run tests on kernel arm64
+        timeout-minutes: 30
         if: matrix.target_arch == 'arm64'
         # Run the tests.
         run: |
