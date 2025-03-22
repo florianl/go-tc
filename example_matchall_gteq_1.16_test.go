@@ -17,9 +17,9 @@ import (
 	"golang.org/x/sys/unix"
 )
 
-// This example demonstrates how to attach an eBPF program with TC to an interface.
-func Example_eBPF() {
-	tcIface := "ExampleEBPF"
+// This example demonstrates how to use an eBPF program in a TC filer/matchall action.
+func ExampleMatchall() {
+	tcIface := "matchallIface"
 
 	// For the purpose of testing a dummy network interface is set up for the example.
 	rtnl, err := setupDummyInterface(tcIface)
@@ -67,37 +67,18 @@ func Example_eBPF() {
 		return
 	}
 
-	// Create a qdisc/clsact object that will be attached to the ingress part
-	// of the networking interface.
-	qdisc := tc.Object{
-		Msg: tc.Msg{
-			Family:  unix.AF_UNSPEC,
-			Ifindex: uint32(devID.Index),
-			Handle:  core.BuildHandle(tc.HandleRoot, 0x0),
-			Parent:  tc.HandleIngress,
-		},
-		Attribute: tc.Attribute{
-			Kind: "clsact",
-		},
-	}
-
-	// Attach the qdisc/clsact to the networking interface.
-	if err := tcnl.Qdisc().Add(&qdisc); err != nil {
-		fmt.Fprintf(os.Stderr, "could not assign clsact to %s: %v\n", tcIface, err)
-		return
-	}
-	// When deleting the qdisc, the applied filter will also be gone
-	defer tcnl.Qdisc().Delete(&qdisc)
-
-	// Handcraft an eBPF program of type BPF_PROG_TYPE_SCHED_CLS that will be attached to
-	// the networking interface via qdisc/clsact.
+	// For the purpose of this example handcraft an eBPF program of type BPF_PROG_TYPE_SCHED_ACT
+	// that will be attached to the networking interface via the TC filter/matchall action.
 	//
-	// For eBPF programs of type BPF_PROG_TYPE_SCHED_CLS the returned code defines the action that
+	// Check out ebpf.LoadCollection() and ebpf.LoadCollectionSpec() for different ways to load
+	// an eBPF program.
+	//
+	// For eBPF programs of type BPF_PROG_TYPE_SCHED_ACT the returned code defines the action that
 	// will be applied to the network packet. Returning 0 translates to TC_ACT_OK and will terminate
 	// the packet processing pipeline within netlink/tc and allows the packet to proceed.
 	spec := ebpf.ProgramSpec{
-		Name: "test",
-		Type: ebpf.SchedCLS,
+		Name: "matchAll",
+		Type: ebpf.SchedACT,
 		Instructions: asm.Instructions{
 			// Set exit code to 0
 			asm.Mov.Imm(asm.R0, 0),
@@ -113,30 +94,62 @@ func Example_eBPF() {
 		return
 	}
 
-	fd := uint32(prog.FD())
-	flags := uint32(0x1)
-
-	// Create a tc/filter object that will attach the eBPF program to the qdisc/clsact.
-	filter := tc.Object{
-		tc.Msg{
+	// Create a qdisc/ingress object.
+	qdisc := tc.Object{
+		Msg: tc.Msg{
 			Family:  unix.AF_UNSPEC,
 			Ifindex: uint32(devID.Index),
-			Handle:  0,
-			Parent:  core.BuildHandle(tc.HandleRoot, tc.HandleMinIngress),
-			Info:    core.FilterInfo(0, unix.ETH_P_ALL),
+			Handle:  core.BuildHandle(tc.HandleRoot, 0x0),
+			Parent:  tc.HandleIngress,
 		},
-		tc.Attribute{
-			Kind: "bpf",
-			BPF: &tc.Bpf{
-				FD:    &fd,
-				Flags: &flags,
+		Attribute: tc.Attribute{
+			Kind: "ingress",
+		},
+	}
+	// Attach the qdisc/ingress to the networking interface.
+	if err := tcnl.Qdisc().Add(&qdisc); err != nil {
+		fmt.Fprintf(os.Stderr, "could not assign clsact to %s: %v\n", tcIface, err)
+		return
+	}
+	// When deleting the qdisc, the applied filter will also be gone
+	defer func() {
+		if err := tcnl.Qdisc().Delete(&qdisc); err != nil {
+			fmt.Fprintf(os.Stderr, "failed to delete qdisc: %v\n", err)
+		}
+	}()
+
+	fd := uint32(prog.FD())
+	eBpfActionIndex := uint32(73) // Arbitrary ID to reference the bpf action.
+
+	// Create a filter/matchall object.
+	filter := tc.Object{
+		Msg: tc.Msg{
+			Family:  unix.AF_UNSPEC,
+			Ifindex: uint32(devID.Index),
+			Info:    core.FilterInfo(0, unix.ETH_P_ALL),
+			Parent:  tc.HandleIngress + 1,
+		},
+		Attribute: tc.Attribute{
+			Kind: "matchall",
+			Matchall: &tc.Matchall{
+				Actions: &[]*tc.Action{
+					{
+						Kind: "bpf",
+						Bpf: &tc.ActBpf{
+							Parms: &tc.ActBpfParms{
+								Index: eBpfActionIndex,
+							},
+							FD: &fd,
+						},
+					},
+				},
 			},
 		},
 	}
 
-	// Attach the tc/filter object with the eBPF program to the qdisc/clsact.
+	// Load and attach the filter object to the ingress path of the interface.
 	if err := tcnl.Filter().Add(&filter); err != nil {
-		fmt.Fprintf(os.Stderr, "could not attach filter for eBPF program: %v\n", err)
+		fmt.Fprintf(os.Stderr, "failed to attach matchall filter: %v\n", err)
 		return
 	}
 }
