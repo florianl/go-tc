@@ -50,7 +50,7 @@ func TestUnmarshalNByteMatch(t *testing.T) {
 		needleLen uint16
 		err       error
 	}{
-		"invalid lenght": {
+		"invalid length": {
 			data: []byte{0x0, 0x1, 0x2, 0x3},
 			err:  ErrInvalidArg,
 		},
