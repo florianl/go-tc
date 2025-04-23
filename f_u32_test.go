@@ -21,7 +21,11 @@ func TestU32(t *testing.T) {
 		"simple": {val: U32{
 			ClassID: uint32Ptr(0xFFFF),
 			Mark:    &U32Mark{Val: 0x55, Mask: 0xAA, Success: 0x1},
-			Hash:    uint32Ptr(1234), Pcnt: uint64Ptr(4321), InDev: stringPtr("foobar"),
+			Hash:    uint32Ptr(1234), Pcnt: &U32Pcnt{
+				Rcnt:  32,
+				Rhit:  33,
+				Kcnts: []uint64{34, 35, 36, 37},
+			}, InDev: stringPtr("foobar"),
 		}},
 		"divisor": {val: U32{Divisor: uint32Ptr(1), Link: uint32Ptr(42)}},
 		"extended": {val: U32{
@@ -97,6 +101,29 @@ func TestU32(t *testing.T) {
 		err := unmarshalU32([]byte{0x0}, nil)
 		if err == nil {
 			t.Fatalf("expected error but got none")
+		}
+	})
+
+	t.Run("validateU32SelOptions()", func(t *testing.T) {
+		_, err := validateU32SelOptions(&U32Sel{
+			NKeys: 3,
+		})
+		if !errors.Is(err, ErrInvalidArg) {
+			t.Fatalf("unexpected error: %v", err)
+		}
+	})
+
+	t.Run("extractU32Sel()", func(t *testing.T) {
+		err := extractU32Sel([]byte{0x0, 0x1, 0x2}, &U32Sel{})
+		if !errors.Is(err, ErrInvalidArg) {
+			t.Fatalf("unexpected error: %v", err)
+		}
+	})
+
+	t.Run("extractU32Pcnt()", func(t *testing.T) {
+		err := extractU32Pcnt([]byte{0x0, 0x1, 0x2}, &U32Pcnt{})
+		if !errors.Is(err, ErrInvalidArg) {
+			t.Fatalf("unexpected error: %v", err)
 		}
 	})
 }
