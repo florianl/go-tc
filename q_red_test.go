@@ -13,7 +13,12 @@ func TestRed(t *testing.T) {
 		err1 error
 		err2 error
 	}{
-		"simple": {val: Red{MaxP: uint32Ptr(2), Parms: &RedQOpt{QthMin: 2, QthMax: 4}}},
+		"simple": {val: Red{
+			MaxP:           uint32Ptr(2),
+			Parms:          &RedQOpt{QthMin: 2, QthMax: 4},
+			Flags:          uint64Ptr(42),
+			EarlyDropBlock: uint32Ptr(43),
+			MarkBlock:      uint32Ptr(44)}},
 	}
 
 	for name, testcase := range tests {
@@ -43,6 +48,12 @@ func TestRed(t *testing.T) {
 		_, err := marshalRed(nil)
 		if !errors.Is(err, ErrNoArg) {
 			t.Fatalf("unexpected error: %v", err)
+		}
+	})
+	t.Run("unmarshalRed", func(t *testing.T) {
+		err := unmarshalRed([]byte{0x0}, &Red{})
+		if err == nil {
+			t.Fatalf("expected error but got none")
 		}
 	})
 }
