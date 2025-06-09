@@ -96,7 +96,30 @@ func TestEmatch(t *testing.T) {
 				},
 			},
 		},
-
+		"meta(nf_mark gt 42)": {
+			val: Ematch{
+				Hdr: &EmatchTreeHdr{NMatches: 1, ProgID: 42},
+				Matches: &[]EmatchMatch{
+					{
+						Hdr: EmatchHdr{MatchID: 0, Kind: EmatchMeta},
+						MetaMatch: &MetaMatch{
+							Hdr: &MetaHdr{
+								Left: MetaValue{
+									Kind: 0x100c, // ((TCF_META_TYPE_INT << 12) || TCF_META_ID_NFMARK)
+									Op:   0x1,    // EmatchOpndGt
+								},
+								Right: MetaValue{
+									Kind: 0x1000, // (TCF_META_TYPE_INT << 12)
+								},
+							},
+							Right: &MetaValueType{
+								Int: uint32Ptr(42),
+							},
+						},
+					},
+				},
+			},
+		},
 		// A AND (B1 OR B2) AND NOT C
 		// EmatchHMatch:
 		//   ----------------------------
