@@ -98,6 +98,8 @@ func validateQdiscObject(action int, info *Object) ([]tcOption, error) {
 		data, err = marshalCake(info.Cake)
 	case "choke":
 		data, err = marshalChoke(info.Choke)
+	case "gred":
+		data, err = marshalGred(info.Gred)
 	case "pfifo":
 		data, err = marshalStruct(info.Pfifo)
 	case "bfifo":
