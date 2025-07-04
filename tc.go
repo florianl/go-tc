@@ -203,6 +203,7 @@ type Attribute struct {
 	Sfb     *Sfb
 	Sfq     *Sfq
 	Red     *Red
+	Gred    *Gred
 	MqPrio  *MqPrio
 	Pfifo   *FifoOpt
 	Bfifo   *FifoOpt
