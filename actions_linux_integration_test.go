@@ -45,6 +45,12 @@ func TestTCActions(t *testing.T) {
 		}
 	}()
 
+	existingMirredActions, err := tcSocket.Actions().Get("mirred")
+	if err != nil {
+		t.Fatalf("failed to get singe action: %v", err)
+	}
+	t.Logf("existing mirred actions: %d", len(existingMirredActions))
+
 	mirrorIf, err := net.InterfaceByName(tcTestIface)
 	if err != nil {
 		t.Fatalf("failed t oget mirror interface: %v", err)
@@ -87,25 +93,26 @@ func TestTCActions(t *testing.T) {
 		}
 	}()
 
-	mirredActions, err := tcSocket.Actions().Get([]*Action{
-		&Action{
-			Kind: "mirred",
-		},
-	})
+	mirredActions, err := tcSocket.Actions().Get("mirred")
 	if err != nil {
 		t.Fatalf("failed to get singe action: %v", err)
 	}
 
-	if len(mirredActions) != 1 {
+	if len(mirredActions) != 1+len(existingMirredActions) {
 		t.Fatalf("expected 1 mirred action but got %d", len(mirredActions))
 	}
 
+	foundInstalledMirredAction := false
 	for _, a := range mirredActions {
 		gotMirredActionIndex := a.Mirred.Parms.Index
-		if gotMirredActionIndex != mirredActionIdx {
-			t.Fatalf("expected mirred action index of %d but got %d",
-				mirredActionIdx, gotMirredActionIndex)
+		if gotMirredActionIndex == mirredActionIdx {
+			foundInstalledMirredAction = true
 		}
+	}
+
+	if !foundInstalledMirredAction {
+		t.Fatalf("did not find installed mirred action index with index %d",
+			mirredActionIdx)
 	}
 
 	if err := tcSocket.Actions().Delete([]*Action{
@@ -117,16 +124,14 @@ func TestTCActions(t *testing.T) {
 		t.Fatalf("failed to delete mirred action: %v", err)
 	}
 
-	mirredActions, err = tcSocket.Actions().Get([]*Action{
-		&Action{
-			Kind: "mirred",
-		},
-	})
+	mirredActions, err = tcSocket.Actions().Get("mirred")
 	if err != nil {
-		t.Fatalf("failed to get singe action: %v", err)
+		t.Fatalf("failed to get mirred action: %v", err)
 	}
 
-	if len(mirredActions) != 0 {
-		t.Fatalf("expected 0 mirred action but got %d", len(mirredActions))
+	if len(mirredActions) != len(existingMirredActions) {
+		t.Fatalf("expected %d mirred action but got %d",
+			len(existingMirredActions),
+			len(mirredActions))
 	}
 }
