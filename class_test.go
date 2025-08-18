@@ -86,10 +86,12 @@ func TestClass(t *testing.T) {
 		hfsc   *Hfsc
 		htb    *Htb
 		dsmark *Dsmark
+		drr    *Drr
 	}{
 		"hfsc":    {kind: "hfsc", hfsc: &Hfsc{Rsc: &ServiceCurve{M1: 12, D: 34, M2: 56}}},
 		"htb":     {kind: "htb", htb: &Htb{DirectQlen: uint32Ptr(4455)}},
 		"dsmark":  {kind: "dsmark", dsmark: &Dsmark{DefaultIndex: uint16Ptr(42)}},
+		"drr":     {kind: "drr", drr: &Drr{}},
 		"unknown": {kind: "unknown", err: ErrNotImplemented},
 	}
 
@@ -102,6 +104,7 @@ func TestClass(t *testing.T) {
 					Hfsc:   testcase.hfsc,
 					Htb:    testcase.htb,
 					Dsmark: testcase.dsmark,
+					Drr:    testcase.drr,
 				},
 			}
 
