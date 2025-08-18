@@ -40,6 +40,7 @@ func TestQdisc(t *testing.T) {
 		cbq     *Cbq
 		cbs     *Cbs
 		codel   *Codel
+		drr     *Drr
 		hhf     *Hhf
 		pie     *Pie
 		choke   *Choke
@@ -71,6 +72,8 @@ func TestQdisc(t *testing.T) {
 			Target: uint32Ptr(1), Limit: uint32Ptr(2), Interval: uint32Ptr(3),
 			ECN: uint32Ptr(4), CEThreshold: uint32Ptr(5),
 		}},
+		"drr":      {kind: "drr", drr: &Drr{Quantum: uint32Ptr(10)}},
+		"emptyDrr": {kind: "drr", drr: &Drr{}},
 		"hhf": {kind: "hhf", hhf: &Hhf{
 			BacklogLimit: uint32Ptr(1), Quantum: uint32Ptr(2), HHFlowsLimit: uint32Ptr(3),
 			ResetTimeout: uint32Ptr(4), AdmitBytes: uint32Ptr(5), EVICTTimeout: uint32Ptr(6), NonHHWeight: uint32Ptr(7),
@@ -115,6 +118,7 @@ func TestQdisc(t *testing.T) {
 					Sfq:     testcase.sfq,
 					Cbq:     testcase.cbq,
 					Codel:   testcase.codel,
+					Drr:     testcase.drr,
 					Hhf:     testcase.hhf,
 					Pie:     testcase.pie,
 					Choke:   testcase.choke,

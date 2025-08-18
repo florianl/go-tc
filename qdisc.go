@@ -158,7 +158,10 @@ func validateQdiscObject(action int, info *Object) ([]tcOption, error) {
 		return options, err
 	}
 	if len(data) < 1 && action == unix.RTM_NEWQDISC {
-		if info.Kind != "clsact" && info.Kind != "ingress" && info.Kind != "qfq" {
+		switch info.Kind {
+		case "clsact", "drr", "ingress", "qfq":
+			// these can be parameterless
+		default:
 			return options, ErrNoArg
 		}
 	} else {
