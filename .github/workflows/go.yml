@@ -13,7 +13,7 @@ jobs:
   go-test:
     strategy:
       matrix:
-        go-version: [1.13.x, 1.22.x, 1.23.x, 1.24.x]
+        go-version: [1.13.x, 1.24.x, 1.25.x ]
         platform: [ubuntu-latest, ubuntu-24.04-arm, macos-latest, windows-latest]
         exclude:
             # There is no arm64 version of Go for darwin.
@@ -56,7 +56,7 @@ jobs:
   code-check:
     strategy:
       matrix:
-        go-version: [1.24.x]
+        go-version: [1.25.x]
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
