@@ -59,7 +59,7 @@ func main() {
 }
 ```
 
-Check out the (package documentation](https://pkg.go.dev/github.com/florianl/go-tc#pkg-examples) for more and advanced examples.
+Check out the [package documentation](https://pkg.go.dev/github.com/florianl/go-tc#pkg-examples) for more and advanced examples.
 
 ## Requirements
 
