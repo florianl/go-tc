@@ -38,7 +38,7 @@ jobs:
         # Install bluebox and generate a initramfs.cpio with the previously created statically linked
         # tests embedded.
         run: |
-          go install github.com/florianl/bluebox@latest
+          go install github.com/florianl/bluebox@v0.0.2
           bluebox  -a=${{ matrix.target_arch }} -e go-tc.test
 
       - name: upload initramfs for tests
@@ -55,16 +55,14 @@ jobs:
     strategy:
       matrix:
         target_arch: ["amd64"]
-        kernel-version: ["4.9", "4.14", "4.19", "5.4", "5.10", "5.15", "6.1", "6.6", "6.12"]
+        kernel-version: ["4.9", "4.14", "4.19", "5.4", "5.10", "5.15", "6.1", "6.6", "6.12", "6.15"]
         include:
           - target_arch: "arm64"
-            kernel-version: "6.6.41"
-          - target_arch: "arm64"
-            kernel-version: "6.7"
-          - target_arch: "arm64"
-            kernel-version: "6.9"
+            kernel-version: "6.6"
           - target_arch: "arm64"
             kernel-version: "6.12"
+          - target_arch: "arm64"
+            kernel-version: "6.15"
     steps:
       - name: add Docker repo
         run: |

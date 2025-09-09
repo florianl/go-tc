@@ -69,10 +69,6 @@ jobs:
       env:
         GOPROXY: "https://proxy.golang.org"
       run: go mod download
-    - name: golint
-      run: |
-        go install golang.org/x/lint/golint@latest
-        $(go env GOPATH)/bin/golint $(go list ./... | grep -v internal/unix)
     - name: staticcheck.io
       uses: dominikh/staticcheck-action@024238d2898c874f26d723e7d0ff4308c35589a2 # v1.4.0
       with:
