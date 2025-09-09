@@ -1,6 +1,6 @@
 module github.com/florianl/go-tc
 
-go 1.13
+go 1.15
 
 require (
 	github.com/cilium/ebpf v0.8.1

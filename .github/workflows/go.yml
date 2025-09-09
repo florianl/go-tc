@@ -13,13 +13,13 @@ jobs:
   go-test:
     strategy:
       matrix:
-        go-version: [1.13.x, 1.24.x, 1.25.x ]
+        go-version: [1.15.x, 1.24.x, 1.25.x ]
         platform: [ubuntu-latest, ubuntu-24.04-arm, macos-latest, windows-latest]
         exclude:
             # There is no arm64 version of Go for darwin.
             # This exclude can be removed if the minimal Go version
             # is > Go 1.16.
-          - go-version: "1.13.x"
+          - go-version: "1.15.x"
             platform: "macos-latest"
     runs-on: ${{ matrix.platform }}
     steps:
