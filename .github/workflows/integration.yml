@@ -38,7 +38,7 @@ jobs:
         # Install bluebox and generate a initramfs.cpio with the previously created statically linked
         # tests embedded.
         run: |
-          go install github.com/florianl/bluebox@latest
+          go install github.com/florianl/bluebox@v0.0.2
           bluebox  -a=${{ matrix.target_arch }} -e go-tc.test
 
       - name: upload initramfs for tests
@@ -55,23 +55,21 @@ jobs:
     strategy:
       matrix:
         target_arch: ["amd64"]
-        kernel-version: ["4.9", "4.14", "4.19", "5.4", "5.10", "5.15", "6.1", "6.6", "6.12"]
+        kernel-version: ["4.9", "4.14", "4.19", "5.4", "5.10", "5.15", "6.1", "6.6", "6.12", "6.15"]
         include:
           - target_arch: "arm64"
             kernel-version: "6.6.41"
           - target_arch: "arm64"
-            kernel-version: "6.7"
-          - target_arch: "arm64"
-            kernel-version: "6.9"
-          - target_arch: "arm64"
             kernel-version: "6.12"
+          - target_arch: "arm64"
+            kernel-version: "6.15"
     steps:
       - name: add Docker repo
         run: |
           # From https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository
           # Add Docker's official GPG key:
-          sudo apt-get update
-          sudo apt-get install ca-certificates curl
+          sudo apt --yes update
+          sudo apt --yes install --no-install-recommends --no-install-suggests ca-certificates curl
           sudo install -m 0755 -d /etc/apt/keyrings
           sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
           sudo chmod a+r /etc/apt/keyrings/docker.asc
@@ -81,12 +79,12 @@ jobs:
             "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
             $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
             sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-          sudo apt-get update
+          sudo apt --yes update
       - name: install dependencies
         # Make sure required software packages are available.
         run: |
           sudo apt --yes update
-          sudo apt --yes install --no-install-recommends qemu-system-aarch64 qemu-system-x86 docker-buildx-plugin
+          sudo apt --yes install --no-install-recommends --no-install-suggests qemu-system-aarch64 qemu-system-x86 docker-buildx-plugin
 
       - name: get initramfs
         # Fetch the initramfs.cpio that was created in the previous step.
