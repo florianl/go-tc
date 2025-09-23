@@ -11,7 +11,7 @@ import (
 
 func TestReadPsched(t *testing.T) {
 	t.Run("Read from system", func(t *testing.T) {
-		if _, _, err := readPsched(); err != nil {
+		if _, _, err := readSystemClock(); err != nil {
 			t.Fatal(err)
 		}
 	})
@@ -34,7 +34,7 @@ func TestReadPsched(t *testing.T) {
 
 		t.Setenv("PROC_ROOT", tmpDir)
 
-		if _, _, err := readPsched(); err == nil {
+		if _, _, err := readSystemClock(); err == nil {
 			t.Fatal("expected error but got nil")
 		}
 	})
@@ -44,7 +44,7 @@ func TestReadPsched(t *testing.T) {
 		defer os.RemoveAll(tmpDir)
 		t.Setenv("PROC_ROOT", tmpDir)
 
-		if _, _, err := readPsched(); err == nil {
+		if _, _, err := readSystemClock(); err == nil {
 			t.Fatal("expected error but got nil")
 		}
 	})

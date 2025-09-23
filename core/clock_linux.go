@@ -8,15 +8,8 @@ import (
 	"os"
 )
 
-func init() {
-	var err error
-	clockFactor, tickInUSec, err = readPsched()
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "%s", err)
-	}
-}
-
-func readPsched() (float64, float64, error) {
+// readSystemClock reads the system-specific clock values from /proc/net/psched.
+func readSystemClock() (float64, float64, error) {
 	var pschedFile string
 
 	if procRoot := os.Getenv("PROC_ROOT"); procRoot != "" {

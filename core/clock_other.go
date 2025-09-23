@@ -3,7 +3,7 @@
 
 package core
 
-func init() {
-	clockFactor = 1.0
-	tickInUSec = 1.0
+// readSystemClock returns default clock values for non-Linux platforms
+func readSystemClock() (float64, float64, error) {
+	return 1.0, 1.0, nil
 }

@@ -126,12 +126,18 @@ func ExampleNetem_with_delay() {
 		}
 	}()
 
-	tcTime, err := core.Duration2TcTime(100 * time.Millisecond)
+	clock, err := core.NewSystemClock()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "could not get system clock: %v\n", err)
+		return
+	}
+
+	tcTime, err := clock.Duration2TcTime(100 * time.Millisecond)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "could not convert duration to TC time: %v\n", err)
 		return
 	}
-	ticks := core.Time2Tick(tcTime)
+	ticks := clock.Time2Tick(tcTime)
 
 	qdisc := tc.Object{
 		tc.Msg{

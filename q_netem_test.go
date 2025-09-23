@@ -10,6 +10,11 @@ import (
 )
 
 func TestNetem(t *testing.T) {
+	clock, err := core.NewSystemClock()
+	if err != nil {
+		t.Logf("could not get system clock: %v, using defaults", err)
+		clock = core.NewSystemClockWithDefaults()
+	}
 	delayDist := []int16{9, 7, 5, 3, 1}
 	tests := map[string]struct {
 		val  Netem
@@ -18,8 +23,8 @@ func TestNetem(t *testing.T) {
 	}{
 		"delayDist": {val: Netem{
 			Qopt: NetemQopt{
-				Latency: core.Time2Tick(2),
-				Jitter:  core.Time2Tick(3),
+				Latency: clock.Time2Tick(2),
+				Jitter:  clock.Time2Tick(3),
 			},
 			DelayDist: &delayDist}},
 		"simple":   {val: Netem{Ecn: uint32Ptr(123), Latency64: int64Ptr(-4242), Jitter64: int64Ptr(-1337)}},
