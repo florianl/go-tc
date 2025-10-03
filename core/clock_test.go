@@ -2,12 +2,20 @@ package core
 
 import (
 	"errors"
+	"fmt"
 	"syscall"
 	"testing"
 	"time"
 )
 
 func TestClock(t *testing.T) {
+	// Initialize clock for testing
+	if err := InitializeClock(); err != nil {
+		t.Logf("Warning: failed to initialize clock: %v", err)
+		// Set fallback values for testing
+		SetClockParameters(1.0, 1.0)
+	}
+
 	t.Run("Tick", func(t *testing.T) {
 		tick := Time2Tick(0xC0FFEE)
 		time := Tick2Time(tick)
@@ -69,4 +77,30 @@ func TestDuration2TcTime(t *testing.T) {
 			}
 		})
 	}
+}
+
+// ExampleInitializeClock demonstrates the clock initialization API
+func ExampleInitializeClock() {
+	// Initialize clock parameters
+	if err := InitializeClock(); err != nil {
+		fmt.Printf("Warning: failed to initialize clock: %v\n", err)
+		// You can optionally set fallback values if initialization fails
+		SetClockParameters(1.0, 1.0)
+	}
+
+	// Set known values for predictable output
+	SetClockParameters(1.0, 1.0)
+
+	// Now you can use timing functions
+	ticks := Time2Tick(1000)
+	fmt.Printf("Time2Tick(1000) = %d\n", ticks)
+
+	// You can also get the current clock parameters
+	clockFactor := GetClockFactor()
+	tickInUSec := GetTickInUSec()
+	fmt.Printf("Clock Factor: %.1f, Tick in µs: %.1f\n", clockFactor, tickInUSec)
+
+	// Output:
+	// Time2Tick(1000) = 1000
+	// Clock Factor: 1.0, Tick in µs: 1.0
 }
