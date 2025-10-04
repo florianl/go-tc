@@ -10,6 +10,13 @@ import (
 )
 
 func TestNetem(t *testing.T) {
+	// Initialize clock parameters for timing functions
+	if err := core.InitializeClock(); err != nil {
+		t.Logf("Warning: failed to initialize clock: %v", err)
+		// Set fallback values for testing
+		core.SetClockParameters(1.0, 1.0)
+	}
+
 	delayDist := []int16{9, 7, 5, 3, 1}
 	tests := map[string]struct {
 		val  Netem

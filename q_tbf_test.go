@@ -4,6 +4,7 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/florianl/go-tc/core"
 	"github.com/google/go-cmp/cmp"
 )
 
@@ -28,6 +29,13 @@ func TestTbf(t *testing.T) {
 				Linklayer: 1,
 			},
 		}}},
+	}
+
+	// Initialize clock parameters for timing functions
+	if err := core.InitializeClock(); err != nil {
+		t.Logf("Warning: failed to initialize clock: %v", err)
+		// Set fallback values for testing
+		core.SetClockParameters(1.0, 1.0)
 	}
 
 	for name, testcase := range tests {

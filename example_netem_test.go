@@ -95,6 +95,12 @@ func ExampleNetem() {
 }
 
 func ExampleNetem_with_delay() {
+	// Initialize clock parameters
+	if err := core.InitializeClock(); err != nil {
+		fmt.Fprintf(os.Stderr, "could not initialize clock: %v\n", err)
+		return
+	}
+
 	tcIface := "ExampleNetemDelay"
 
 	rtnl, err := setupDummyInterface(tcIface)
