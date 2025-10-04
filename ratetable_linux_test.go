@@ -7,6 +7,7 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/florianl/go-tc/core"
 	"github.com/florianl/go-tc/internal/unix"
 )
 
@@ -183,6 +184,12 @@ func TestGenerateRateTable(t *testing.T) {
 			},
 			expect: rate8kbitBurst5kbPeakrate12kbitMpu64Mtu1464Drop,
 		},
+	}
+	// Initialize clock parameters for timing functions
+	if err := core.InitializeClock(); err != nil {
+		t.Logf("Warning: failed to initialize clock: %v", err)
+		// Set fallback values for testing
+		core.SetClockParameters(1.0, 1.0)
 	}
 
 	for name, testcase := range tests {
