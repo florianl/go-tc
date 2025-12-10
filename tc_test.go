@@ -225,6 +225,8 @@ func alterResponses(t *testing.T, cache *[]netlink.Message) []byte {
 		switch obj.Kind {
 		case "fq_codel":
 			data, err = marshalXStats(XStats{FqCodel: &FqCodelXStats{Type: 0, Qd: &FqCodelQdStats{}}})
+		case "fq_pie":
+			data, err = marshalXStats(XStats{FqPie: &FqPieXStats{PacketsIn: 0, Dropped: 1, OverLimit: 2, OverMemory: 3, EcnMark: 4, NewFlowsCount: 5, OldFlowsCount: 6, MemoryUsage: 7}})
 		case "sfb":
 			data, err = marshalXStats(XStats{Sfb: &SfbXStats{EarlyDrop: 1, PenaltyDrop: 2, AvgProb: 42}})
 		case "sfq":
