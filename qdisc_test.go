@@ -34,6 +34,7 @@ func TestQdisc(t *testing.T) {
 		kind    string
 		err     error
 		fqCodel *FqCodel
+		fqPie   *FqPie
 		red     *Red
 		sfb     *Sfb
 		sfq     *Sfq
@@ -57,8 +58,9 @@ func TestQdisc(t *testing.T) {
 			kind:    "fq_codel",
 			fqCodel: &FqCodel{Target: uint32Ptr(42), Limit: uint32Ptr(0xCAFE)},
 		},
-		"red": {kind: "red", red: &Red{MaxP: uint32Ptr(42)}},
-		"sfb": {kind: "sfb", sfb: &Sfb{Parms: &SfbQopt{Max: 0xFF}}},
+		"fq_pie": {kind: "fq_pie", fqPie: &FqPie{Target: uint32Ptr(15)}},
+		"red":    {kind: "red", red: &Red{MaxP: uint32Ptr(42)}},
+		"sfb":    {kind: "sfb", sfb: &Sfb{Parms: &SfbQopt{Max: 0xFF}}},
 		"sfq": {kind: "sfq", sfq: &Sfq{V0: SfqQopt{
 			PerturbPeriod: 64,
 			Limit:         3000,
@@ -113,6 +115,7 @@ func TestQdisc(t *testing.T) {
 					Kind:    testcase.kind,
 					Cbs:     testcase.cbs,
 					FqCodel: testcase.fqCodel,
+					FqPie:   testcase.fqPie,
 					Red:     testcase.red,
 					Sfb:     testcase.sfb,
 					Sfq:     testcase.sfq,
