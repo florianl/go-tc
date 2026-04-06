@@ -1,6 +1,3 @@
-//go:build linux && amd64 && go1.17
-// +build linux,amd64,go1.17
-
 package core
 
 import (
@@ -20,7 +17,7 @@ func TestReadPsched(t *testing.T) {
 		tmpDir := t.TempDir()
 		defer os.RemoveAll(tmpDir)
 
-		if err := os.MkdirAll(fmt.Sprintf("%s/net", tmpDir), 0750); err != nil {
+		if err := os.MkdirAll(fmt.Sprintf("%s/net", tmpDir), 0o750); err != nil {
 			t.Fatal(err)
 		}
 		fakePsched, err := os.Create(fmt.Sprintf("%s/net/psched", tmpDir))
