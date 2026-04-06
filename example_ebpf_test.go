@@ -1,5 +1,5 @@
-//go:build go1.16 && linux
-// +build go1.16,linux
+//go:build linux
+// +build linux
 
 package tc_test
 
