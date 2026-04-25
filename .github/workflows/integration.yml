@@ -55,14 +55,14 @@ jobs:
     strategy:
       matrix:
         target_arch: ["amd64"]
-        kernel-version: ["4.9", "4.14", "4.19", "5.4", "5.10", "5.15", "6.1", "6.6", "6.12", "6.15"]
+        kernel-version: ["4.9", "4.14", "4.19", "5.4", "5.10", "5.15", "6.1", "6.6", "6.12", "6.18", "6.19", "7.0"]
         include:
           - target_arch: "arm64"
-            kernel-version: "6.6.41"
+            kernel-version: "6.18"
           - target_arch: "arm64"
-            kernel-version: "6.12"
+            kernel-version: "6.19"
           - target_arch: "arm64"
-            kernel-version: "6.15"
+            kernel-version: "7.0"
     steps:
       - name: add Docker repo
         run: |
