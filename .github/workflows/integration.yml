@@ -1,4 +1,4 @@
-name: 'per x86_64 kernel integration test'
+name: 'per kernel integration test'
 
 on:
   workflow_dispatch:
@@ -56,14 +56,14 @@ jobs:
     strategy:
       matrix:
         target_arch: ["amd64"]
-        kernel-version: ["4.9", "4.14", "4.19", "5.4", "5.10", "5.15", "6.1", "6.6", "6.12", "6.18", "6.19", "7.0"]
+        kernel-version: ["4.9", "4.14", "4.19", "5.4", "5.10", "5.15", "6.1", "6.6", "6.12", "6.18", "6.19", "7.1"]
         include:
           - target_arch: "arm64"
             kernel-version: "6.18"
           - target_arch: "arm64"
             kernel-version: "6.19"
           - target_arch: "arm64"
-            kernel-version: "7.0"
+            kernel-version: "7.1"
     steps:
       - name: add Docker repo
         run: |
@@ -101,7 +101,7 @@ jobs:
           echo "FROM ghcr.io/cilium/ci-kernels:${{ matrix.kernel-version }}" | docker buildx build --platform linux/${{ matrix.target_arch }} --quiet --pull --output="/tmp/ci-kernel/${{ matrix.target_arch }}/${{ matrix.kernel-version }}/" -     
 
       - name: run tests on kernel x86
-        timeout-minutes: 30
+        timeout-minutes: 10
         if: matrix.target_arch == 'amd64'
         # Run the tests.
         run: |
@@ -109,7 +109,7 @@ jobs:
           grep PASS log.txt
 
       - name: run tests on kernel arm64
-        timeout-minutes: 30
+        timeout-minutes: 10
         if: matrix.target_arch == 'arm64'
         # Run the tests.
         run: |
