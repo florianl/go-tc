@@ -1,6 +1,7 @@
 name: 'per x86_64 kernel integration test'
 
 on:
+  workflow_dispatch:
   schedule:
     # Run job once a week on saturday at 8:15 AM.
     - cron: '15 8 * * 6'
