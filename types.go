@@ -20,6 +20,9 @@ var (
 
 	// ErrUnknownKind is returned for unknown qdisc, filter or class types.
 	ErrUnknownKind = errors.New("unknown kind")
+
+	// ErrShortMsg is returned when a received netlink message is shorter than expected.
+	ErrShortMsg = errors.New("received netlink message is too short")
 )
 
 // Config contains options for RTNETLINK
