@@ -23,6 +23,13 @@ var (
 
 	// ErrShortMsg is returned when a received netlink message is shorter than expected.
 	ErrShortMsg = errors.New("received netlink message is too short")
+
+	// ErrMonitorActive is returned when a synchronous call (Get/Add/Replace/Delete) is made
+	// on a Tc while a Monitor or MonitorWithErrorFunc loop is receiving on the same
+	// connection, or when Monitor/MonitorWithErrorFunc is called a second time on it. A
+	// single netlink connection cannot multiplex synchronous request/reply calls with a
+	// background Monitor loop. Open a dedicated Tc for Monitor/MonitorWithErrorFunc.
+	ErrMonitorActive = errors.New("a Monitor is already active on this connection")
 )
 
 // Config contains options for RTNETLINK
