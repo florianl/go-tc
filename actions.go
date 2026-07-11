@@ -131,6 +131,9 @@ func (a *Actions) Get(kind string) ([]*Action, error) {
 	}
 
 	for _, msg := range msgs {
+		if len(msg.Data) < 4 {
+			return results, fmt.Errorf("received message from netlink: %w", ErrShortMsg)
+		}
 		// The first 4 bytes contain tcaMsg - which is skipped here.
 		if err := unmarshalRoot(msg.Data[4:], &results); err != nil {
 			return results, err

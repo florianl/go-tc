@@ -10,6 +10,10 @@ import (
 	"github.com/mdlayher/netlink"
 )
 
+// tcMsgHdrLen is the length in bytes of the Msg header that precedes the
+// attributes in every qdisc/class/filter netlink message.
+const tcMsgHdrLen = 20
+
 // tcConn defines a subset of netlink.Conn.
 type tcConn interface {
 	Close() error
@@ -100,6 +104,9 @@ func (tc *Tc) action(action int, flags netlink.HeaderFlags, msg interface{}, opt
 	for _, msg := range msgs {
 		switch msg.Header.Type {
 		case netlink.Error:
+			if len(msg.Data) < 4 {
+				return fmt.Errorf("received error message from netlink: %w", ErrShortMsg)
+			}
 			errCode := bytesToInt32(msg.Data[:4])
 			// Check if the success message is embedded encoded as error code 0:
 			if errCode != 0 {
@@ -138,11 +145,14 @@ func (tc *Tc) get(action int, i *Msg) ([]Object, error) {
 	}
 
 	for _, msg := range msgs {
+		if len(msg.Data) < tcMsgHdrLen {
+			return results, fmt.Errorf("received message from netlink: %w", ErrShortMsg)
+		}
 		var result Object
-		if err := unmarshalStruct(msg.Data[:20], &result.Msg); err != nil {
+		if err := unmarshalStruct(msg.Data[:tcMsgHdrLen], &result.Msg); err != nil {
 			return results, err
 		}
-		if err := extractTcmsgAttributes(action, msg.Data[20:], &result.Attribute); err != nil {
+		if err := extractTcmsgAttributes(action, msg.Data[tcMsgHdrLen:], &result.Attribute); err != nil {
 			return results, err
 		}
 		results = append(results, result)
@@ -361,11 +371,14 @@ func (tc *Tc) monitor(ctx context.Context, deadline time.Duration,
 				continue
 			}
 			for _, msg := range msgs {
-				var monitored Object
-				if err := unmarshalStruct(msg.Data[:20], &monitored.Msg); err != nil {
+				if len(msg.Data) < tcMsgHdrLen {
 					continue
 				}
-				if err := extractTcmsgAttributes(int(msg.Header.Type), msg.Data[20:],
+				var monitored Object
+				if err := unmarshalStruct(msg.Data[:tcMsgHdrLen], &monitored.Msg); err != nil {
+					continue
+				}
+				if err := extractTcmsgAttributes(int(msg.Header.Type), msg.Data[tcMsgHdrLen:],
 					&monitored.Attribute); err != nil {
 					continue
 				}
