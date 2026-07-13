@@ -19,8 +19,8 @@ func TestPedit(t *testing.T) {
 			Keys:   []PeditKey{{Val: 0xc0a80101, Off: 12}},
 			KeysEx: []PeditKeyEx{{HeaderType: PeditHeaderTypeIP4, Cmd: PeditCmdSet}},
 		}},
-		"invalidArgument":    {val: Pedit{Tm: &Tcft{Install: 1}}, err1: ErrNoArgAlter},
-		"keyLengthMismatch":  {val: Pedit{Keys: []PeditKey{{Val: 1}}, KeysEx: []PeditKeyEx{}}, err1: errors.New("pedit keys and extended keys length mismatch")},
+		"invalidArgument":   {val: Pedit{Tm: &Tcft{Install: 1}}, err1: ErrNoArgAlter},
+		"keyLengthMismatch": {val: Pedit{Keys: []PeditKey{{Val: 1}}, KeysEx: []PeditKeyEx{}}, err1: errors.New("pedit keys and extended keys length mismatch")},
 	}
 
 	for name, testcase := range tests {
