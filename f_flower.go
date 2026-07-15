@@ -137,6 +137,10 @@ type Flower struct {
 	KeyIPv4SrcMask       *net.IP
 	KeyIPv4Dst           *net.IP
 	KeyIPv4DstMask       *net.IP
+	KeyIPv6Src           *net.IP
+	KeyIPv6SrcMask       *net.IP
+	KeyIPv6Dst           *net.IP
+	KeyIPv6DstMask       *net.IP
 	KeyTCPSrc            *uint16 /* be16 */
 	KeyTCPDst            *uint16 /* be16 */
 	KeyUDPSrc            *uint16 /* be16 */
@@ -278,6 +282,18 @@ func unmarshalFlower(data []byte, info *Flower) error {
 		case tcaFlowerKeyIPv4DstMask:
 			tmp := uint32ToIP(ad.Uint32())
 			info.KeyIPv4DstMask = &tmp
+		case tcaFlowerKeyIPv6Src:
+			tmp := bytesToIPv6(ad.Bytes())
+			info.KeyIPv6Src = &tmp
+		case tcaFlowerKeyIPv6SrcMask:
+			tmp := bytesToIPv6(ad.Bytes())
+			info.KeyIPv6SrcMask = &tmp
+		case tcaFlowerKeyIPv6Dst:
+			tmp := bytesToIPv6(ad.Bytes())
+			info.KeyIPv6Dst = &tmp
+		case tcaFlowerKeyIPV6DstMask:
+			tmp := bytesToIPv6(ad.Bytes())
+			info.KeyIPv6DstMask = &tmp
 		case tcaFlowerKeyTCPSrc:
 			tmp := endianSwapUint16(ad.Uint16())
 			info.KeyTCPSrc = &tmp
@@ -574,6 +590,26 @@ func marshalFlower(info *Flower) ([]byte, error) {
 		tmp, err := ipToUint32(*info.KeyIPv4DstMask)
 		multiError = concatError(multiError, err)
 		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaFlowerKeyIPv4DstMask, Data: tmp})
+	}
+	if info.KeyIPv6Src != nil {
+		tmp, err := ipv6ToBytes(*info.KeyIPv6Src)
+		multiError = concatError(multiError, err)
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaFlowerKeyIPv6Src, Data: tmp})
+	}
+	if info.KeyIPv6SrcMask != nil {
+		tmp, err := ipv6ToBytes(*info.KeyIPv6SrcMask)
+		multiError = concatError(multiError, err)
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaFlowerKeyIPv6SrcMask, Data: tmp})
+	}
+	if info.KeyIPv6Dst != nil {
+		tmp, err := ipv6ToBytes(*info.KeyIPv6Dst)
+		multiError = concatError(multiError, err)
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaFlowerKeyIPv6Dst, Data: tmp})
+	}
+	if info.KeyIPv6DstMask != nil {
+		tmp, err := ipv6ToBytes(*info.KeyIPv6DstMask)
+		multiError = concatError(multiError, err)
+		options = append(options, tcOption{Interpretation: vtBytes, Type: tcaFlowerKeyIPV6DstMask, Data: tmp})
 	}
 	if info.KeyTCPSrc != nil {
 		options = append(options, tcOption{Interpretation: vtUint16Be, Type: tcaFlowerKeyTCPSrc, Data: *info.KeyTCPSrc})

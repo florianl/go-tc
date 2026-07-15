@@ -34,6 +34,23 @@ func ipToBytes(ip net.IP) []byte {
 	return []byte(ip)
 }
 
+// ipv6ToBytes casts an IPv6 net.IP into its 16-byte representation. It returns
+// ErrInvalidArg for addresses that cannot be represented as IPv6.
+func ipv6ToBytes(ip net.IP) ([]byte, error) {
+	tmp := ip.To16()
+	if tmp == nil {
+		return nil, ErrInvalidArg
+	}
+	return []byte(tmp), nil
+}
+
+// bytesToIPv6 converts a 16-byte slice into a net.IP object.
+func bytesToIPv6(ip []byte) net.IP {
+	netIP := make(net.IP, net.IPv6len)
+	copy(netIP, ip)
+	return netIP
+}
+
 // bytesToHardwareAddr converts a slice of bytes into a net.HardwareAddr object.
 func bytesToHardwareAddr(mac []byte) net.HardwareAddr {
 	return net.HardwareAddr(mac[:])
