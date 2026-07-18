@@ -88,7 +88,6 @@ func marshalFqCodel(info *FqCodel) ([]byte, error) {
 
 	if info.CeThresholdSelector != nil {
 		options = append(options, tcOption{Interpretation: vtUint8, Type: tcaFqCodelCeThresholdSelector, Data: uint8Value(info.CeThresholdSelector)})
-
 	}
 
 	if info.CeThresholdMask != nil {

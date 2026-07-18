@@ -18,7 +18,8 @@ func TestRed(t *testing.T) {
 			Parms:          &RedQOpt{QthMin: 2, QthMax: 4},
 			Flags:          uint64Ptr(42),
 			EarlyDropBlock: uint32Ptr(43),
-			MarkBlock:      uint32Ptr(44)}},
+			MarkBlock:      uint32Ptr(44),
+		}},
 	}
 
 	for name, testcase := range tests {

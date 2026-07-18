@@ -21,7 +21,8 @@ func TestPie(t *testing.T) {
 			Beta:            uint32Ptr(5),
 			ECN:             uint32Ptr(6),
 			Bytemode:        uint32Ptr(7),
-			DqRateEstimator: uint32Ptr(8)}},
+			DqRateEstimator: uint32Ptr(8),
+		}},
 	}
 
 	for name, testcase := range tests {

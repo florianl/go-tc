@@ -207,9 +207,9 @@ type Flower struct {
 	KeyCtZoneMask  *uint16 /* u16 */
 	KeyCtMark      *uint32 /* u32 */
 	KeyCtMarkMask  *uint32 /* u32 */
-	//KeyCtLabels,	/* u128 */
-	//KeyCtLabelsMask,	/* u128 */
-	//KeyMplsOpts,
+	// KeyCtLabels,	/* u128 */
+	// KeyCtLabelsMask,	/* u128 */
+	// KeyMplsOpts,
 
 	KeyHash     *uint32 /* u32 */
 	KeyHashMask *uint32 /* u32 */
@@ -223,7 +223,7 @@ type Flower struct {
 
 	L2Miss *uint8 /* u8 */
 
-	//KeyCfm,		/* nested */
+	// KeyCfm,		/* nested */
 
 	KeySpi     *uint32 /* be32 */
 	KeySpiMask *uint32 /* be32 */

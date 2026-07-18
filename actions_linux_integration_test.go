@@ -1,5 +1,4 @@
 //go:build integration && linux
-// +build integration,linux
 
 package tc
 
@@ -59,7 +58,7 @@ func TestTCActions(t *testing.T) {
 	gactActionIdx := uint32(1337)
 
 	if err := tcSocket.Actions().Add([]*Action{
-		&Action{
+		{
 			Kind: "mirred",
 			Mirred: &Mirred{
 				Parms: &MirredParam{
@@ -69,7 +68,7 @@ func TestTCActions(t *testing.T) {
 				},
 			},
 		},
-		&Action{
+		{
 			Kind: "gact",
 			Gact: &Gact{
 				Parms: &GactParms{
@@ -84,7 +83,7 @@ func TestTCActions(t *testing.T) {
 
 	defer func() {
 		if err := tcSocket.Actions().Delete([]*Action{
-			&Action{
+			{
 				Kind:  "gact",
 				Index: gactActionIdx,
 			},
@@ -116,7 +115,7 @@ func TestTCActions(t *testing.T) {
 	}
 
 	if err := tcSocket.Actions().Delete([]*Action{
-		&Action{
+		{
 			Kind:  "mirred",
 			Index: mirredActionIdx,
 		},

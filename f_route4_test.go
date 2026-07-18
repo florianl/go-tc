@@ -9,8 +9,10 @@ import (
 
 func TestRoute4(t *testing.T) {
 	actions := []*Action{
-		{Kind: "mirred", Mirred: &Mirred{Parms: &MirredParam{Index: 0x1, Capab: 0x0, Action: 0x4,
-			RefCnt: 0x1, BindCnt: 0x1, Eaction: 0x1, IfIndex: 0x2}}},
+		{Kind: "mirred", Mirred: &Mirred{Parms: &MirredParam{
+			Index: 0x1, Capab: 0x0, Action: 0x4,
+			RefCnt: 0x1, BindCnt: 0x1, Eaction: 0x1, IfIndex: 0x2,
+		}}},
 	}
 	tests := map[string]struct {
 		val  Route4

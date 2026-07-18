@@ -24,7 +24,8 @@ func TestFqCodel(t *testing.T) {
 			DropBatchSize:       uint32Ptr(8),
 			MemoryLimit:         uint32Ptr(9),
 			CeThresholdSelector: uint8Ptr(10),
-			CeThresholdMask:     uint8Ptr(11)}},
+			CeThresholdMask:     uint8Ptr(11),
+		}},
 	}
 
 	for name, testcase := range tests {

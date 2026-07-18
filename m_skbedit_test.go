@@ -14,9 +14,11 @@ func TestSkbEdit(t *testing.T) {
 		err2 error
 	}{
 		"simple": {val: SkbEdit{Parms: &SkbEditParms{BindCnt: 111}}},
-		"all arguments": {val: SkbEdit{Parms: &SkbEditParms{Index: 222},
+		"all arguments": {val: SkbEdit{
+			Parms:    &SkbEditParms{Index: 222},
 			Priority: uint32Ptr(11), QueueMapping: uint16Ptr(12), Mark: uint32Ptr(13), Ptype: uint16Ptr(14),
-			Mask: uint32Ptr(15), Flags: uint64Ptr(16), QueueMappingMax: uint16Ptr(17)}},
+			Mask: uint32Ptr(15), Flags: uint64Ptr(16), QueueMappingMax: uint16Ptr(17),
+		}},
 	}
 
 	for name, testcase := range tests {

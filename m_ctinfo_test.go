@@ -14,10 +14,12 @@ func TestCtInfo(t *testing.T) {
 		err2 error
 	}{
 		"simple": {val: CtInfo{Act: &CtInfoAct{Action: 13}}},
-		"all arguments": {val: CtInfo{Act: &CtInfoAct{RefCnt: 14},
+		"all arguments": {val: CtInfo{
+			Act:  &CtInfoAct{RefCnt: 14},
 			Zone: uint16Ptr(15), ParmsDscpMask: uint32Ptr(16), ParmsDscpStateMask: uint32Ptr(17),
 			ParmsCpMarkMask: uint32Ptr(18), StatsDscpSet: uint64Ptr(19), StatsDscpError: uint64Ptr(20),
-			StatsCpMarkSet: uint64Ptr(21)}},
+			StatsCpMarkSet: uint64Ptr(21),
+		}},
 	}
 
 	for name, testcase := range tests {

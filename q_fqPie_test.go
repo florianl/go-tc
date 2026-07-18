@@ -25,7 +25,8 @@ func TestFqPie(t *testing.T) {
 			EcnProb:         uint32Ptr(10),
 			Ecn:             uint32Ptr(0),
 			Bytemode:        uint32Ptr(0),
-			DqRateEstimator: uint32Ptr(0)}},
+			DqRateEstimator: uint32Ptr(0),
+		}},
 	}
 
 	for name, testcase := range tests {

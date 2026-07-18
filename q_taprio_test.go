@@ -15,7 +15,8 @@ func TestTaPrio(t *testing.T) {
 	}{
 		"simple": {val: TaPrio{
 			PrioMap: &MqPrioQopt{
-				NumTc: 3},
+				NumTc: 3,
+			},
 			SchedBaseTime:           int64Ptr(5),
 			SchedClockID:            int32Ptr(7),
 			SchedCycleTime:          int64Ptr(11),
