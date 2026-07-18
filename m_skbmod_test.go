@@ -20,7 +20,8 @@ func TestSkbMod(t *testing.T) {
 			Parms: &SkbModParms{Index: 42},
 			SMac:  &srcMac,
 			DMac:  &dstMac,
-			EType: uint16Ptr(13)}},
+			EType: uint16Ptr(13),
+		}},
 	}
 
 	for name, testcase := range tests {

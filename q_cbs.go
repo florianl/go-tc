@@ -63,5 +63,4 @@ func marshalCbs(info *Cbs) ([]byte, error) {
 	options = append(options, tcOption{Interpretation: vtBytes, Type: tcaCbsParms, Data: data})
 
 	return marshalAttributes(options)
-
 }

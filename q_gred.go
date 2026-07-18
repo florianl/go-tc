@@ -111,5 +111,4 @@ func marshalGred(info *Gred) ([]byte, error) {
 		return []byte{}, multiError
 	}
 	return marshalAttributes(options)
-
 }

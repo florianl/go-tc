@@ -14,9 +14,11 @@ func TestNByteMatch(t *testing.T) {
 		err2 error
 	}{
 		"simple": {
-			val: NByteMatch{Needle: []byte("helloWorld"),
+			val: NByteMatch{
+				Needle: []byte("helloWorld"),
 				Offset: 42,
-				Layer:  7},
+				Layer:  7,
+			},
 		},
 	}
 
@@ -55,11 +57,13 @@ func TestUnmarshalNByteMatch(t *testing.T) {
 			err:  ErrInvalidArg,
 		},
 		"invalid needle": {
-			data: []byte{0x00, 0x00,
+			data: []byte{
+				0x00, 0x00,
 				0xaa, 0xaa,
 				0x01,
 				0x00, 0x00, 0x00,
-				0x0a, 0x0b, 0x0c},
+				0x0a, 0x0b, 0x0c,
+			},
 			err: ErrInvalidArg,
 		},
 	}

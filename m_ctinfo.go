@@ -104,7 +104,6 @@ func marshalCtInfo(info *CtInfo) ([]byte, error) {
 	}
 	if info.Zone != nil {
 		options = append(options, tcOption{Interpretation: vtUint16, Type: tcaCtInfoZone, Data: uint16Value(info.Zone)})
-
 	}
 	if info.ParmsDscpMask != nil {
 		options = append(options, tcOption{Interpretation: vtUint32, Type: tcaCtInfoParmsDscpMask, Data: uint32Value(info.ParmsDscpMask)})
