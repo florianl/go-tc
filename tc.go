@@ -233,7 +233,7 @@ type Attribute struct {
 	Chain        *uint32
 	Stats        *Stats
 	XStats       *XStats
-	Stats2       *Stats2
+	Stats2       *GenStats
 	Stab         *Stab
 	ExtWarnMsg   string
 

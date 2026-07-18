@@ -184,17 +184,22 @@ func alterResponses(t *testing.T, cache *[]netlink.Message) []byte {
 		tmp = append(tmp, result)
 	}
 
-	var stats2 bytes.Buffer
-	if err := binary.Write(&stats2, nativeEndian, &Stats2{
-		Bytes:      42,
-		Packets:    1,
-		Qlen:       1,
-		Backlog:    0,
-		Drops:      0,
-		Requeues:   0,
-		Overlimits: 42,
-	}); err != nil {
-		t.Fatalf("could not encode stats2: %v", err)
+	genStats := &GenStats{
+		Basic: &GenBasic{
+			Bytes:   42,
+			Packets: 1,
+		},
+		Queue: &GenQueue{
+			QueueLen:   1,
+			Backlog:    0,
+			Drops:      0,
+			Requeues:   0,
+			Overlimits: 42,
+		},
+	}
+	stats2Data, err := marshalGenStats(genStats)
+	if err != nil {
+		t.Fatalf("could not marshal genStats: %v", err)
 	}
 
 	var stats bytes.Buffer
@@ -217,7 +222,7 @@ func alterResponses(t *testing.T, cache *[]netlink.Message) []byte {
 		var err error
 		var attrs []tcOption
 		attrs = append(attrs, tcOption{Interpretation: vtString, Type: tcaKind, Data: obj.Kind})
-		attrs = append(attrs, tcOption{Interpretation: vtBytes, Type: tcaStats2, Data: stats2.Bytes()})
+		attrs = append(attrs, tcOption{Interpretation: vtBytes, Type: tcaStats2, Data: stats2Data})
 		attrs = append(attrs, tcOption{Interpretation: vtBytes, Type: tcaStats, Data: stats.Bytes()})
 		attrs = append(attrs, tcOption{Interpretation: vtUint8, Type: tcaHwOffload, Data: uint8(0)})
 

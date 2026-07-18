@@ -50,19 +50,6 @@ type Stats struct {
 	Backlog uint32
 }
 
-// Stats2 from include/uapi/linux/pkt_sched.h
-type Stats2 struct {
-	// gnet_stats_basic
-	Bytes   uint64
-	Packets uint32
-	// gnet_stats_queue
-	Qlen       uint32
-	Backlog    uint32
-	Drops      uint32
-	Requeues   uint32
-	Overlimits uint32
-}
-
 // Tcft from include/uapi/linux/pkt_sched.h
 type Tcft struct {
 	Install  uint64
