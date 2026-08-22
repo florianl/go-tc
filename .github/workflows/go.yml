@@ -14,7 +14,7 @@ jobs:
   go-test:
     strategy:
       matrix:
-        go-version: [1.18.x, 1.25.x, 1.26.x ]
+        go-version: ['1.18.x', 'oldstable', 'stable']
         platform: [ubuntu-latest, ubuntu-24.04-arm, macos-latest, windows-latest]
     runs-on: ${{ matrix.platform }}
     steps:
@@ -35,14 +35,14 @@ jobs:
       if: matrix.platform == 'ubuntu-latest'
       run: go test -race -count=3 ./...
     - name: Test with -shuffle=on
-      if: matrix.platform == 'ubuntu-latest' && startsWith(matrix.go-version, '1.2')
+      if: matrix.platform == 'ubuntu-latest' && startsWith(matrix.go-version, 'stable')
       run: go test -shuffle=on -count=3 ./...
     - name: Integrationtest for linux
       if: matrix.platform == 'ubuntu-latest'
       run: |
         go test -race -v -exec=sudo -tags integration -covermode=atomic -coverprofile=profile.cov ./...
     - name: coveralls.io
-      if: matrix.platform == 'ubuntu-latest' && startsWith(matrix.go-version, '1.26')
+      if: matrix.platform == 'ubuntu-latest' && startsWith(matrix.go-version, 'stable')
       env:
         COVERALLS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
@@ -51,7 +51,7 @@ jobs:
   code-check:
     strategy:
       matrix:
-        go-version: [1.26.x]
+        go-version: ['stable']
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
@@ -67,6 +67,6 @@ jobs:
     - name: staticcheck.io
       uses: dominikh/staticcheck-action@9716614d4101e79b4340dd97b10e54d68234e431 # v1.4.1
       with:
-        version: "2026.1"
+        version: "2026.2.1"
         install-go: false
         cache-key: ${{ matrix.go }}
