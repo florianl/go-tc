@@ -373,6 +373,7 @@ func TestQdiscAttribute(t *testing.T) {
 		"<unknown>":    {val: &Attribute{Kind: "<unknown>"}, err1: ErrNotImplemented},
 		"clsact+stats": {val: &Attribute{Kind: "clsact", Stats: &Stats{Drops: 42}}, err1: ErrNotImplemented},
 		"clsact+stab":  {val: &Attribute{Kind: "clsact", Stab: &Stab{Base: &SizeSpec{MTU: 9200}}}},
+		"gred":         {val: &Attribute{Kind: "gred", Gred: &Gred{Parms: &GredQOpt{Limit: 42}, DPS: &GredSOpt{DPs: 1337}, Limit: uint32Ptr(73)}}},
 	}
 
 	for name, testcase := range tests {
