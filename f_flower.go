@@ -172,6 +172,8 @@ type Flower struct {
 	KeyIcmpv4TypeMask    *uint8
 	KeyIcmpv6Code        *uint8
 	KeyIcmpv6CodeMask    *uint8
+	KeyIcmpv6Type        *uint8
+	KeyIcmpv6TypeMask    *uint8
 	KeyArpSIP            *uint32 /* be32 */
 	KeyArpSIPMask        *uint32 /* be32 */
 	KeyArpTIP            *uint32 /* be32 */
@@ -387,6 +389,12 @@ func unmarshalFlower(data []byte, info *Flower) error {
 		case tcaFlowerKeyIcmpv6CodeMask:
 			tmp := ad.Uint8()
 			info.KeyIcmpv6CodeMask = &tmp
+		case tcaFlowerKeyIcmpv6Type:
+			tmp := ad.Uint8()
+			info.KeyIcmpv6Type = &tmp
+		case tcaFlowerKeyIcmpv6TypeMask:
+			tmp := ad.Uint8()
+			info.KeyIcmpv6TypeMask = &tmp
 		case tcaFlowerKeyArpSIP:
 			tmp := endianSwapUint32(ad.Uint32())
 			info.KeyArpSIP = &tmp
@@ -705,6 +713,12 @@ func marshalFlower(info *Flower) ([]byte, error) {
 	}
 	if info.KeyIcmpv4TypeMask != nil {
 		options = append(options, tcOption{Interpretation: vtUint8, Type: tcaFlowerKeyIcmpv4TypeMask, Data: *info.KeyIcmpv4TypeMask})
+	}
+	if info.KeyIcmpv6Type != nil {
+		options = append(options, tcOption{Interpretation: vtUint8, Type: tcaFlowerKeyIcmpv6Type, Data: *info.KeyIcmpv6Type})
+	}
+	if info.KeyIcmpv6TypeMask != nil {
+		options = append(options, tcOption{Interpretation: vtUint8, Type: tcaFlowerKeyIcmpv6TypeMask, Data: *info.KeyIcmpv6TypeMask})
 	}
 	if info.KeyIcmpv6Code != nil {
 		options = append(options, tcOption{Interpretation: vtUint8, Type: tcaFlowerKeyIcmpv6Code, Data: *info.KeyIcmpv6Code})
