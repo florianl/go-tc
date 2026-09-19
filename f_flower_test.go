@@ -113,6 +113,8 @@ func TestFlower(t *testing.T) {
 			KeySpiMask:           uint32Ptr(73),
 			KeyEncFlags:          uint32Ptr(74),
 			KeyEncFlagsMask:      uint32Ptr(75),
+			KeyIcmpv6Type:        uint8Ptr(76),
+			KeyIcmpv6TypeMask:    uint8Ptr(77),
 		}},
 	}
 	for name, testcase := range tests {
