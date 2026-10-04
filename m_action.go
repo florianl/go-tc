@@ -75,6 +75,7 @@ type Action struct {
 	MPLS      *MPLS
 	SkbEdit   *SkbEdit
 	SkbMod    *SkbMod
+	Pedit     *Pedit
 }
 
 func unmarshalActions(data []byte, actions *[]*Action) error {
@@ -211,6 +212,8 @@ func marshalAction(cmd int, info *Action, actOption uint16) ([]byte, error) {
 		data, err = marshalSkbEdit(info.SkbEdit)
 	case "skbmod":
 		data, err = marshalSkbMod(info.SkbMod)
+	case "pedit":
+		data, err = marshalPedit(info.Pedit)
 	default:
 		return []byte{}, fmt.Errorf("unknown kind '%s'", info.Kind)
 	}
@@ -320,6 +323,10 @@ func extractActOptions(data []byte, act *Action, kind string) error {
 		info := &SkbMod{}
 		err = unmarshalSkbMod(data, info)
 		act.SkbMod = info
+	case "pedit":
+		info := &Pedit{}
+		err = unmarshalPedit(data, info)
+		act.Pedit = info
 	default:
 		return fmt.Errorf("extractActOptions(): unsupported kind: %s", kind)
 
