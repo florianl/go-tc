@@ -231,3 +231,14 @@ func marshalNetem(info *Netem) ([]byte, error) {
 
 	return append(qoptData[:], data[:]...), multiError
 }
+
+// NetemXStats from include/uapi/linux/pkt_sched.h
+type NetemXStats struct {
+	Delayed          uint64 // packets delayed
+	Dropped          uint64 // packets dropped by loss model
+	Corrupted        uint64 // packets with bit errors injected
+	Duplicated       uint64 // duplicate packets generated
+	Reordered        uint64 // packets sent out of order
+	EcnMarked        uint64 // packets ECN CE-marked (not dropped)
+	AllocationErrors uint64
+}

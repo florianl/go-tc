@@ -25,6 +25,9 @@ type GenStats struct {
 	Queue     *GenQueue
 	RateEst64 *GenRateEst64
 	BasicHw   *GenBasic
+	// App holds the raw payload of TCA_STATS_APP. Qdiscs use it to export
+	// kind-specific extended statistics, e.g. struct tc_netem_xstats for netem.
+	App []byte
 }
 
 // GenBasic from include/uapi/linux/gen_stats.h
@@ -88,6 +91,13 @@ func unmarshalGenStats(data []byte, info *GenStats) error {
 			err = unmarshalStruct(ad.Bytes(), stat)
 			multiError = concatError(multiError, err)
 			info.BasicHw = stat
+		case tcaStatsApp:
+			// kind-specific extended statistics (e.g. struct tc_netem_xstats
+			// for netem); the raw payload is kept, the kind-specific parsing
+			// has to happen with the TCA_KIND context available.
+			app := make([]byte, len(ad.Bytes()))
+			copy(app, ad.Bytes())
+			info.App = app
 		case tcaStatsPad:
 			// padding does not contain data, we just skip it
 		default:
