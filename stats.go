@@ -25,9 +25,6 @@ type GenStats struct {
 	Queue     *GenQueue
 	RateEst64 *GenRateEst64
 	BasicHw   *GenBasic
-	// App holds the raw payload of TCA_STATS_APP. Qdiscs use it to export
-	// kind-specific extended statistics, e.g. struct tc_netem_xstats for netem.
-	App []byte
 }
 
 // GenBasic from include/uapi/linux/gen_stats.h
@@ -58,7 +55,10 @@ type GenQueue struct {
 }
 
 // unmarshalGenStats parses the Pie-encoded data and stores the result in the value pointed to by info.
-func unmarshalGenStats(data []byte, info *GenStats) error {
+// The raw payload of TCA_STATS_APP (kind-specific extended statistics, e.g. struct tc_netem_xstats
+// for netem) is not part of GenStats; it is buffered in app and has to be parsed with the TCA_KIND
+// context available, see extractAppStats().
+func unmarshalGenStats(data []byte, info *GenStats, app *[]byte) error {
 	ad, err := netlink.NewAttributeDecoder(data)
 	if err != nil {
 		return err
@@ -93,11 +93,11 @@ func unmarshalGenStats(data []byte, info *GenStats) error {
 			info.BasicHw = stat
 		case tcaStatsApp:
 			// kind-specific extended statistics (e.g. struct tc_netem_xstats
-			// for netem); the raw payload is kept, the kind-specific parsing
-			// has to happen with the TCA_KIND context available.
-			app := make([]byte, len(ad.Bytes()))
-			copy(app, ad.Bytes())
-			info.App = app
+			// for netem); the raw payload is buffered here, the kind-specific
+			// parsing happens with the TCA_KIND context available.
+			buf := make([]byte, len(ad.Bytes()))
+			copy(buf, ad.Bytes())
+			*app = buf
 		case tcaStatsPad:
 			// padding does not contain data, we just skip it
 		default:

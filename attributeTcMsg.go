@@ -14,6 +14,7 @@ func extractTcmsgAttributes(action int, data []byte, info *Attribute) error {
 	}
 	var options []byte
 	var xStats []byte
+	var app []byte
 	var multiError error
 	for ad.Next() {
 		switch ad.Type() {
@@ -38,18 +39,9 @@ func extractTcmsgAttributes(action int, data []byte, info *Attribute) error {
 			info.Stats = tcstats
 		case tcaStats2:
 			stats := &GenStats{}
-			err := unmarshalGenStats(ad.Bytes(), stats)
+			err := unmarshalGenStats(ad.Bytes(), stats, &app)
 			multiError = concatError(multiError, err)
 			info.Stats2 = stats
-			// Some qdiscs export their extended statistics via
-			// TCA_STATS_APP (e.g. netem's struct tc_netem_xstats) instead of
-			// TCA_XSTATS. Parse the payload with the kind context available.
-			if len(stats.App) > 0 {
-				tcxstats := &XStats{}
-				if err := extractAppStats(stats.App, tcxstats, info.Kind); err == nil {
-					info.XStats = tcxstats
-				}
-			}
 		case tcaHwOffload:
 			info.HwOffload = uint8Ptr(ad.Uint8())
 		case tcaEgressBlock:
@@ -89,6 +81,19 @@ func extractTcmsgAttributes(action int, data []byte, info *Attribute) error {
 		err := extractXStats(xStats, tcxstats, info.Kind)
 		multiError = concatError(multiError, err)
 		info.XStats = tcxstats
+	}
+
+	if len(app) > 0 {
+		// Some qdiscs export their extended statistics via TCA_STATS_APP
+		// (e.g. netem's struct tc_netem_xstats) instead of TCA_XSTATS. The
+		// kind-specific parsing happens here, where tcaKind is known
+		// regardless of the attribute order in the netlink message.
+		tcxstats := &XStats{}
+		parsed, err := extractAppStats(app, tcxstats, info.Kind)
+		multiError = concatError(multiError, err)
+		if parsed {
+			info.XStats = tcxstats
+		}
 	}
 	return multiError
 }
@@ -424,20 +429,22 @@ func extractXStats(data []byte, tc *XStats, kind string) error {
 }
 
 // extractAppStats parses the payload of TCA_STATS_APP, which carries
-// kind-specific extended statistics. Unknown kinds are ignored (no error),
-// as the payload is qdisc specific.
-func extractAppStats(data []byte, tc *XStats, kind string) error {
+// kind-specific extended statistics. Unknown kinds are not an error (the
+// payload is qdisc specific); parsed reports whether the payload was
+// interpreted for the given kind.
+func extractAppStats(data []byte, tc *XStats, kind string) (bool, error) {
 	switch kind {
 	case "netem":
 		info := &NetemXStats{}
 		if err := unmarshalStruct(data, info); err != nil {
-			return err
+			return false, err
 		}
 		tc.Netem = info
+		return true, nil
 	default:
 		// payload of other kinds is not interpreted
+		return false, nil
 	}
-	return nil
 }
 
 func extractClsact(data []byte) error {

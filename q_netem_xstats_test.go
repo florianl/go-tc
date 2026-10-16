@@ -45,14 +45,18 @@ func TestExtractTcmsgAttributesNetemAppXStats(t *testing.T) {
 	if err != nil {
 		t.Fatalf("marshalAttributes: %v", err)
 	}
+	// tcaStats2 comes before tcaKind on purpose: the kernel does not
+	// guarantee the attribute order, so the TCA_STATS_APP payload must be
+	// parsed after the whole attribute list has been walked.
 	attrs, err := marshalAttributes([]tcOption{
 		{Interpretation: vtBytes, Type: tcaStats2, Data: stats2},
+		{Interpretation: vtString, Type: tcaKind, Data: "netem"},
 	})
 	if err != nil {
 		t.Fatalf("marshalAttributes: %v", err)
 	}
 
-	obj := &Attribute{Kind: "netem"}
+	obj := &Attribute{}
 	if err := extractTcmsgAttributes(0, attrs, obj); err != nil {
 		t.Fatalf("extractTcmsgAttributes: %v", err)
 	}
