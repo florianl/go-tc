@@ -57,8 +57,11 @@ type GenQueue struct {
 // unmarshalGenStats parses the Pie-encoded data and stores the result in the value pointed to by info.
 // The raw payload of TCA_STATS_APP (kind-specific extended statistics, e.g. struct tc_netem_xstats
 // for netem) is not part of GenStats; it is buffered in app and has to be parsed with the TCA_KIND
-// context available, see extractAppStats().
+// context available, see extractXStats().
 func unmarshalGenStats(data []byte, info *GenStats, app *[]byte) error {
+	if app == nil {
+		return fmt.Errorf("app is not provided")
+	}
 	ad, err := netlink.NewAttributeDecoder(data)
 	if err != nil {
 		return err

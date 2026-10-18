@@ -76,24 +76,20 @@ func extractTcmsgAttributes(action int, data []byte, info *Attribute) error {
 		multiError = concatError(multiError, err)
 	}
 
-	if len(xStats) > 0 {
+	// Some qdiscs export their extended statistics via TCA_STATS_APP
+	// (e.g. netem's struct tc_netem_xstats) instead of TCA_XSTATS. The
+	// kind-specific parsing happens here, where tcaKind is known
+	// regardless of the attribute order in the netlink message.
+	if len(app) > 0 || len(xStats) > 0 {
 		tcxstats := &XStats{}
-		err := extractXStats(xStats, tcxstats, info.Kind)
-		multiError = concatError(multiError, err)
-		info.XStats = tcxstats
-	}
-
-	if len(app) > 0 {
-		// Some qdiscs export their extended statistics via TCA_STATS_APP
-		// (e.g. netem's struct tc_netem_xstats) instead of TCA_XSTATS. The
-		// kind-specific parsing happens here, where tcaKind is known
-		// regardless of the attribute order in the netlink message.
-		tcxstats := &XStats{}
-		parsed, err := extractAppStats(app, tcxstats, info.Kind)
-		multiError = concatError(multiError, err)
-		if parsed {
-			info.XStats = tcxstats
+		if len(app) > 0 {
+			err := extractXStats(app, tcxstats, info.Kind)
+			multiError = concatError(multiError, err)
+		} else {
+			err := extractXStats(xStats, tcxstats, info.Kind)
+			multiError = concatError(multiError, err)
 		}
+		info.XStats = tcxstats
 	}
 	return multiError
 }
@@ -421,30 +417,13 @@ func extractXStats(data []byte, tc *XStats, kind string) error {
 		info := &NetemXStats{}
 		err := unmarshalStruct(data, info)
 		multiError = concatError(multiError, err)
-		tc.Netem = info
+		if tc.Netem == nil {
+			tc.Netem = info
+		}
 	default:
 		return fmt.Errorf("extractXStats(): unsupported kind: %s", kind)
 	}
 	return multiError
-}
-
-// extractAppStats parses the payload of TCA_STATS_APP, which carries
-// kind-specific extended statistics. Unknown kinds are not an error (the
-// payload is qdisc specific); parsed reports whether the payload was
-// interpreted for the given kind.
-func extractAppStats(data []byte, tc *XStats, kind string) (bool, error) {
-	switch kind {
-	case "netem":
-		info := &NetemXStats{}
-		if err := unmarshalStruct(data, info); err != nil {
-			return false, err
-		}
-		tc.Netem = info
-		return true, nil
-	default:
-		// payload of other kinds is not interpreted
-		return false, nil
-	}
 }
 
 func extractClsact(data []byte) error {

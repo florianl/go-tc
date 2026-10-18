@@ -69,7 +69,7 @@ func TestExtractTcmsgAttributesNetemAppXStats(t *testing.T) {
 }
 
 // TestExtractTcmsgAttributesUnknownKindApp ensures that an unknown qdisc kind
-// with a TCA_STATS_APP payload does not abort the dump.
+// with a TCA_STATS_APP payload is reported as an error.
 func TestExtractTcmsgAttributesUnknownKindApp(t *testing.T) {
 	payload := make([]byte, 16)
 	stats2, err := marshalAttributes([]tcOption{
@@ -86,7 +86,7 @@ func TestExtractTcmsgAttributesUnknownKindApp(t *testing.T) {
 	}
 
 	obj := &Attribute{Kind: "somenewkind"}
-	if err := extractTcmsgAttributes(0, attrs, obj); err != nil {
-		t.Fatalf("unknown kind with APP payload must not fail: %v", err)
+	if err := extractTcmsgAttributes(0, attrs, obj); err == nil {
+		t.Fatal("unknown kind with APP payload must fail")
 	}
 }
