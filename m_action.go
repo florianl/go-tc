@@ -112,7 +112,10 @@ func unmarshalAction(data []byte, info *Action) error {
 			info.Cookie = &tmp
 		case tcaActStats:
 			stats := &GenStats{}
-			if err := unmarshalGenStats(ad.Bytes(), stats); err != nil {
+			// The TCA_STATS_APP payload of actions is not interpreted;
+			// buffering only to keep the kind-specific payload out of GenStats.
+			var app []byte
+			if err := unmarshalGenStats(ad.Bytes(), stats, &app); err != nil {
 				return err
 			}
 			info.Stats = stats

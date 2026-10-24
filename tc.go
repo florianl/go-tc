@@ -299,6 +299,7 @@ type XStats struct {
 	FqPie   *FqPieXStats
 	Fq      *FqQdStats
 	Hfsc    *HfscXStats
+	Netem   *NetemXStats
 }
 
 func marshalXStats(v XStats) ([]byte, error) {
@@ -324,6 +325,8 @@ func marshalXStats(v XStats) ([]byte, error) {
 		return marshalFqCodelXStats(v.FqCodel)
 	} else if v.FqPie != nil {
 		return marshalStruct(v.FqPie)
+	} else if v.Netem != nil {
+		return marshalStruct(v.Netem)
 	}
 	return []byte{}, fmt.Errorf("could not marshal XStat")
 }

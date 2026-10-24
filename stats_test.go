@@ -24,7 +24,8 @@ func TestGenStats(t *testing.T) {
 			}
 			val := GenStats{}
 			newData := injectAttribute(t, data, []byte{}, tcaStatsPad)
-			err2 := unmarshalGenStats(newData, &val)
+			var app []byte
+			err2 := unmarshalGenStats(newData, &val, &app)
 			if !errors.Is(err2, testcase.err2) {
 				t.Fatalf("Unexpected error: %v", err2)
 			}

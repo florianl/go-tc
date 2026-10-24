@@ -14,6 +14,7 @@ func extractTcmsgAttributes(action int, data []byte, info *Attribute) error {
 	}
 	var options []byte
 	var xStats []byte
+	var app []byte
 	var multiError error
 	for ad.Next() {
 		switch ad.Type() {
@@ -38,7 +39,7 @@ func extractTcmsgAttributes(action int, data []byte, info *Attribute) error {
 			info.Stats = tcstats
 		case tcaStats2:
 			stats := &GenStats{}
-			err := unmarshalGenStats(ad.Bytes(), stats)
+			err := unmarshalGenStats(ad.Bytes(), stats, &app)
 			multiError = concatError(multiError, err)
 			info.Stats2 = stats
 		case tcaHwOffload:
@@ -75,10 +76,19 @@ func extractTcmsgAttributes(action int, data []byte, info *Attribute) error {
 		multiError = concatError(multiError, err)
 	}
 
-	if len(xStats) > 0 {
+	// Some qdiscs export their extended statistics via TCA_STATS_APP
+	// (e.g. netem's struct tc_netem_xstats) instead of TCA_XSTATS. The
+	// kind-specific parsing happens here, where tcaKind is known
+	// regardless of the attribute order in the netlink message.
+	if len(app) > 0 || len(xStats) > 0 {
 		tcxstats := &XStats{}
-		err := extractXStats(xStats, tcxstats, info.Kind)
-		multiError = concatError(multiError, err)
+		if len(app) > 0 {
+			err := extractXStats(app, tcxstats, info.Kind)
+			multiError = concatError(multiError, err)
+		} else {
+			err := extractXStats(xStats, tcxstats, info.Kind)
+			multiError = concatError(multiError, err)
+		}
 		info.XStats = tcxstats
 	}
 	return multiError
@@ -403,6 +413,13 @@ func extractXStats(data []byte, tc *XStats, kind string) error {
 		err := unmarshalStruct(data, info)
 		multiError = concatError(multiError, err)
 		tc.Hfsc = info
+	case "netem":
+		info := &NetemXStats{}
+		err := unmarshalStruct(data, info)
+		multiError = concatError(multiError, err)
+		if tc.Netem == nil {
+			tc.Netem = info
+		}
 	default:
 		return fmt.Errorf("extractXStats(): unsupported kind: %s", kind)
 	}
