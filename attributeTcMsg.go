@@ -420,6 +420,11 @@ func extractXStats(data []byte, tc *XStats, kind string) error {
 		if tc.Netem == nil {
 			tc.Netem = info
 		}
+	case "cake":
+		info := &CakeXStats{}
+		err := unmarshalCakeXStats(data, info)
+		multiError = concatError(multiError, err)
+		tc.Cake = info
 	default:
 		return fmt.Errorf("extractXStats(): unsupported kind: %s", kind)
 	}
