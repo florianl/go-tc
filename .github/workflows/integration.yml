@@ -85,7 +85,7 @@ jobs:
         # Make sure required software packages are available.
         run: |
           sudo apt --yes update
-          sudo apt --yes install --no-install-recommends --no-install-suggests qemu-system-aarch64 qemu-system-x86 docker-buildx-plugin
+          sudo apt --yes install --no-install-recommends --no-install-suggests qemu-system-arm qemu-system-x86 docker-buildx-plugin
 
       - name: get initramfs
         # Fetch the initramfs.cpio that was created in the previous step.
